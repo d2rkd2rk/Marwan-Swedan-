@@ -1,0 +1,4 @@
+import {NextResponse} from 'next/server';
+import {session} from '@/lib/auth';
+import {blockFor24Hours,securityEvent} from '@/lib/security';
+export async function POST(request:Request){const user=await session();if(!user)return NextResponse.json({ok:false},{status:401});const body=await request.json().catch(()=>({}));const event=String(body.event||'suspicious_client_activity').slice(0,80);await securityEvent(user.id,event,'high',request,{details:String(body.details||'').slice(0,500)});await blockFor24Hours(user.id,request,event);return NextResponse.json({blocked:true,message:'Your account has been temporarily blocked for 24 hours due to suspicious activity.'},{status:403})}
