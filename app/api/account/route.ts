@@ -4,19 +4,21 @@ import {requireUser,hashPassword,validPassword,verifyPassword} from '@/lib/auth'
 import {audit} from '@/lib/security';
 
 export async function GET(){
-  try{return NextResponse.json({user:await requireUser()})}catch{return NextResponse.json({error:'Authentication required'},{status:401})}
+  try{const user=await requireUser();const rows=await db`select id,name,email,whatsapp,username,role,is_blocked,blocked_until,bio,avatar_url,cv_url,cv_name from users where id=${user.id} limit 1`;return NextResponse.json({user:rows[0]})}catch{return NextResponse.json({error:'Authentication required'},{status:401})}
 }
 
 export async function PATCH(request:Request){
   try{
     const user=await requireUser();
+    const currentRows=await db`select name,username,bio,avatar_url,cv_url,cv_name from users where id=${user.id} limit 1`;
+    const current=currentRows[0] as any;
     const body=await request.json();
-    const name=String(body.name??user.name).trim();
-    const username=String(body.username??user.username).trim().toLowerCase();
-    const bio=String(body.bio??user.bio??'').trim().slice(0,1000);
-    const avatarUrl=String(body.avatar_url??user.avatar_url??'');
-    const cvUrl=String(body.cv_url??user.cv_url??'');
-    const cvName=String(body.cv_name??user.cv_name??'').slice(0,180);
+    const name=String(body.name??current.name).trim();
+    const username=String(body.username??current.username).trim().toLowerCase();
+    const bio=String(body.bio??current.bio??'').trim().slice(0,1000);
+    const avatarUrl=String(body.avatar_url??current.avatar_url??'');
+    const cvUrl=String(body.cv_url??current.cv_url??'');
+    const cvName=String(body.cv_name??current.cv_name??'').slice(0,180);
     if(name.length<2||name.length>80||!/^[A-Za-z0-9_]{3,24}$/.test(username))return NextResponse.json({error:'Invalid profile data.'},{status:400});
     if(avatarUrl&&!avatarUrl.startsWith('/api/file?pathname=profiles/'))return NextResponse.json({error:'Invalid profile image.'},{status:400});
     if(cvUrl&&!cvUrl.startsWith('/api/file?pathname=profiles/'))return NextResponse.json({error:'Invalid CV file.'},{status:400});
@@ -32,12 +34,12 @@ export async function POST(request:Request){
   try{
     const user=await requireUser();
     const body=await request.json();
-    const current=String(body.currentPassword||'');
+    const currentPassword=String(body.currentPassword||'');
     const next=String(body.newPassword||'');
-    if(!current||!validPassword(next))return NextResponse.json({error:'New password must be 8+ characters with a number and special character.'},{status:400});
+    if(!currentPassword||!validPassword(next))return NextResponse.json({error:'New password must be 8+ characters with a number and special character.'},{status:400});
     const rows=await db`select password_hash from users where id=${user.id} limit 1`;
     if(!rows.length)return NextResponse.json({error:'Account not found.'},{status:404});
-    if(!(await verifyPassword(current,String(rows[0].password_hash))))return NextResponse.json({error:'Current password is incorrect.'},{status:401});
+    if(!(await verifyPassword(currentPassword,String(rows[0].password_hash))))return NextResponse.json({error:'Current password is incorrect.'},{status:401});
     const passwordHash=await hashPassword(next);
     await db`update users set password_hash=${passwordHash} where id=${user.id}`;
     await audit(user.id,'password_change',request);
