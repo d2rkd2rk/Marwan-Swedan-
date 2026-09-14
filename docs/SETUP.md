@@ -18,13 +18,26 @@ Required environment variables:
 - `ADMIN_EMAIL=202501259@pua.edu.eg`
 - `BLOB_READ_WRITE_TOKEN` — provided when the Vercel Blob store is connected
 
-For course media, use a **private** Vercel Blob store. The admin upload flow creates short-lived signed PUT URLs so large videos/files can upload directly from the browser instead of passing through the Next.js function. Vercel documents direct browser uploads and private Blob storage for authenticated content. citeturn3search0turn3search2
+For course media, use a private Vercel Blob store. The admin upload flow creates short-lived signed PUT URLs so large videos/files can upload directly from the browser instead of passing through the Next.js function.
 
 ## 3. Bootstrap the administrator
 
-Send a POST request to `/api/admin/bootstrap` with the `x-admin-bootstrap-secret` header and JSON containing `name`, `password`, and `whatsapp`.
+Open `/admin/bootstrap` after the application is deployed.
 
-The password must be at least 8 characters and include a number and special character.
+Enter the `ADMIN_BOOTSTRAP_SECRET` and a temporary password that is at least 8 characters and contains a number and special character.
+
+The bootstrap creates the fixed administrator identity:
+
+- Name: `Marwan Swedan`
+- Username: `marwan_swedan`
+- Email: `202501259@pua.edu.eg`
+- WhatsApp: `201515227612`
+
+The database migration `004_admin_bootstrap.sql` creates a one-time lock. After the first successful administrator creation, the bootstrap endpoint rejects every later attempt even if the administrator account is removed.
+
+After the first sign-in, change the temporary password from the account settings.
+
+When adding `ADMIN_BOOTSTRAP_SECRET` in Vercel, use the Production environment and keep it sensitive. Vercel requires a new deployment before changed environment variables are available to the running deployment.
 
 ## 4. Building a playlist
 
@@ -38,7 +51,7 @@ From `/admin`:
 6. Upload a video/audio/PDF/archive/document directly from the device, or provide a video URL.
 7. Publish the playlist when it is ready.
 
-Course media is stored as private content and served through the app's authorization layer rather than exposed as a public file URL. citeturn3search0turn3search3
+Course media is stored as private content and served through the app's authorization layer rather than exposed as a public file URL.
 
 ## 5. Optional integrations
 
