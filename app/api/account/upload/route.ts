@@ -18,7 +18,7 @@ export async function POST(request:Request){
     const pathname=`profiles/${user.id}/${kind}/${crypto.randomUUID()}-${safeName}`;
     const expires=Date.now()+15*60*1000;
     const token=await issueSignedToken({pathname,operations:['put'],validUntil:expires,allowedContentTypes:[type],maximumSizeInBytes:size});
-    const {presignedUrl}=await presignUrl(token,{pathname,operation:'put',validUntil:expires});
+    const {presignedUrl}=await presignUrl(token,{pathname,operation:'put',validUntil:expires,access:'private'});
     return NextResponse.json({uploadUrl:presignedUrl,url:`/api/file?pathname=${encodeURIComponent(pathname)}`,pathname,name:safeName,kind});
   }catch(e:any){return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Could not prepare upload'},{status:e.message==='UNAUTHENTICATED'?401:400})}
 }
