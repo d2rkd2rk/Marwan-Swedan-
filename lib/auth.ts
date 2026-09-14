@@ -20,7 +20,7 @@ export async function session(){
   try{
     const {payload}=await jwtVerify(token,secret);
     if(typeof payload.uid!=='string')return null;
-    const rows=await db`select id,name,email,whatsapp,username,role,is_blocked,blocked_until,bio,avatar_url,cv_url,cv_name from users where id=${payload.uid} limit 1`;
+    const rows=await db`select id,name,email,whatsapp,username,role,is_blocked,blocked_until from users where id=${payload.uid} limit 1`;
     const user=rows[0] as any;
     if(!user)return null;
     if(user.is_blocked && user.blocked_until && new Date(user.blocked_until)>new Date())return null;
