@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import db from '@/lib/db';
 import {requireUser,hashPassword,validPassword,verifyPassword} from '@/lib/auth';
+import {issueOtp,verifyOtp} from '@/lib/otp';
 import {audit} from '@/lib/security';
 
 export async function GET(){
@@ -36,13 +37,20 @@ export async function POST(request:Request){
     const body=await request.json();
     const currentPassword=String(body.currentPassword||'');
     const next=String(body.newPassword||'');
+    const challengeId=String(body.challengeId||'');
+    const code=String(body.code||'').trim();
     if(!currentPassword||!validPassword(next))return NextResponse.json({error:'New password must be 8+ characters with a number and special character.'},{status:400});
-    const rows=await db`select password_hash from users where id=${user.id} limit 1`;
+    const rows=await db`select password_hash,email from users where id=${user.id} limit 1`;
     if(!rows.length)return NextResponse.json({error:'Account not found.'},{status:404});
     if(!(await verifyPassword(currentPassword,String(rows[0].password_hash))))return NextResponse.json({error:'Current password is incorrect.'},{status:401});
+    if(!challengeId){const id=await issueOtp(user.id,String(rows[0].email),'password_change');return NextResponse.json({requiresOtp:true,challengeId:id})}
+    if(!code)return NextResponse.json({error:'Enter the verification code.'},{status:400});
+    const verified=await verifyOtp(challengeId,code,'password_change');
+    if(verified!==user.id)return NextResponse.json({error:'Invalid or expired verification code.'},{status:400});
     const passwordHash=await hashPassword(next);
     await db`update users set password_hash=${passwordHash} where id=${user.id}`;
+    await db`delete from trusted_devices where user_id=${user.id}`;
     await audit(user.id,'password_change',request);
     return NextResponse.json({ok:true});
-  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Password change failed.'},{status:e.message==='UNAUTHENTICATED'?401:400})}
+  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':e.message==='EMAIL_NOT_CONFIGURED'?'Email verification is not configured yet.':'Password change failed.'},{status:e.message==='UNAUTHENTICATED'?401:e.message==='EMAIL_NOT_CONFIGURED'?503:400})}
 }
