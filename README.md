@@ -5,29 +5,34 @@ Production-oriented cybersecurity portfolio and private course platform.
 ## Included
 
 - Premium responsive cybersecurity portfolio based on the supplied CV
-- GitHub Pages static portfolio mirror
 - Next.js application for dynamic hosting
 - Registration with name, email, WhatsApp, username and strong password policy
 - Secure HttpOnly session cookies and bcrypt password hashing
+- Email OTP for first login on a device, password reset and password changes
 - Server-side course enrollment and lesson authorization
-- Administrator dashboard for user search, WhatsApp contact, course creation and access grants/revocations
+- Administrator dashboard for user search, course creation and access grants/revocations
 - Audit logs and security events
 - Server-side 24-hour block policy for suspicious activity reports
 - Course-scoped AI assistant
-- Official WhatsApp Cloud API adapter for registration notifications
-- Database schema and starter courses
+- WhatsApp purchase links with prefilled course and current-price messages
+- Private course media uploads and authorization
+- Database schema and migrations
 - Secure response headers and CI build verification
 
 ## Required environment
 
-Copy `.env.example` to your deployment environment and set `DATABASE_URL`, `SESSION_SECRET` and `ADMIN_BOOTSTRAP_SECRET`. AI and WhatsApp variables are optional integrations.
+Copy `.env.example` to the deployment environment and set `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_BOOTSTRAP_SECRET`, `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY` and `EMAIL_FROM`.
 
-Run `db/schema.sql` against a PostgreSQL database before using accounts or protected courses.
+Run `db/schema.sql` against a PostgreSQL database before using accounts or protected courses, then apply the migrations in `db/migrations` in order.
 
-After deployment, bootstrap the administrator using the protected `/api/admin/bootstrap` endpoint with the `x-admin-bootstrap-secret` header and a strong password. The administrator email is `202501259@pua.edu.eg`.
+The administrator uses a server-protected one-time login-link flow. The generated link is short-lived, single-use and never stored in the repository.
+
+## Course sales flow
+
+There is no payment gateway or WhatsApp bot. A paid course opens the instructor's personal WhatsApp with a ready-made message containing the course name and current price. Payment is arranged directly with the instructor, and course access is granted manually from the administrator dashboard.
 
 ## Architecture
 
-GitHub Pages is used only for the public static mirror. The secure application must run on a server-side platform such as Vercel because authentication, database access, private course authorization, WhatsApp credentials and AI credentials must not be exposed to the browser.
+The secure application must run on a server-side platform such as Vercel because authentication, database access, private course authorization, media storage, email credentials and AI credentials must not be exposed to the browser.
 
 Never commit `.env`, tokens, passwords or provider secrets.
