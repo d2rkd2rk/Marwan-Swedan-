@@ -1,4 +1,5 @@
 import {NextResponse} from 'next/server';
+import {cookies} from 'next/headers';
 import db from '@/lib/db';
 import {requireUser,hashPassword,validPassword,verifyPassword} from '@/lib/auth';
 import {issueOtp,verifyOtp} from '@/lib/otp';
@@ -39,7 +40,17 @@ export async function POST(request:Request){
     const next=String(body.newPassword||'');
     const challengeId=String(body.challengeId||'');
     const code=String(body.code||'').trim();
-    if(!currentPassword||!validPassword(next))return NextResponse.json({error:'New password must be 8+ characters with a number and special character.'},{status:400});
+    if(!validPassword(next))return NextResponse.json({error:'New password must be 8+ characters with a number and special character.'},{status:400});
+    const bootstrap=(await cookies()).get('marwan_admin_bootstrap')?.value==='1';
+    if(bootstrap&&user.role==='admin'){
+      const passwordHash=await hashPassword(next);
+      await db`update users set password_hash=${passwordHash} where id=${user.id}`;
+      await db`delete from trusted_devices where user_id=${user.id}`;
+      (await cookies()).set('marwan_admin_bootstrap','',{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:0});
+      await audit(user.id,'admin_initial_password_set',request);
+      return NextResponse.json({ok:true});
+    }
+    if(!currentPassword)return NextResponse.json({error:'Enter your current password.'},{status:400});
     const rows=await db`select password_hash,email from users where id=${user.id} limit 1`;
     if(!rows.length)return NextResponse.json({error:'Account not found.'},{status:404});
     if(!(await verifyPassword(currentPassword,String(rows[0].password_hash))))return NextResponse.json({error:'Current password is incorrect.'},{status:401});
