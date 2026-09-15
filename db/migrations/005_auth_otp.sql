@@ -1,0 +1,6 @@
+create table if not exists otp_challenges(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,purpose text not null check(purpose in('login','password_reset','password_change','email_change')),code_hash text not null,expires_at timestamptz not null,attempts integer not null default 0,consumed_at timestamptz,created_at timestamptz not null default now());
+create table if not exists trusted_devices(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,token_hash text not null unique,expires_at timestamptz not null,created_at timestamptz not null default now(),last_used_at timestamptz);
+create table if not exists admin_login_links(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,token_hash text not null unique,expires_at timestamptz not null,used_at timestamptz,created_at timestamptz not null default now());
+create index if not exists otp_challenges_user_idx on otp_challenges(user_id,purpose,created_at desc);
+create index if not exists trusted_devices_user_idx on trusted_devices(user_id,expires_at);
+create index if not exists admin_login_links_user_idx on admin_login_links(user_id,expires_at,used_at);
