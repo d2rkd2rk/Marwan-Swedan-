@@ -8,7 +8,7 @@ async function promoteProtectedAdmin(user:any){
   if(String(user.email).toLowerCase()!==String(adminEmail).toLowerCase())return user;
   const admins=await db`select id from users where role='admin' limit 1`;
   if(admins.length)return user;
-  const rows=await db`update users set role='admin' where id=${user.id} and role='user' returning id,name,email,whatsapp,username,role`;
+  const rows=await db`update users set role='admin' where id=${user.id} and role='student' returning id,name,email,whatsapp,username,role`;
   return (rows[0] as any)||user;
 }
 
