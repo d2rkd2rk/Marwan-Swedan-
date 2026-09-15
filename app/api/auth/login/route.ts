@@ -33,5 +33,10 @@ export async function POST(request:Request){
     await createSession(user);
     await audit(user.id,'login',request);
     return NextResponse.json({user:{id:user.id,name:user.name,email:user.email,whatsapp:user.whatsapp,username:user.username,role:user.role}});
-  }catch(e:any){return NextResponse.json({error:e.message==='EMAIL_NOT_CONFIGURED'?'Email verification is not configured yet.':'Login failed.'},{status:e.message==='EMAIL_NOT_CONFIGURED'?503:500})}
+  }catch(e:any){
+    console.error('LOGIN_FAILED', {name:e?.name, message:e?.message});
+    if(e?.message==='EMAIL_NOT_CONFIGURED')return NextResponse.json({error:'Email verification is not configured yet.'},{status:503});
+    if(e?.message==='EMAIL_SEND_FAILED')return NextResponse.json({error:'We could not send the verification email. Please try again.'},{status:502});
+    return NextResponse.json({error:'Login failed.'},{status:500});
+  }
 }
