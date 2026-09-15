@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import db from '@/lib/db';
-import {adminEmail,hashPassword} from '@/lib/auth';
+import {hashPassword} from '@/lib/auth';
 import {validPassword} from '@/lib/auth';
 import {audit,clientIp} from '@/lib/security';
 
@@ -13,7 +13,6 @@ export async function POST(request:Request){
     const username=String(body.username||'').trim().toLowerCase();
     const password=String(body.password||'');
     if(name.length<2||name.length>80||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)||whatsapp.length<10||!/^[A-Za-z0-9_]{3,24}$/.test(username)||!validPassword(password))return NextResponse.json({error:'Invalid registration data.'},{status:400});
-    if(email===adminEmail)return NextResponse.json({error:'The administrator account uses a protected setup flow.'},{status:403});
     if(!process.env.DATABASE_URL)return NextResponse.json({error:'Database is not configured.'},{status:503});
     const existing=await db`select id from users where lower(email)=${email} or lower(username)=${username} limit 1`;
     if(existing.length)return NextResponse.json({error:'Email or username is already in use.'},{status:409});
