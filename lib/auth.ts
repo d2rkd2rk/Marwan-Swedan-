@@ -33,7 +33,7 @@ export async function trustedDeviceValid(userId:string){
   await db`update trusted_devices set last_used_at=now() where id=${rows[0].id}`;
   return true;
 }
-export async function destroySession(){const jar=await cookies();jar.set(cookieName,'',{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:0});jar.set(trustedCookieName,'',{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:0})}
+export async function destroySession(){(await cookies()).set(cookieName,'',{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:0)}
 export async function session(){
   const token=(await cookies()).get(cookieName)?.value;
   if(!token)return null;
