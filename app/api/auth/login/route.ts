@@ -1,8 +1,16 @@
 import {NextResponse} from 'next/server';
 import db from '@/lib/db';
-import {createSession,trustedDeviceValid,verifyPassword} from '@/lib/auth';
+import {adminEmail,createSession,trustedDeviceValid,verifyPassword} from '@/lib/auth';
 import {issueOtp} from '@/lib/otp';
 import {audit,securityEvent} from '@/lib/security';
+
+async function promoteProtectedAdmin(user:any){
+  if(String(user.email).toLowerCase()!==String(adminEmail).toLowerCase())return user;
+  const admins=await db`select id from users where role='admin' limit 1`;
+  if(admins.length)return user;
+  const rows=await db`update users set role='admin' where id=${user.id} and role='user' returning id,name,email,whatsapp,username,role`;
+  return (rows[0] as any)||user;
+}
 
 export async function POST(request:Request){
   try{
@@ -11,7 +19,7 @@ export async function POST(request:Request){
     if(!value||!password)return NextResponse.json({error:'Enter your username/email and password.'},{status:400});
     if(!process.env.DATABASE_URL)return NextResponse.json({error:'Database is not configured.'},{status:503});
     const rows=await db`select id,name,email,whatsapp,username,password_hash,role,is_blocked,blocked_until from users where lower(email)=${value} or lower(username)=${value} limit 1`;
-    const user=rows[0] as any;
+    let user=rows[0] as any;
     if(!user)return NextResponse.json({error:'Invalid credentials.'},{status:401});
     if(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date())return NextResponse.json({error:'Account is temporarily blocked.'},{status:403});
     const ok=await verifyPassword(String(password),user.password_hash);
@@ -20,6 +28,7 @@ export async function POST(request:Request){
       const challengeId=await issueOtp(String(user.id),String(user.email),'login');
       return NextResponse.json({requiresOtp:true,challengeId});
     }
+    user=await promoteProtectedAdmin(user);
     await db`update users set last_login_at=now() where id=${user.id}`;
     await createSession(user);
     await audit(user.id,'login',request);
