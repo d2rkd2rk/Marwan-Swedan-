@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server';
-import {head} from '@vercel/blob';
 import db from '@/lib/db';
 import {requireAdmin} from '@/lib/auth';
+import {head} from '@vercel/blob';
 import {audit} from '@/lib/security';
 
 async function ensureMediaColumns(){
@@ -18,10 +18,12 @@ async function verifyFile(fileUrl:string|null){
   const pathname=decodeURIComponent(fileUrl.slice(marker.length));
   if(!pathname.startsWith('courses/')||pathname.split('/').length<3)throw new Error('INVALID_FILE_PATH');
   try{
-    const blob=await head(pathname,{access:'private'} as any);
+    // Verify the object through the same Blob connection used by the app.
+    const blob=await head(pathname,{access:'private'});
     if(!blob?.pathname)throw new Error('BLOB_NOT_FOUND');
     return pathname;
-  }catch{
+  }catch(e:any){
+    console.error('VERIFY_BLOB_FAILED',e?.message||e);
     throw new Error('BLOB_NOT_FOUND');
   }
 }
