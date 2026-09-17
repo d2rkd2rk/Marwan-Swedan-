@@ -5,7 +5,6 @@ const allowed=new Set(['video/mp4','video/webm','video/quicktime','audio/mpeg','
 export async function POST(request:Request){
  try{
   await requireAdmin();
-  if(!process.env.BLOB_READ_WRITE_TOKEN)return NextResponse.json({error:'Media storage is not connected yet. Connect a Vercel Blob store to this project, then redeploy.'},{status:503});
   const b=await request.json();const name=String(b.name||'').trim(),type=String(b.type||'application/octet-stream'),size=Number(b.size||0);
   if(!name)return NextResponse.json({error:'File name is required.'},{status:400});
   if(!allowed.has(type))return NextResponse.json({error:'File type is not allowed.'},{status:400});
