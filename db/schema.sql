@@ -1,7 +1,11 @@
 create extension if not exists pgcrypto;
-create table if not exists users(id uuid primary key default gen_random_uuid(),name text not null,email text not null unique,whatsapp text not null,username text not null unique,password_hash text not null,role text not null default 'student' check(role in('student','admin')),is_blocked boolean not null default false,blocked_until timestamptz,created_at timestamptz not null default now(),last_login_at timestamptz,username_updated_at timestamptz);
+create table if not exists users(id uuid primary key default gen_random_uuid(),name text not null,email text not null unique,whatsapp text not null,username text not null unique,password_hash text not null,role text not null default 'student' check(role in('student','admin')),is_blocked boolean not null default false,blocked_until timestamptz,bio text not null default '',avatar_url text,cv_url text,cv_name text,created_at timestamptz not null default now(),last_login_at timestamptz,username_updated_at timestamptz);
 create table if not exists courses(id uuid primary key default gen_random_uuid(),title text not null default 'Untitled Course',slug text not null unique,description text not null default '',category text not null default 'Cybersecurity',level text not null default 'Beginner',duration_minutes integer not null default 0,thumbnail_url text,ai_context text not null default '',is_free boolean not null default true,price numeric(10,2) not null default 0,published boolean not null default false,created_at timestamptz not null default now(),updated_at timestamptz not null default now());
 alter table users add column if not exists username_updated_at timestamptz;
+alter table users add column if not exists bio text not null default '';
+alter table users add column if not exists avatar_url text;
+alter table users add column if not exists cv_url text;
+alter table users add column if not exists cv_name text;
 alter table courses add column if not exists is_free boolean not null default true;
 alter table courses add column if not exists price numeric(10,2) not null default 0;
 alter table courses alter column title set default 'Untitled Course';
