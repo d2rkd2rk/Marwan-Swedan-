@@ -21,8 +21,10 @@ export async function POST(request:Request){
   const courseId=String(b.courseId||'uploads').replace(/[^a-zA-Z0-9_-]/g,'')||'uploads';
   const pathname=`courses/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
   const expires=Date.now()+15*60*1000;
-  const token=await issueSignedToken({pathname,operations:['put'],validUntil:expires,allowedContentTypes:[type],maximumSizeInBytes:size});
-  const {presignedUrl}=await presignUrl(token,{pathname,operation:'put',validUntil:expires,access:'private'});
-  return NextResponse.json({uploadUrl:presignedUrl,url:`/api/file?pathname=${encodeURIComponent(pathname)}`,pathname,name,type});
+  const putToken=await issueSignedToken({pathname,operations:['put'],validUntil:expires,allowedContentTypes:[type],maximumSizeInBytes:size});
+  const {presignedUrl:uploadUrl}=await presignUrl(putToken,{pathname,operation:'put',validUntil:expires,access:'private'});
+  const headToken=await issueSignedToken({pathname,operations:['head'],validUntil:Date.now()+15*60*1000});
+  const {presignedUrl:verifyUrl}=await presignUrl(headToken,{pathname,operation:'head',validUntil:Date.now()+15*60*1000,access:'private'});
+  return NextResponse.json({uploadUrl,verifyUrl,url:`/api/file?pathname=${encodeURIComponent(pathname)}`,pathname,name,type});
  }catch(e:any){console.error('PREPARE_MEDIA_UPLOAD_FAILED',e);return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Could not prepare upload. Check that Vercel Blob storage is connected.'},{status:e.message==='FORBIDDEN'?403:503})}
 }
