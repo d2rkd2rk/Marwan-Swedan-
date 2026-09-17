@@ -1,0 +1,59 @@
+@media (max-width: 760px){
+  .shell{width:min(100% - 24px,1180px)}
+  .nav{min-height:0;padding:14px 0 0;flex-wrap:wrap;gap:10px}
+  .nav .brand{font-size:15px}
+  .nav > .actions{margin-left:auto!important;gap:6px;flex-wrap:nowrap}
+  .nav > .actions .btn{min-height:36px;padding:8px 10px;font-size:11px}
+  .navlinks{order:3;flex:0 0 100%;width:100%;overflow-x:auto;overflow-y:hidden;gap:20px;padding:2px 2px 12px;white-space:nowrap;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .navlinks::-webkit-scrollbar{display:none}
+  .hero{min-height:0;grid-template-columns:1fr;gap:28px;padding:48px 0 56px}
+  .hero h1{font-size:clamp(42px,13vw,62px);line-height:.98}
+  .hero p{font-size:15px;line-height:1.65}
+  .heroVisual{min-height:300px;border-radius:20px}
+  .heroVisual:before{width:230px;height:230px}
+  .heroVisual:after{inset:12px;border-radius:14px}
+  .heroMark{font-size:100px}
+  .signature{grid-template-columns:1fr}
+  .signature>div{padding:20px 0}
+  .signature>div+div{border-left:0;border-top:1px solid var(--line);padding-left:0}
+  .signature b{font-size:24px}
+  .section{padding:64px 0}
+  .section.compact{padding:52px 0}
+  .sectionhead{align-items:flex-start;flex-direction:column;gap:16px;margin-bottom:22px}
+  .section h2{font-size:32px;line-height:1.05}
+  .projectGrid{grid-template-columns:1fr}
+  .projectCard{min-height:210px;padding:22px}
+  .role{grid-template-columns:1fr;gap:8px;padding:20px 0}
+  .certRow{grid-template-columns:1fr}
+  .cert{min-height:auto;padding:15px 0}
+  .academyBanner{align-items:flex-start;flex-direction:column;padding:28px;gap:20px}
+  .academyBanner h2{font-size:30px}
+  .footer{grid-template-columns:1fr;gap:28px;padding:36px 0 42px}
+  .formwrap{padding:16px}
+  .form{padding:24px 18px;border-radius:16px}
+  .form h1{font-size:31px}
+  .coursehero{padding:48px 0 20px}
+  .coursehero h1{font-size:clamp(38px,12vw,58px)}
+  .lesson{align-items:flex-start;flex-direction:column;gap:10px}
+  .adminTitle{align-items:flex-start;flex-direction:column;gap:16px}
+  .adminTitle h1{font-size:clamp(40px,12vw,58px)}
+  .adminGrid{grid-template-columns:1fr}
+  .courseList{position:static}
+  .grid{grid-template-columns:1fr;gap:8px}
+  .lessonBuilder{grid-template-columns:1fr;gap:20px}
+  .lessonForm{padding-right:0;padding-bottom:20px;border-right:0;border-bottom:1px solid var(--line)}
+  .lessonRow{grid-template-columns:18px 24px minmax(0,1fr);gap:8px}
+  .lessonRow .iconBtn{grid-column:3;justify-self:start}
+  .tableWrap{margin-inline:-8px;padding-inline:8px}
+  .table{min-width:650px}
+  .previewOverlay{padding:10px}
+  .previewModal{padding:20px;max-height:94vh}
+}
+@media (max-width: 420px){
+  .shell{width:calc(100% - 18px)}
+  .nav > .actions .btn{padding:7px 8px;font-size:10px}
+  .navlinks{gap:16px;font-size:12px}
+  .actions{width:100%}
+  .hero{padding-top:38px}
+  .heroVisual{min-height:250px}
+}
