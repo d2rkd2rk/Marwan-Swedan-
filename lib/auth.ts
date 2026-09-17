@@ -12,11 +12,14 @@ export async function hashPassword(password:string){return bcrypt.hash(password,
 export async function verifyPassword(password:string,hash:string){return bcrypt.compare(password,hash)}
 export function hashToken(value:string){return createHash('sha256').update(value).digest('hex')}
 export function createRandomToken(){return randomBytes(32).toString('hex')}
+
 export async function createSession(user:{id:string,role:string,username:string}){
   const token=await new SignJWT({uid:user.id,role:user.role,username:user.username}).setProtectedHeader({alg:'HS256'}).setIssuedAt().setExpirationTime('7d').sign(secret);
   const jar=await cookies();
   jar.set(cookieName,token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:60*60*24*7});
+  await createTrustedDevice(user.id);
 }
+
 export async function createTrustedDevice(userId:string){
   const raw=createRandomToken();
   const tokenHash=hashToken(raw);
@@ -24,6 +27,7 @@ export async function createTrustedDevice(userId:string){
   const jar=await cookies();
   jar.set(trustedCookieName,raw,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:60*60*24*90});
 }
+
 export async function trustedDeviceValid(userId:string){
   const raw=(await cookies()).get(trustedCookieName)?.value;
   if(!raw)return false;
@@ -33,22 +37,39 @@ export async function trustedDeviceValid(userId:string){
   await db`update trusted_devices set last_used_at=now() where id=${rows[0].id}`;
   return true;
 }
+
 export async function destroySession(){
-  (await cookies()).set(cookieName,'',{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:0});
+  const jar=await cookies();
+  const raw=jar.get(trustedCookieName)?.value;
+  if(raw)await db`delete from trusted_devices where token_hash=${hashToken(raw)}`;
+  jar.set(cookieName,'',{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:0});
+  jar.set(trustedCookieName,'',{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'lax',path:'/',maxAge:0});
 }
+
 export async function session(){
-  const token=(await cookies()).get(cookieName)?.value;
-  if(!token)return null;
-  try{
-    const {payload}=await jwtVerify(token,secret);
-    if(typeof payload.uid!=='string')return null;
-    const rows=await db`select id,name,email,whatsapp,username,role,is_blocked,blocked_until from users where id=${payload.uid} limit 1`;
-    const user=rows[0] as any;
-    if(!user)return null;
-    if(user.is_blocked && user.blocked_until && new Date(user.blocked_until)>new Date())return null;
-    return user;
-  }catch{return null}
+  const jar=await cookies();
+  const token=jar.get(cookieName)?.value;
+  if(token){
+    try{
+      const {payload}=await jwtVerify(token,secret);
+      if(typeof payload.uid==='string'){
+        const rows=await db`select id,name,email,whatsapp,username,role,is_blocked,blocked_until from users where id=${payload.uid} limit 1`;
+        const user=rows[0] as any;
+        if(user&&!(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date()))return user;
+      }
+    }catch{}
+  }
+  const raw=jar.get(trustedCookieName)?.value;
+  if(!raw)return null;
+  const tokenHash=hashToken(raw);
+  const rows=await db`select u.id,u.name,u.email,u.whatsapp,u.username,u.role,u.is_blocked,u.blocked_until from trusted_devices d join users u on u.id=d.user_id where d.token_hash=${tokenHash} and d.expires_at>now() limit 1`;
+  const user=rows[0] as any;
+  if(!user)return null;
+  if(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date())return null;
+  await db`update trusted_devices set last_used_at=now() where token_hash=${tokenHash}`;
+  return user;
 }
+
 export async function requireUser(){const user=await session();if(!user)throw new Error('UNAUTHENTICATED');return user}
 export async function requireAdmin(){const user=await requireUser();if(user.role!=='admin')throw new Error('FORBIDDEN');return user}
 export function validPassword(password:string){return password.length>=8&&/[0-9]/.test(password)&&/[^A-Za-z0-9]/.test(password)}
