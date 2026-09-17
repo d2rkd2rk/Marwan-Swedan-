@@ -18,8 +18,7 @@ async function verifyFile(fileUrl:string|null){
   const pathname=decodeURIComponent(fileUrl.slice(marker.length));
   if(!pathname.startsWith('courses/')||pathname.split('/').length<3)throw new Error('INVALID_FILE_PATH');
   try{
-    // Verify the object through the same Blob connection used by the app.
-    const blob=await head(pathname,{access:'private'});
+    const blob=await head(pathname);
     if(!blob?.pathname)throw new Error('BLOB_NOT_FOUND');
     return pathname;
   }catch(e:any){
