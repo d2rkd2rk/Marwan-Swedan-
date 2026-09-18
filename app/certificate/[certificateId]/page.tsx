@@ -8,9 +8,9 @@ import CertificateActions from '@/app/components/CertificateActions';
 export async function generateMetadata({params}:{params:Promise<{certificateId:string}>}){
   const {certificateId}=await params;
   const rows=await db`select u.name,c.title from course_certificates cc join users u on u.id=cc.user_id join courses c on c.id=cc.course_id where cc.certificate_id=${certificateId} and c.published=true limit 1`;
-  if(!rows.length)return {title:'Certificate | Marwan Swedan Academy'};
+  if(!rows.length)return {title:'Certificate | Marwan Swedan'};
   const cert=rows[0] as any;
-  return {title:`Certificate — ${cert.name} | Marwan Swedan Academy`,description:`Verified certificate of completion for ${cert.title}, issued by Marwan Swedan Academy.`};
+  return {title:`Certificate — ${cert.name} | Marwan Swedan`,description:`Verified certificate of completion for ${cert.title}.`};
 }
 
 export default async function CertificatePage({params}:{params:Promise<{certificateId:string}>}){
