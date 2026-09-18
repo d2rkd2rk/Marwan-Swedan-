@@ -41,17 +41,22 @@ export async function POST(request:Request){
   const {Bucket,client}=storage();
   const courseId=String(b.courseId||'uploads').replace(/[^a-zA-Z0-9_-]/g,'')||'uploads';
   const key=`courses/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
-  await client.send(new PutBucketCorsCommand({
-    Bucket,
-    CORSConfiguration:{
-      CORSRules:[{
-        AllowedOrigins:['*'],
-        AllowedMethods:['PUT','GET','HEAD'],
-        AllowedHeaders:['*'],
-        ExposeHeaders:['ETag']
-      }]
-    }
-  }));
+  try {
+    await client.send(new PutBucketCorsCommand({
+      Bucket,
+      CORSConfiguration:{
+        CORSRules:[{
+          AllowedOrigins:['*'],
+          AllowedMethods:['PUT','GET','HEAD'],
+          AllowedHeaders:['*'],
+          ExposeHeaders:['ETag'],
+          MaxAgeSeconds:86400
+        }]
+      }
+    }));
+  } catch (corsError:any) {
+    console.warn('TIGRIS_CORS_SETUP_FAILED', corsError?.message || corsError);
+  }
   const uploadUrl=await getSignedUrl(
     client,
     new PutObjectCommand({Bucket,Key:key,ContentType:type}),
