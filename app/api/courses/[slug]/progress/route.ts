@@ -52,7 +52,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
       values(${user.id},${lessonId},${completed},${seconds},now(),now())
       on conflict(user_id,lesson_id) do update set
         completed=lesson_progress.completed or excluded.completed,
-        progress_seconds=greatest(lesson_progress.progress_seconds,excluded.progress_seconds),
+        progress_seconds=excluded.progress_seconds,
         last_viewed_at=now(),
         updated_at=now()
       returning lesson_id,completed,progress_seconds,updated_at,last_viewed_at`;
