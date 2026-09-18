@@ -26,7 +26,7 @@ export async function POST(request:Request){
   const pathname=`courses/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
   const expires=Date.now()+15*60*1000;
   const putToken=await issueSignedToken({pathname,operations:['put'],validUntil:expires,allowedContentTypes:[type],maximumSizeInBytes:size,storeId});
-  const {presignedUrl:uploadUrl}=await presignUrl(putToken,{pathname,operation:'put',validUntil:expires,access:'public',storeId});
+  const {presignedUrl:uploadUrl}=await presignUrl(putToken,{pathname,operation:'put',validUntil:expires,access:'public'});
 
   return NextResponse.json({uploadUrl,url:`/api/file?pathname=${encodeURIComponent(pathname)}`,pathname,name,type});
  }catch(e:any){
