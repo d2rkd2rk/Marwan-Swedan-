@@ -1,5 +1,5 @@
 import {NextRequest,NextResponse} from 'next/server';
-import {issueSignedToken,presignUrl} from '@vercel/blob';
+import {get} from '@vercel/blob';
 import db from '@/lib/db';
 import {session} from '@/lib/auth';
 
@@ -25,10 +25,18 @@ export async function GET(request:NextRequest){
   const allowed=Boolean(course[0].is_free)||Boolean(enrollment.length)||user.role==='admin';
   if(!allowed)return new NextResponse('Course access has not been granted.',{status:403});
 
-  const validUntil=Date.now()+60*60*1000;
-  const token=await issueSignedToken({pathname,operations:['get'],validUntil});
-  const {presignedUrl}=await presignUrl(token,{pathname,operation:'get',validUntil,access:'private'});
-  return NextResponse.redirect(presignedUrl,302);
+  const storeId=process.env.public_STORE_ID||process.env.PUBLIC_BLOB_STORE_ID;
+  if(!storeId)return new NextResponse('Public Blob store is not configured',{status:503});
+
+  const result=await get(pathname,{access:'public',storeId,useCache:false});
+  if(!result||result.statusCode!==200||!result.stream)return new NextResponse('Not found',{status:404});
+
+  const headers=new Headers();
+  headers.set('Content-Type',result.blob.contentType||'application/octet-stream');
+  headers.set('Cache-Control','public, max-age=31536000, immutable');
+  headers.set('X-Content-Type-Options','nosniff');
+  headers.set('Content-Disposition',result.blob.contentType==='application/pdf'?'inline':'attachment');
+  return new NextResponse(result.stream,{status:200,headers});
  }catch(e:any){
   console.error('FILE_ACCESS_FAILED',e?.message||e);
   return new NextResponse('File unavailable',{status:404});

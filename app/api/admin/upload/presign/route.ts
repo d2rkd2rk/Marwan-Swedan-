@@ -18,14 +18,19 @@ export async function POST(request:Request){
   if(!name)return NextResponse.json({error:'File name is required.'},{status:400});
   if(!allowed.has(type))return NextResponse.json({error:'File type is not allowed.'},{status:400});
   if(!Number.isFinite(size)||size<=0||size>5_000_000_000)return NextResponse.json({error:'File size must be between 1 byte and 5 GB.'},{status:400});
+
+  const storeId=process.env.public_STORE_ID||process.env.PUBLIC_BLOB_STORE_ID;
+  if(!storeId)return NextResponse.json({error:'Public Blob store is not configured on this deployment.'},{status:503});
+
   const courseId=String(b.courseId||'uploads').replace(/[^a-zA-Z0-9_-]/g,'')||'uploads';
   const pathname=`courses/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
   const expires=Date.now()+15*60*1000;
-  const putToken=await issueSignedToken({pathname,operations:['put'],validUntil:expires,allowedContentTypes:[type],maximumSizeInBytes:size});
-  const {presignedUrl:uploadUrl}=await presignUrl(putToken,{pathname,operation:'put',validUntil:expires,access:'private'});
+  const putToken=await issueSignedToken({pathname,operations:['put'],validUntil:expires,allowedContentTypes:[type],maximumSizeInBytes:size,storeId});
+  const {presignedUrl:uploadUrl}=await presignUrl(putToken,{pathname,operation:'put',validUntil:expires,access:'public',storeId});
+
   return NextResponse.json({uploadUrl,url:`/api/file?pathname=${encodeURIComponent(pathname)}`,pathname,name,type});
  }catch(e:any){
   console.error('PREPARE_MEDIA_UPLOAD_FAILED',e?.message||e);
-  return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Could not prepare upload. Check that Vercel Blob storage is connected.'},{status:e.message==='FORBIDDEN'?403:503});
+  return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Could not prepare upload. Check that the public Vercel Blob store is connected.'},{status:e.message==='FORBIDDEN'?403:503});
  }
 }
