@@ -16,7 +16,7 @@ ${question}`;
 
   try{
     const {text}=await generateText({
-      model:groq('llama-3.3-70b-versatile'),
+      model:groq('openai/gpt-oss-20b'),
       prompt,
       temperature:0.2,
     });
