@@ -1,4 +1,5 @@
-import {generateText} from 'ai';
+import { generateText } from 'ai';
+import { groq } from '@ai-sdk/groq';
 
 export async function askCourseAI(question:string,context:string){
   const prompt=`You are the course assistant for Marwan Swedan Academy.
@@ -15,7 +16,7 @@ ${question}`;
 
   try{
     const {text}=await generateText({
-      model:'openai/gpt-5.4-mini',
+      model:groq('llama-3.1-8b-instant'),
       prompt,
       temperature:0.2,
     });
