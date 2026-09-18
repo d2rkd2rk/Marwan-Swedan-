@@ -33,8 +33,8 @@ export default async function CertificatePage({params}:{params:Promise<{certific
         <CertificateActions shareUrl={shareUrl}/>
       </div>
       <article className="certificateCard">
-        <div className="certificateTop"><span className="certificateBrand">⌘&nbsp; MARWAN SWEDAN</span><span className="certificateId">CERTIFICATE ID<br/><b>{cert.certificate_id}</b></span></div>
-        <div className="certificateMedal">✓</div>
+        <div className="certificateTop"><span className="certificateBrand">MARWAN SWEDAN</span><span className="certificateId">CERTIFICATE ID<br/><b>{cert.certificate_id}</b></span></div>
+        <div className="certificateMedal" aria-hidden="true">✓</div>
         <div className="certificateTitle">CERTIFICATE</div>
         <div className="certificateSubtitle"><i/> OF COMPLETION <i/></div>
         <div className="certificatePresented">THIS CERTIFICATE IS PROUDLY PRESENTED TO</div>
@@ -42,9 +42,9 @@ export default async function CertificatePage({params}:{params:Promise<{certific
         <div className="certificateLine"/>
         <div className="certificateFor">FOR SUCCESSFULLY COMPLETING THE COURSE</div>
         <div className="certificateCourse">{cert.title}</div>
-        <p className="certificateText">Through dedication, consistency, and a commitment to learning, you have successfully completed every required lesson in this course.</p>
+        <p className="certificateText">This certificate recognizes the successful completion of every required lesson in this course.</p>
         <div className="certificateMeta"><div><span>COMPLETED ON</span><b>{date}</b></div><div><span>VERIFICATION</span><b>Verified Certificate</b></div></div>
-        <div className="certificateBottom"><div><small>BETTER SKILLS</small><small>A BRIGHTER FUTURE</small></div><div className="certificateSignature"><em>Marwan Swedan</em><span>MARWAN SWEDAN · INSTRUCTOR & CYBERSECURITY SPECIALIST</span></div><div className="certificateVerify"><strong>VERIFY THIS CERTIFICATE</strong><span>{shareUrl}</span></div></div>
+        <div className="certificateBottom"><div><small>COURSE COMPLETION</small><small>VERIFIED ACHIEVEMENT</small></div><div className="certificateSignature"><em>Marwan Swedan</em><span>MARWAN SWEDAN · INSTRUCTOR</span></div><div className="certificateVerify"><strong>VERIFY THIS CERTIFICATE</strong><span>{shareUrl}</span></div></div>
       </article>
       <div className="certificateShareNote"><b>Share your achievement.</b><span>Public verification link:</span><a href={shareUrl} target="_blank" rel="noreferrer">{shareUrl}</a></div>
     </section>
