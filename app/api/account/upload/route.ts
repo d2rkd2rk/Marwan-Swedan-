@@ -22,7 +22,7 @@ export async function POST(request:Request){
     const secretAccessKey=process.env.TIGRIS_STORAGE_SECRET_ACCESS_KEY;
     const Bucket=process.env.TIGRIS_STORAGE_BUCKET;
     if(!accessKeyId||!secretAccessKey||!Bucket)throw new Error('TIGRIS_NOT_CONFIGURED');
-    const client=new S3Client({region:'auto',endpoint:'https://t3.storage.dev',credentials:{accessKeyId,secretAccessKey}});
+    const client=new S3Client({region:'auto',endpoint:'https://t3.storage.dev',forcePathStyle:false,credentials:{accessKeyId,secretAccessKey}});
     const uploadUrl=await getSignedUrl(client,new PutObjectCommand({Bucket,Key:pathname,ContentType:type}),{expiresIn:15*60});
     return NextResponse.json({uploadUrl,url:`/api/file?key=${encodeURIComponent(pathname)}`,pathname,name:safeName,kind});
   }catch(e:any){return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':e.message==='TIGRIS_NOT_CONFIGURED'?'Tigris storage is not configured':'Could not prepare upload'},{status:e.message==='UNAUTHENTICATED'?401:e.message==='TIGRIS_NOT_CONFIGURED'?503:400})}
