@@ -44,7 +44,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
     const body=await request.json();
     const lessonId=String(body.lessonId||'');
     if(!lessonId)return NextResponse.json({error:'lessonId is required.'},{status:400});
-    const lesson=await db`select id from lessons where id=${lessonId} and course_id=${course.id} and published=true limit 1`;
+    const lesson=await db`select id,duration_minutes from lessons where id=${lessonId} and course_id=${course.id} and published=true limit 1`;
     if(!lesson.length)return NextResponse.json({error:'Lesson not found.'},{status:404});
     const seconds=Math.max(0,Math.floor(Number(body.progressSeconds||0)));
     const completed=Boolean(body.completed);
