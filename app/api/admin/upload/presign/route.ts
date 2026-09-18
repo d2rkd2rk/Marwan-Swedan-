@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {PutObjectCommand,S3Client} from '@aws-sdk/client-s3';
+import {PutBucketCorsCommand,PutObjectCommand,S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import {requireAdmin} from '@/lib/auth';
 
@@ -41,6 +41,17 @@ export async function POST(request:Request){
   const {Bucket,client}=storage();
   const courseId=String(b.courseId||'uploads').replace(/[^a-zA-Z0-9_-]/g,'')||'uploads';
   const key=`courses/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
+  await client.send(new PutBucketCorsCommand({
+    Bucket,
+    CORSConfiguration:{
+      CORSRules:[{
+        AllowedOrigins:['*'],
+        AllowedMethods:['PUT','GET','HEAD'],
+        AllowedHeaders:['*'],
+        ExposeHeaders:['ETag']
+      }]
+    }
+  }));
   const uploadUrl=await getSignedUrl(
     client,
     new PutObjectCommand({Bucket,Key:key,ContentType:type}),
