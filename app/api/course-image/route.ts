@@ -20,7 +20,7 @@ export async function GET(request:NextRequest){
   const secretAccessKey=process.env.TIGRIS_STORAGE_SECRET_ACCESS_KEY;
   const Bucket=process.env.TIGRIS_STORAGE_BUCKET;
   if(!accessKeyId||!secretAccessKey||!Bucket)throw new Error('TIGRIS_NOT_CONFIGURED');
-  const client=new S3Client({region:'auto',endpoint:'https://t3.storage.dev',credentials:{accessKeyId,secretAccessKey}});
+  const client=new S3Client({region:'auto',endpoint:'https://t3.storage.dev',forcePathStyle:false,credentials:{accessKeyId,secretAccessKey}});
   const signedUrl=await getSignedUrl(client,new GetObjectCommand({Bucket,Key:pathname}),{expiresIn:30*60});
   return NextResponse.redirect(signedUrl,302);
  }catch(e:any){console.error('COURSE_IMAGE_ACCESS_FAILED',e?.message||e);return new NextResponse(e?.message==='TIGRIS_NOT_CONFIGURED'?'Tigris storage is not configured':'Image unavailable',{status:e?.message==='TIGRIS_NOT_CONFIGURED'?503:404})}
