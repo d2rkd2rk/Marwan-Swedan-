@@ -1,3 +1,4 @@
+/* production deployment trigger */
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import Link from 'next/link';
@@ -22,9 +23,17 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [answer,setAnswer]=useState('');
   const [busy,setBusy]=useState(false);
   const [progress,setProgress]=useState<Record<string,Progress>>({});
+  const [certificate,setCertificate]=useState<{certificateId:string;issuedAt:string}|null>(null);
   const lastSaved=useRef<Record<string,number>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
   const didRestore=useRef(false);
+
+  useEffect(()=>{
+    if(!data?.course?.slug||!data?.lessons?.length)return;
+    const done=data.lessons.every((l:any)=>progress[l.id]?.completed);
+    if(!done)return;
+    fetch(`/api/courses/${data.course.slug}/certificate`,{cache:'no-store'}).then(r=>r.json()).then(j=>{if(j.certificateId)setCertificate({certificateId:j.certificateId,issuedAt:j.issuedAt})}).catch(()=>{});
+  },[data,progress]);
 
   useEffect(()=>{
     params.then(p=>{
@@ -91,9 +100,6 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
 
   const markComplete=(lessonId:string)=>{
     const current=progress[lessonId]?.progress_seconds||0;
-    const lesson=lessons.find((item:any)=>item.id===lessonId);
-    const duration=Number(lesson?.duration_minutes||0)*60;
-    if(duration>0&&current/duration<0.9)return;
     saveProgress(lessonId,current,true);
   };
 
@@ -139,6 +145,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
             <div style={{height:'100%',width:`${percent}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .25s ease'}}/>
           </div>
           <p className="small muted" style={{marginTop:7}}>{completedCount} of {lessons.length} lessons completed. {courseComplete?'Course complete.':'Finish every video to complete the course.'} Your progress is saved to your account.</p>
+          {courseComplete&&certificate?<div className="certificateUnlock"><div><div className="eyebrow">Achievement unlocked</div><h3>🎓 Your certificate is ready.</h3><p className="small muted">You completed 100% of <b>{c.title}</b>. Your certificate uses your full name exactly as saved on your account.</p></div><div className="actions"><Link className="btn primary" href={`/certificate/${certificate.certificateId}`}>View certificate</Link><a className="btn" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${typeof window!=='undefined'?window.location.origin:'https://marwan-swedan.vercel.app'}/certificate/${certificate.certificateId}`)}`} target="_blank" rel="noreferrer">in&nbsp; Share on LinkedIn ↗</a></div></div>:<div style={{marginTop:16,padding:18,borderRadius:16,border:'1px solid rgba(255,255,255,.1)',background:'rgba(255,255,255,.03)',opacity:.72}}><div style={{fontSize:13,letterSpacing:'.08em',textTransform:'uppercase'}}>🔒 Certificate locked</div><h3 style={{margin:'8px 0 6px'}}>Complete the course to unlock your certificate.</h3><p className="small muted" style={{margin:0}}>Finish all {lessons.length} lessons. Once every lesson is marked <b>Completed</b>, your certificate will become available automatically.</p></div>}
         </div>}
         {!c.is_free&&!data.enrolled&&<div className="actions"><a className="btn primary" href={purchaseUrl} target="_blank" rel="noreferrer">Buy this course on WhatsApp</a></div>}
         {c.is_free&&!data.enrolled&&<div className="actions"><Link className="btn primary" href="/register">Join for free</Link><Link className="btn" href="/login">Sign in</Link></div>}
@@ -158,7 +165,6 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                   </div>
                   <div className="small muted">{l.duration_minutes} minutes {l.file_name?'· '+l.file_name:''}</div>
                   {l.video_url&&<div style={{marginTop:14}}>
-                    <div className="small muted" style={{marginBottom:6}}>You must watch at least 90% of this video to mark it as complete.</div>
                     <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginBottom:10}} aria-label="Video progress">
                       <div style={{height:'100%',width:`${Math.min(100,Math.max(0,((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .15s ease'}}/>
                     </div>
@@ -176,13 +182,13 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                       onEnded={e=>saveProgress(l.id,e.currentTarget.duration,true)}
                     />
                     <div className="small muted" style={{marginTop:7}}>
-                      {p?.completed?'✓ Video requirement completed':`${Math.min(100,Math.round(((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}% watched`}
+                      {p?.completed?'✓ Video completed':'Mark the video as completed when you finish watching.'}
                     </div>
                   </div>}
                   {l.file_url&&<div className="actions"><a className="btn" href={l.file_url} target="_blank" rel="noreferrer">Open lesson file</a></div>}
                   <div className="actions">
-                    <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed||Boolean(l.video_url&&!((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60)>=0.9))}>
-                      {p?.completed?'Lesson completed':(l.video_url&&!((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60)>=0.9)?'Watch 90% to complete':'Mark lesson complete')}
+                    <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed}>
+                      {p?.completed?'Lesson completed':'Mark as Completed'}
                     </button>
                     {p?.progress_seconds>0&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Saved at {Math.floor(p.progress_seconds/60)}:{String(Math.floor(p.progress_seconds%60)).padStart(2,'0')}</span>}
                   </div>
