@@ -82,7 +82,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
 
   const handleTimeUpdate=(lessonId:string,currentTime:number,duration:number)=>{
     const previous=lastSaved.current[lessonId]??0;
-    const nearEnd=duration>0&&currentTime/duration>=0.95;
+    const nearEnd=duration>0&&currentTime/duration>=0.9;
     if(currentTime-previous>=5||nearEnd){
       lastSaved.current[lessonId]=currentTime;
       saveProgress(lessonId,currentTime,nearEnd);
@@ -91,7 +91,9 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
 
   const markComplete=(lessonId:string)=>{
     const current=progress[lessonId]?.progress_seconds||0;
-    lastSaved.current[lessonId]=current;
+    const lesson=lessons.find((item:any)=>item.id===lessonId);
+    const duration=Number(lesson?.duration_minutes||0)*60;
+    if(duration>0&&current/duration<0.9)return;
     saveProgress(lessonId,current,true);
   };
 
@@ -114,6 +116,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const lessons=data.lessons||[];
   const completedCount=lessons.filter((l:any)=>progress[l.id]?.completed).length;
   const percent=lessons.length?Math.round((completedCount/lessons.length)*100):0;
+  const courseComplete=lessons.length>0&&completedCount===lessons.length;
 
   return <main>
     <div className="shell">
@@ -135,7 +138,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
           <div style={{height:8,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden'}}>
             <div style={{height:'100%',width:`${percent}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .25s ease'}}/>
           </div>
-          <p className="small muted" style={{marginTop:7}}>{completedCount} of {lessons.length} lessons completed. Your progress is saved to your account.</p>
+          <p className="small muted" style={{marginTop:7}}>{completedCount} of {lessons.length} lessons completed. {courseComplete?'Course complete.':'Finish every video to complete the course.'} Your progress is saved to your account.</p>
         </div>}
         {!c.is_free&&!data.enrolled&&<div className="actions"><a className="btn primary" href={purchaseUrl} target="_blank" rel="noreferrer">Buy this course on WhatsApp</a></div>}
         {c.is_free&&!data.enrolled&&<div className="actions"><Link className="btn primary" href="/register">Join for free</Link><Link className="btn" href="/login">Sign in</Link></div>}
@@ -154,23 +157,32 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     {p?.completed&&<span className="tag">Completed</span>}
                   </div>
                   <div className="small muted">{l.duration_minutes} minutes {l.file_name?'· '+l.file_name:''}</div>
-                  {l.video_url&&<video
-                    controls
-                    preload="metadata"
-                    style={{width:'100%',marginTop:14,borderRadius:12}}
-                    src={l.video_url}
-                    onLoadedMetadata={e=>{
-                      const saved=progress[l.id]?.progress_seconds||0;
-                      if(saved>0&&saved<e.currentTarget.duration-2)e.currentTarget.currentTime=saved;
-                    }}
-                    onTimeUpdate={e=>handleTimeUpdate(l.id,e.currentTarget.currentTime,e.currentTarget.duration)}
-                    onPause={e=>saveProgress(l.id,e.currentTarget.currentTime,Boolean(p?.completed))}
-                    onEnded={e=>saveProgress(l.id,e.currentTarget.duration,true)}
-                  />}
+                  {l.video_url&&<div style={{marginTop:14}}>
+                    <div className="small muted" style={{marginBottom:6}}>You must watch at least 90% of this video to mark it as complete.</div>
+                    <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginBottom:10}} aria-label="Video progress">
+                      <div style={{height:'100%',width:`${Math.min(100,Math.max(0,((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .15s ease'}}/>
+                    </div>
+                    <video
+                      controls
+                      preload="metadata"
+                      style={{width:'100%',borderRadius:12}}
+                      src={l.video_url}
+                      onLoadedMetadata={e=>{
+                        const saved=progress[l.id]?.progress_seconds||0;
+                        if(saved>0&&saved<e.currentTarget.duration-2)e.currentTarget.currentTime=saved;
+                      }}
+                      onTimeUpdate={e=>handleTimeUpdate(l.id,e.currentTarget.currentTime,e.currentTarget.duration)}
+                      onPause={e=>saveProgress(l.id,e.currentTarget.currentTime,Boolean(p?.completed))}
+                      onEnded={e=>saveProgress(l.id,e.currentTarget.duration,true)}
+                    />
+                    <div className="small muted" style={{marginTop:7}}>
+                      {p?.completed?'✓ Video requirement completed':`${Math.min(100,Math.round(((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}% watched`}
+                    </div>
+                  </div>}
                   {l.file_url&&<div className="actions"><a className="btn" href={l.file_url} target="_blank" rel="noreferrer">Open lesson file</a></div>}
                   <div className="actions">
-                    <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)}>
-                      {p?.completed?'Lesson completed':'Mark lesson complete'}
+                    <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed||Boolean(l.video_url&&!((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60)>=0.9))}>
+                      {p?.completed?'Lesson completed':(l.video_url&&!((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60)>=0.9)?'Watch 90% to complete':'Mark lesson complete')}
                     </button>
                     {p?.progress_seconds>0&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Saved at {Math.floor(p.progress_seconds/60)}:{String(Math.floor(p.progress_seconds%60)).padStart(2,'0')}</span>}
                   </div>
