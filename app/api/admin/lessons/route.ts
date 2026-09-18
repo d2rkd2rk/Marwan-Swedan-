@@ -11,11 +11,11 @@ function makeSlug(value:string){const base=value.toLowerCase().trim().replace(/[
 async function uniqueSlug(courseId:string,raw:string,id?:string){const base=makeSlug(raw);const rows=id?await db`select id from lessons where course_id=${courseId} and slug=${base} and id<>${id} limit 1`:await db`select id from lessons where course_id=${courseId} and slug=${base} limit 1`;return rows.length?`${base}-${Date.now().toString().slice(-6)}`:base}
 function validateFileUrl(fileUrl:string|null){
   if(!fileUrl)return null;
-  const marker='/api/file?pathname=';
+  const marker='/api/file?key=';
   if(!fileUrl.startsWith(marker))throw new Error('INVALID_FILE_URL');
-  const pathname=decodeURIComponent(fileUrl.slice(marker.length));
-  if(!pathname.startsWith('courses/')||pathname.split('/').length<3)throw new Error('INVALID_FILE_PATH');
-  return pathname;
+  const key=decodeURIComponent(fileUrl.slice(marker.length));
+  if(!key.startsWith('courses/')||key.split('/').length<3)throw new Error('INVALID_FILE_PATH');
+  return key;
 }
 
 export async function GET(request:Request){try{await requireAdmin();await ensureMediaColumns();const courseId=new URL(request.url).searchParams.get('courseId');if(!courseId)return NextResponse.json({error:'courseId is required'},{status:400});return NextResponse.json({lessons:await db`select * from lessons where course_id=${courseId} order by position asc`})}catch(e:any){return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Authentication required'},{status:e.message==='FORBIDDEN'?403:401})}}
