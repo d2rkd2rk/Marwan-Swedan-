@@ -34,12 +34,14 @@ export async function GET(request:NextRequest){
   if(!user)return new NextResponse('Authentication required',{status:401});
 
   const courseId=key.split('/')[1];
-  const course=await db`select is_free from courses where id=${courseId} limit 1`;
-  if(!course.length)return new NextResponse('Not found',{status:404});
-
-  const enrollment=await db`select id from enrollments where user_id=${user.id} and course_id=${courseId} and revoked_at is null limit 1`;
-  const allowed=Boolean(course[0].is_free)||Boolean(enrollment.length)||user.role==='admin';
-  if(!allowed)return new NextResponse('Course access has not been granted.',{status:403});
+  const isThumbnail=courseId==='course-thumbnails';
+  if(!isThumbnail){
+    const course=await db`select is_free from courses where id=${courseId} limit 1`;
+    if(!course.length)return new NextResponse('Not found',{status:404});
+    const enrollment=await db`select id from enrollments where user_id=${user.id} and course_id=${courseId} and revoked_at is null limit 1`;
+    const allowed=Boolean(course[0].is_free)||Boolean(enrollment.length)||user.role==='admin';
+    if(!allowed)return new NextResponse('Course access has not been granted.',{status:403});
+  }
 
   const {Bucket,client}=storage();
   const signedUrl=await getSignedUrl(
