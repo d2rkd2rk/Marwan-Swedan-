@@ -170,9 +170,12 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     </div>
                     <video
                       controls
+                      controlsList="nodownload noremoteplayback"
+                      disablePictureInPicture
                       preload="metadata"
                       style={{width:'100%',borderRadius:12}}
                       src={l.video_url}
+                      onContextMenu={e=>e.preventDefault()}
                       onLoadedMetadata={e=>{
                         const saved=progress[l.id]?.progress_seconds||0;
                         if(saved>0&&saved<e.currentTarget.duration-2)e.currentTarget.currentTime=saved;
