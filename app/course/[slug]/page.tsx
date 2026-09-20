@@ -128,6 +128,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     <div className="shell">
       <SiteNav/>
       <section className="coursehero">
+        {c.thumbnail_url&&<img src={c.thumbnail_url} alt={c.title} style={{display:'block',width:'100%',maxWidth:900,aspectRatio:'16/9',objectFit:'cover',borderRadius:18,marginBottom:24}}/>}
         <span className="tag">{c.category}</span>
         <h1>{c.title}</h1>
         <p className="muted" style={{maxWidth:800,lineHeight:1.8}}>{c.description}</p>
