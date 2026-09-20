@@ -26,7 +26,6 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [certificate,setCertificate]=useState<{certificateId:string;issuedAt:string}|null>(null);
   const lastSaved=useRef<Record<string,number>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
-  const didRestore=useRef(false);
 
   useEffect(()=>{
     if(!data?.course?.slug||!data?.lessons?.length)return;
@@ -51,14 +50,6 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     });
   },[params]);
 
-  useEffect(()=>{
-    if(!data?.lessons?.length||didRestore.current)return;
-    const saved=Object.values(progress).sort((a,b)=>new Date(b.updated_at).getTime()-new Date(a.updated_at).getTime())[0];
-    if(saved?.lesson_id&&lessonRefs.current[saved.lesson_id]){
-      didRestore.current=true;
-      setTimeout(()=>lessonRefs.current[saved.lesson_id]?.scrollIntoView({behavior:'smooth',block:'center'}),100);
-    }
-  },[data,progress]);
 
   const purchaseUrl=useMemo(()=>{
     if(!data?.course||data.course.is_free)return '';
