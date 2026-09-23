@@ -5,8 +5,11 @@ import db from '@/lib/db';
 import SiteNav from '@/app/components/SiteNav';
 import CertificateActions from '@/app/components/CertificateActions';
 
+async function ensureCertificateFlag(){await db`alter table courses add column if not exists certificate_enabled boolean not null default false`}
+
 export async function generateMetadata({params}:{params:Promise<{certificateId:string}>}){
   const {certificateId}=await params;
+  await ensureCertificateFlag();
   const rows=await db`select u.name,c.title from course_certificates cc join users u on u.id=cc.user_id join courses c on c.id=cc.course_id where cc.certificate_id=${certificateId} and c.published=true and c.certificate_enabled=true limit 1`;
   if(!rows.length)return {title:'Certificate | Marwan Swedan'};
   const cert=rows[0] as any;
@@ -15,6 +18,7 @@ export async function generateMetadata({params}:{params:Promise<{certificateId:s
 
 export default async function CertificatePage({params}:{params:Promise<{certificateId:string}>}){
   const {certificateId}=await params;
+  await ensureCertificateFlag();
   const rows=await db`select cc.certificate_id,cc.issued_at,u.name,c.title,c.slug
     from course_certificates cc
     join users u on u.id=cc.user_id
