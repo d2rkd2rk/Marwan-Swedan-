@@ -3,6 +3,8 @@ import crypto from 'crypto';
 import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
 
+async function ensureCertificateFlag(){await db`alter table courses add column if not exists certificate_enabled boolean not null default false`}
+
 async function ensureCertificateTable(){
   await db`create table if not exists course_certificates(id uuid primary key default gen_random_uuid(),certificate_id text not null unique,user_id uuid not null references users(id) on delete cascade,course_id uuid not null references courses(id) on delete cascade,issued_at timestamptz not null default now(),unique(user_id,course_id))`;
   await db`create index if not exists course_certificates_course_idx on course_certificates(course_id,issued_at desc)`;
@@ -25,6 +27,7 @@ async function getEligible(userId:string,slug:string){
 export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
   try{
     const user=await requireUser();
+    await ensureCertificateFlag();
     await ensureCertificateTable();
     const {slug}=await params;
     const result=await getEligible(user.id,slug);
