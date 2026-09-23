@@ -10,7 +10,7 @@ async function ensureCertificateTable(){
 }
 
 async function getEligible(userId:string,slug:string){
-  const rows=await db`select id,title,slug from courses where slug=${slug} and published=true limit 1`;
+  const rows=await db`select id,title,slug from courses where slug=${slug} and published=true and certificate_enabled=true limit 1`;
   if(!rows.length)return null;
   const course=rows[0] as any;
   const lessons=await db`select l.id,l.duration_minutes,coalesce(lp.completed,false) as completed,coalesce(lp.progress_seconds,0) as progress_seconds
