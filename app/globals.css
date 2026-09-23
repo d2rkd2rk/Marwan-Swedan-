@@ -6,52 +6,88 @@
 
 .courseGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.courseCard{display:block;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,#0c1e2c,#091722);transition:.2s}.courseCard:hover{transform:translateY(-4px);border-color:#315875;box-shadow:var(--shadow)}.courseCardMedia{position:relative;height:180px;overflow:hidden;background:linear-gradient(145deg,#102b40,#07131d)}.courseCardFallback{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 70% 30%,rgba(121,184,255,.18),transparent 30%),linear-gradient(145deg,#10283a,#080f16)}.courseCardFallback span{position:relative;z-index:2;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#a9cfff}.courseCardFallback b{position:absolute;right:20px;bottom:8px;font:700 80px/1 'Space Grotesk';color:rgba(121,184,255,.12);letter-spacing:-.08em}.fallbackGrid{position:absolute;inset:0;background-image:linear-gradient(rgba(121,184,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(121,184,255,.07) 1px,transparent 1px);background-size:28px 28px;transform:perspective(260px) rotateX(55deg) scale(1.4);transform-origin:center bottom;opacity:.5}.courseLevel{position:absolute;left:14px;bottom:14px;z-index:3;padding:7px 10px;border-radius:999px;background:rgba(7,21,32,.86);border:1px solid rgba(121,184,255,.28);font-size:10px;font-weight:700}.courseCardBody{padding:18px}.courseCardBody h3{margin:0 0 8px;font-family:'Space Grotesk';font-size:18px}.courseCardBody p{margin:0 0 14px;color:var(--muted);font-size:12px;line-height:1.6}.courseMeta{display:flex;justify-content:space-between;gap:8px;color:#7890a1;font-size:10px}.courseCardBody>strong{display:block;margin-top:13px;color:#8fc4ff;font-size:12px}@media(max-width:900px){.courseGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.courseGrid{grid-template-columns:1fr}.courseCardMedia{height:220px}}
 
-.certificateSection{padding:55px 0 85px}
-.certificateToolbar{display:flex;justify-content:space-between;align-items:end;gap:28px;margin-bottom:24px}
-.certificateToolbar h1{font:600 clamp(36px,5vw,56px) 'Space Grotesk';letter-spacing:-.05em;margin:7px 0}
-.certificateActions{display:flex;gap:10px;flex-wrap:wrap}
-.certificateCard{position:relative;overflow:hidden;min-height:0;aspect-ratio:297/210;padding:46px 58px;border:1px solid #b89455;border-radius:2px;background:#f8f6f1;color:#172b40;box-shadow:0 28px 75px rgba(0,0,0,.30);text-align:center}
-.certificateCard:before{content:"";position:absolute;inset:10px;border:1px solid rgba(184,148,85,.72);pointer-events:none}
-.certificateCard:after{content:"";position:absolute;inset:20px;border:1px solid rgba(23,43,64,.08);pointer-events:none}
-.certificateCorner{position:absolute;width:145px;height:145px;pointer-events:none;z-index:1}
-.certificateCornerTL{left:-72px;top:-72px;background:linear-gradient(135deg,#142b43 0 48%,#c6a15b 49% 56%,transparent 57%)}
-.certificateCornerBR{right:-72px;bottom:-72px;background:linear-gradient(315deg,#142b43 0 48%,#c6a15b 49% 56%,transparent 57%)}
-.certificateTop{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:start;gap:24px;color:#243a50}
-.certificateBrand{font-family:'Space Grotesk';font-size:12px;font-weight:700;letter-spacing:.28em}
-.certificateId{text-align:right;color:#7b6d59;letter-spacing:.10em;font-size:8px}
-.certificateId b{color:#243a50;font-weight:700}
-.certificateMain{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 78px);padding:18px 0 8px}
-.certificateHeading{font-family:'Space Grotesk';font-size:clamp(30px,4vw,54px);font-weight:600;letter-spacing:.12em;color:#172b40}
-.certificateRule{width:min(460px,55%);height:1px;margin:18px auto 24px;background:#c4a05e}
-.certificateRuleShort{width:min(310px,38%);margin:14px auto 20px}
-.certificatePresented{color:#7c8995;font-size:8px;font-weight:700;letter-spacing:.28em}
-.certificateName{margin:10px auto 0;max-width:92%;font-family:'DM Sans',sans-serif;font-size:clamp(30px,4vw,48px);font-weight:500;line-height:1.1;color:#172b40;overflow-wrap:anywhere}
-.certificateCourse{margin:0 auto;color:#203f5a;font-family:'Space Grotesk';font-size:clamp(22px,3vw,35px);font-weight:600;line-height:1.12;max-width:82%;overflow-wrap:anywhere}
-.certificateEmblemWrap{margin-top:20px}
-.certificateEmblem{width:66px;height:66px;border-radius:50%;display:grid;place-items:center;background:#183149;border:2px solid #c5a05b;box-shadow:0 0 0 5px #f8f6f1,0 0 0 6px rgba(197,160,91,.65);color:#f4e4bd}
-.certificateEmblem span{font-family:'Space Grotesk';font-size:12px;font-weight:700;letter-spacing:.05em}
-.certificateBottom{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:30px;text-align:center}
-.certificateDate,.certificateVerify,.certificateSignature{display:grid;gap:6px}
-.certificateDate{text-align:left}
-.certificateVerify{text-align:right}
-.certificateDate span,.certificateVerify span{color:#8a7759;font-size:7px;font-weight:700;letter-spacing:.20em}
-.certificateDate b{color:#243a50;font-size:11px;font-weight:500}
-.certificateVerify b{color:#243a50;font-size:8px;font-weight:600;overflow-wrap:anywhere}
-.certificateSignature{justify-items:center}
-.certificateSignature em{font-family:'Great Vibes',cursive;font-size:25px;font-style:normal;line-height:1;color:#172b40}
-.certificateSignature div{width:165px;padding-top:5px;border-top:1px solid #8c8c8c;color:#7d6e58;font-size:7px;font-weight:700;letter-spacing:.17em}
-.certificateShareNote{display:flex;align-items:center;gap:15px;margin-top:15px;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:#0b1b28}
-.certificateShareNote b{color:#e6f0f6}.certificateShareNote span{flex:1;color:var(--muted);font-size:12px}
-@media(max-width:700px){.certificateSection{padding:35px 0 55px}.certificateToolbar{display:block}.certificateToolbar h1{font-size:40px}.certificateActions{margin-top:18px}.certificateCard{padding:31px 22px;min-height:0}.certificateCard:before{inset:8px}.certificateTop{font-size:8px}.certificateBrand{font-size:8px}.certificateMedal{width:62px;height:62px;margin-top:25px}.certificateTitle{font-size:40px;letter-spacing:.1em}.certificateSubtitle{font-size:9px;letter-spacing:.2em;margin-bottom:34px}.certificateSubtitle i{width:30px}.certificatePresented,.certificateFor{font-size:7px;letter-spacing:.14em}.certificateName{font-size:48px}.certificateCourse{font-size:27px}.certificateMeta{gap:25px;margin:30px 0 42px;flex-wrap:wrap}.certificateMeta div{min-width:120px}.certificateBottom{grid-template-columns:1fr;gap:22px}.certificateSignature,.certificateVerify{text-align:center!important}.certificateSignature:before{margin-left:auto;margin-right:auto}.certificateUnlock{display:block}.certificateUnlock .actions{margin-top:15px}.certificateShareNote{display:block}.certificateShareNote .btn{margin-top:12px}}
+.certificateSection{padding:42px 0 70px}
+.certificateCard{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/10.625;
+  overflow:hidden;
+  background:#f8f8f6;
+  color:#102a45;
+  border:1px solid #c6a45d;
+  box-shadow:0 22px 65px rgba(0,0,0,.28);
+}
+.certificateInner{position:absolute;inset:0;padding:4.4% 6.2% 4.8%;display:flex;flex-direction:column;z-index:3}
+.certificateCard:before{content:"";position:absolute;inset:2.2%;border:1px solid rgba(198,164,93,.9);z-index:2;pointer-events:none}
+.certificateCard:after{content:"";position:absolute;inset:3.2%;border:1px solid rgba(16,42,69,.08);z-index:2;pointer-events:none}
+
+.certificateCorner{position:absolute;z-index:1;pointer-events:none}
+.certificateCornerTL{left:-1px;top:-1px;width:17%;height:24%;background:linear-gradient(135deg,#183149 0 47%,#d5bb82 48% 57%,rgba(255,255,255,.88) 58% 67%,transparent 68%)}
+.certificateCornerTR{right:-1px;top:-1px;width:16%;height:22%;background:linear-gradient(225deg,rgba(255,255,255,.7) 0 42%,transparent 43%)}
+.certificateCornerBR{right:-1px;bottom:-1px;width:17%;height:24%;background:linear-gradient(315deg,#183149 0 47%,#d5bb82 48% 57%,rgba(255,255,255,.88) 58% 67%,transparent 68%)}
+.certificateCornerBL{left:-1px;bottom:-1px;width:15%;height:20%;background:linear-gradient(45deg,rgba(255,255,255,.7) 0 42%,transparent 43%)}
+
+.certificateHeader{text-align:center}
+.certificateAcademy{font-family:'Space Grotesk',sans-serif;font-size:clamp(14px,1.35vw,24px);font-weight:600;letter-spacing:.27em;color:#102a45}
+.certificateTagline{margin-top:.75%;font-size:clamp(9px,.72vw,13px);letter-spacing:.34em;color:#62758a}
+.certificateTagline span{margin:0 .35em;color:#a9905d}
+
+.certificateContent{text-align:center;display:flex;flex-direction:column;align-items:center;flex:1;padding-top:4.8%}
+.certificateHeading{font-family:'Space Grotesk',sans-serif;font-size:clamp(25px,3.35vw,53px);font-weight:500;letter-spacing:.07em;color:#102a45;line-height:1}
+.certificatePresented{margin-top:4.2%;font-size:clamp(9px,.72vw,13px);font-weight:500;letter-spacing:.31em;color:#65788c}
+.certificateName{margin-top:1.2%;font-family:'DM Sans',sans-serif;font-size:clamp(30px,4.0vw,64px);font-weight:600;line-height:1.05;color:#102a45}
+.certificateGoldLine{width:43%;height:1px;margin-top:2.1%;background:#c5a15b}
+.certificateCompleted{margin-top:2.8%;font-size:clamp(11px,.95vw,17px);letter-spacing:.02em;color:#536a80}
+.certificateCourse{margin-top:.8%;font-family:'Space Grotesk',sans-serif;font-size:clamp(20px,2.0vw,32px);font-weight:600;line-height:1.1;color:#102f4d}
+.certificateDescription{margin:2.3% 0 0;font-size:clamp(9px,.72vw,13px);line-height:1.65;letter-spacing:.06em;color:#62758a}
+
+.certificateFooter{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:end;gap:4%;min-height:18%;text-align:center}
+.certificateFooterBlock{display:flex;flex-direction:column;align-items:center}
+.certificateDateBlock{align-items:flex-start}
+.certificateSignatureBlock{align-items:center}
+.certificateDate{font-size:clamp(10px,.9vw,16px);letter-spacing:.08em;color:#102a45;white-space:nowrap}
+.certificateFooterLine{height:1px;background:#c5a15b;width:82%;margin-top:7px}
+.certificateDateBlock .certificateFooterLine{width:76%}
+.certificateFooterLabel{margin-top:8px;font-size:clamp(7px,.58vw,11px);font-weight:600;letter-spacing:.24em;color:#69798a}
+.certificateLogoBlock{display:flex;align-items:center;justify-content:center}
+.certificateEmblem{width:clamp(64px,7vw,104px);height:clamp(64px,7vw,104px);border-radius:50%;display:grid;place-items:center;background:#183149;border:3px solid #d1b16c;box-shadow:0 0 0 4px #f8f8f6,0 0 0 6px rgba(198,164,93,.78);color:#f1dfb6}
+.certificateEmblem span{font-family:'Space Grotesk',sans-serif;font-size:clamp(9px,.9vw,15px);font-weight:700;letter-spacing:.04em}
+.certificatePythonEmblem svg{width:67%;height:67%;fill:#e9d09a}
+.certificateSignature{font-family:'Great Vibes',cursive;font-size:clamp(25px,2.25vw,40px);font-style:italic;line-height:.9;color:#102a45;margin-bottom:2px}
+.certificateRole{margin-top:3px;font-size:clamp(6px,.48vw,9px);letter-spacing:.2em;color:#7b6d59}
+.certificateId{margin-top:5px;font-size:clamp(5px,.4vw,8px);letter-spacing:.08em;color:#8b7b62;max-width:100%;overflow-wrap:anywhere}
+.certificateActionsBar{display:flex;justify-content:center;margin-top:18px}
+.certificateActions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+@media(max-width:700px){
+  .certificateSection{padding:25px 0 45px}
+  .certificateCard{aspect-ratio:auto;min-height:560px}
+  .certificateInner{padding:28px 20px 25px}
+  .certificateAcademy{font-size:13px;letter-spacing:.18em}
+  .certificateTagline{font-size:7px;letter-spacing:.22em}
+  .certificateContent{padding-top:45px}
+  .certificateHeading{font-size:25px;letter-spacing:.04em}
+  .certificatePresented{font-size:7px;letter-spacing:.2em;margin-top:30px}
+  .certificateName{font-size:34px}
+  .certificateCompleted{font-size:11px;margin-top:25px}
+  .certificateCourse{font-size:21px}
+  .certificateDescription{font-size:8px}
+  .certificateFooter{min-height:150px;gap:8px}
+  .certificateDate{font-size:9px}
+  .certificateEmblem{width:62px;height:62px}
+  .certificateSignature{font-size:25px}
+  .certificateFooterLabel{font-size:6px}
+}
 @page{size:A4 landscape;margin:0}
 @media print{
   html,body{width:297mm;height:210mm;background:#fff!important}
   body{margin:0!important}
   body:before{display:none!important}
-  .nav,.certificateToolbar,.certificateShareNote{display:none!important}
+  .nav,.certificateActionsBar{display:none!important}
   .shell{width:297mm!important;max-width:none!important;margin:0!important}
   .certificateSection{padding:0!important;margin:0!important}
-  .certificateCard{width:297mm!important;height:210mm!important;aspect-ratio:auto!important;min-height:210mm!important;margin:0!important;padding:46px 58px!important;border:0!important;border-radius:0!important;box-shadow:none!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
-  .certificateCard:before{inset:10px}
-  .certificateCard:after{inset:20px}
+  .certificateCard{width:297mm!important;height:210mm!important;aspect-ratio:auto!important;margin:0!important;border:0!important;box-shadow:none!important}
+  .certificateCard:before{inset:7mm}
+  .certificateCard:after{inset:10mm}
+  .certificateInner{padding:11mm 18mm 10mm}
 }
