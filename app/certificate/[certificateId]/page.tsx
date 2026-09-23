@@ -7,7 +7,7 @@ import CertificateActions from '@/app/components/CertificateActions';
 
 export async function generateMetadata({params}:{params:Promise<{certificateId:string}>}){
   const {certificateId}=await params;
-  const rows=await db`select u.name,c.title from course_certificates cc join users u on u.id=cc.user_id join courses c on c.id=cc.course_id where cc.certificate_id=${certificateId} and c.published=true limit 1`;
+  const rows=await db`select u.name,c.title from course_certificates cc join users u on u.id=cc.user_id join courses c on c.id=cc.course_id where cc.certificate_id=${certificateId} and c.published=true and c.certificate_enabled=true limit 1`;
   if(!rows.length)return {title:'Certificate | Marwan Swedan'};
   const cert=rows[0] as any;
   return {title:`Certificate — ${cert.name} | Marwan Swedan`,description:`Verified certificate of completion for ${cert.title}.`};
@@ -19,7 +19,7 @@ export default async function CertificatePage({params}:{params:Promise<{certific
     from course_certificates cc
     join users u on u.id=cc.user_id
     join courses c on c.id=cc.course_id
-    where cc.certificate_id=${certificateId} and c.published=true
+    where cc.certificate_id=${certificateId} and c.published=true and c.certificate_enabled=true
     limit 1`;
   if(!rows.length)return <main><div className="shell"><SiteNav/><section className="section"><div className="form"><h1>Certificate not found.</h1><p className="muted">This certificate ID is invalid or no longer available.</p><Link className="btn primary" href="/courses">Back to academy</Link></div></section></div></main>;
   const cert=rows[0] as any;
