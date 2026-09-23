@@ -16,6 +16,20 @@ export async function generateMetadata({params}:{params:Promise<{certificateId:s
   return {title:`Certificate — ${cert.name} | Marwan Swedan`,description:`Verified certificate of completion for ${cert.title}.`};
 }
 
+function CourseEmblem({title}:{title:string}){
+  const t=title.toLowerCase();
+  let mark='COURSE';
+  if(t.includes('python')) mark='PY';
+  else if(t.includes('c++')) mark='C++';
+  else if(t.includes('network')) mark='NET';
+  else if(t.includes('javascript')) mark='JS';
+  else if(t.includes('java')) mark='JAVA';
+  else if(t.includes('linux')) mark='LINUX';
+  else if(t.includes('cyber')||t.includes('security')) mark='SEC';
+  else mark=title.trim().split(/\\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase().slice(0,4)||'COURSE';
+  return <div className="certificateEmblem" aria-label={`${title} course emblem`}><span>{mark}</span></div>;
+}
+
 export default async function CertificatePage({params}:{params:Promise<{certificateId:string}>}){
   const {certificateId}=await params;
   await ensureCertificateFlag();
@@ -33,24 +47,29 @@ export default async function CertificatePage({params}:{params:Promise<{certific
   return <main><div className="shell"><SiteNav/>
     <section className="certificateSection">
       <div className="certificateToolbar">
-        <div><div className="eyebrow">Verified achievement</div><h1>Certificate of Completion</h1><p className="muted">This certificate confirms that the student completed 100% of the course requirements.</p></div>
+        <div><div className="eyebrow">Verified certificate</div><h1>Certificate of Completion</h1></div>
         <CertificateActions shareUrl={shareUrl}/>
       </div>
       <article className="certificateCard">
-        <div className="certificateTop"><span className="certificateBrand">MARWAN SWEDAN</span><span className="certificateId">CERTIFICATE ID<br/><b>{cert.certificate_id}</b></span></div>
-        <div className="certificateMedal" aria-hidden="true">✓</div>
-        <div className="certificateTitle">CERTIFICATE</div>
-        <div className="certificateSubtitle"><i/> OF COMPLETION <i/></div>
-        <div className="certificatePresented">THIS CERTIFICATE IS PROUDLY PRESENTED TO</div>
-        <div className="certificateName">{cert.name}</div>
-        <div className="certificateLine"/>
-        <div className="certificateFor">FOR SUCCESSFULLY COMPLETING THE COURSE</div>
-        <div className="certificateCourse">{cert.title}</div>
-        <p className="certificateText">This certificate recognizes the successful completion of every required lesson in this course.</p>
-        <div className="certificateMeta"><div><span>COMPLETED ON</span><b>{date}</b></div><div><span>VERIFICATION</span><b>Verified Certificate</b></div></div>
-        <div className="certificateBottom"><div><small>COURSE COMPLETION</small><small>VERIFIED ACHIEVEMENT</small></div><div className="certificateSignature"><em>Marwan Swedan</em><span>MARWAN SWEDAN · INSTRUCTOR</span></div><div className="certificateVerify"><strong>VERIFY THIS CERTIFICATE</strong><span>{shareUrl}</span></div></div>
+        <div className="certificateCorner certificateCornerTL" aria-hidden="true"/>
+        <div className="certificateCorner certificateCornerBR" aria-hidden="true"/>
+        <div className="certificateTop"><span className="certificateBrand">MARWAN SWEDAN</span><span className="certificateId">CERTIFICATE ID · <b>{cert.certificate_id}</b></span></div>
+        <div className="certificateMain">
+          <div className="certificateHeading">CERTIFICATE OF COMPLETION</div>
+          <div className="certificateRule"/>
+          <div className="certificatePresented">THIS CERTIFICATE IS PRESENTED TO</div>
+          <div className="certificateName">{cert.name}</div>
+          <div className="certificateRule certificateRuleShort"/>
+          <div className="certificateCourse">{cert.title}</div>
+          <div className="certificateEmblemWrap"><CourseEmblem title={cert.title}/></div>
+        </div>
+        <div className="certificateBottom">
+          <div className="certificateDate"><span>ISSUE DATE</span><b>{date}</b></div>
+          <div className="certificateSignature"><em>Marwan Swedan</em><div>MARWAN SWEDAN</div></div>
+          <div className="certificateVerify"><span>VERIFIED CERTIFICATE</span><b>{cert.certificate_id}</b></div>
+        </div>
       </article>
-      <div className="certificateShareNote"><b>Share your achievement.</b><span>Public verification link:</span><a href={shareUrl} target="_blank" rel="noreferrer">{shareUrl}</a></div>
+      <div className="certificateShareNote"><b>Share your certificate</b><span>LinkedIn will share the public verification link to this certificate.</span><a href={shareUrl} target="_blank" rel="noreferrer">Open certificate ↗</a></div>
     </section>
   </div></main>;
 }
