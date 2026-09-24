@@ -23,9 +23,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
   const [current,setCurrent]=useState(0);
   const [duration,setDuration]=useState(0);
   const [fullscreen,setFullscreen]=useState(false);
-  const downloadNoticeTimeout=useRef<number|null>(null);
-  const [downloadMessage,setDownloadMessage]=useState("");
-  const [downloadMessageIndex,setDownloadMessageIndex]=useState(0);
+  const [downloadMessage,setDownloadMessage]=useState(false);
   const [captureWarning,setCaptureWarning]=useState(false);
 
   useEffect(()=>{
@@ -55,8 +53,6 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
       video.removeEventListener('ended',handleEnd);
     };
   },[savedSeconds,onTimeUpdate,onEnded]);
-
-  useEffect(()=>()=>{if(downloadNoticeTimeout.current)window.clearTimeout(downloadNoticeTimeout.current);},[]);
 
   const togglePlay=()=>{
     const video=videoRef.current;
@@ -98,21 +94,9 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
     return()=>window.removeEventListener('keydown',handleCaptureKey);
   },[]);
 
-  const downloadMessages=[
-    "ممنوع الداونلوود يا سكر انا بتاع سكيوريتي مش بتاع كفتة😍",
-    "ما قولنا مفيش داونلود بقا الاه🙃",
-    "انا بدأت اتعصب منك هااا😑",
-    "ركز في الفيديو يا بابا ربنا يكرمك 🤨",
-    "يعم بقولك ركز ضغطة كمان وهقفل الفيديو عليك😑",
-    "والله يعني مش فارقلك طب انا مش هكلمك تاني ركز بجد بقا🤠",
-  ];
-
   const showDownloadMessage=()=>{
-    const message=downloadMessages[downloadMessageIndex];
-    setDownloadMessage(message);
-    setDownloadMessageIndex(index=>(index+1)%downloadMessages.length);
-    if(downloadNoticeTimeout.current)window.clearTimeout(downloadNoticeTimeout.current);
-    downloadNoticeTimeout.current=window.setTimeout(()=>setDownloadMessage(""),5000);
+    setDownloadMessage(true);
+    window.setTimeout(()=>setDownloadMessage(false),5000);
   };
 
   const toggleFullscreen=async()=>{
@@ -140,7 +124,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
     />
     <div className="videoWatermark" aria-hidden="true"><div>PROTECTED CONTENT • MARWAN SWEDAN ACADEMY</div><div className="videoWatermarkUser">{typeof window !== "undefined" ? (document.body.dataset.username || "") : ""}</div></div>
     {captureWarning&&<div className="captureShield" role="status" aria-live="polite">Screenshot / screen capture is disabled here.</div>}
-    {downloadMessage&&<div className="downloadNotice" role="status" aria-live="polite">{downloadMessage}</div>}
+    {downloadMessage&&<div className="downloadNotice" role="status" aria-live="polite">ممنوع الداونلوود يا سكر انا بتاع سكيوريتي مش بتاع كفتة😍</div>}
     <div className="customVideoControls">
       <button type="button" className="videoControlButton" onClick={togglePlay} aria-label={playing?'Pause':'Play'}>{playing?'❚❚':'▶'}</button>
       <button type="button" className="videoControlButton" onClick={toggleMute} aria-label={muted?'Unmute':'Mute'}>{muted?'🔇':'🔊'}</button>
