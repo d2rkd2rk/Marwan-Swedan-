@@ -102,6 +102,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
       src={src}
       preload="metadata"
       playsInline
+      controls={false}
       disablePictureInPicture
       controlsList="nodownload noremoteplayback"
       className="customVideo"
