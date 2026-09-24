@@ -91,9 +91,30 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     }
   };
 
-  const markComplete=(lessonId:string)=>{
+  const [savingLesson,setSavingLesson]=useState<string|null>(null);
+
+  const markComplete=async(lessonId:string)=>{
+    if(savingLesson===lessonId||progress[lessonId]?.completed)return;
     const current=progress[lessonId]?.progress_seconds||0;
-    saveProgress(lessonId,current,true);
+    setSavingLesson(lessonId);
+    try{
+      const response=await fetch(`/api/courses/${slug}/progress`,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({lessonId,progressSeconds:current,completed:true}),
+        keepalive:true,
+        cache:'no-store'
+      });
+      const payload=await response.json().catch(()=>null);
+      if(!response.ok||!payload?.progress)throw new Error(payload?.error||'Could not save lesson completion.');
+      const saved=payload.progress as Progress;
+      setProgress(prev=>({...prev,[lessonId]:saved}));
+    }catch(error){
+      console.error('MARK_LESSON_COMPLETE_FAILED',error);
+      alert('Could not save this lesson as completed. Please try again.');
+    }finally{
+      setSavingLesson(null);
+    }
   };
 
   const ask=async(message?:string)=>{
@@ -178,7 +199,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                   {l.file_url&&<div className="actions"><a className="btn" href={isVideoFile(l.file_url,l.file_name||'')?('#lesson-video-'+l.id):l.file_url} target={isVideoFile(l.file_url,l.file_name||'')?undefined:'_blank'} rel={isVideoFile(l.file_url,l.file_name||'')?undefined:'noreferrer'} onClick={e=>{if(isVideoFile(l.file_url,l.file_name||'')){e.preventDefault();setOpenVideos(v=>({...v,[l.id]:true}));window.setTimeout(()=>document.getElementById('lesson-video-'+l.id)?.scrollIntoView({behavior:'smooth',block:'center'}),0);}}}>Open lesson file</a></div>}
                   <div className="actions">
                     <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed}>
-                      {p?.completed?'Lesson completed':'Mark as Completed'}
+                      {p?.completed?'Lesson completed':savingLesson===l.id?'Saving…':'Mark as Completed'}
                     </button>
                     {p?.progress_seconds>0&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Saved at {Math.floor(p.progress_seconds/60)}:{String(Math.floor(p.progress_seconds%60)).padStart(2,'0')}</span>}
                   </div>
