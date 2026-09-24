@@ -95,7 +95,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     if(!slug)return;
     const current=progress[lessonId]?.progress_seconds||0;
     try{
-      const response=await fetch(\`/api/courses/\${slug}/progress\`,{
+      const response=await fetch(`/api/courses/${slug}/progress`,{
         method:'PUT',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({lessonId,progressSeconds:current,completed:true}),
