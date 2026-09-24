@@ -91,3 +91,20 @@
   .certificateCard:after{inset:10mm}
   .certificateInner{padding:11mm 18mm 10mm}
 }
+
+
+.customVideoPlayer{position:relative;width:100%;overflow:hidden;border-radius:12px;background:#000;user-select:none}
+.customVideo{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#000}
+.customVideoControls{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:9px;padding:10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.9));opacity:0;transform:translateY(4px);transition:opacity .18s ease,transform .18s ease}
+.customVideoPlayer:hover .customVideoControls,.customVideoPlayer:focus-within .customVideoControls{opacity:1;transform:translateY(0)}
+.videoControlButton{border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:grid;place-items:center}
+.videoControlButton:hover{background:rgba(255,255,255,.22)}
+.videoSeek{flex:1;min-width:70px;accent-color:#fff}
+.videoVolume{width:75px;accent-color:#fff}
+.videoTime{font-size:12px;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:600px){
+  .customVideoControls{gap:6px;padding:8px}
+  .videoVolume{display:none}
+  .videoTime{font-size:10px}
+  .videoControlButton{width:30px;height:30px}
+}
