@@ -122,7 +122,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
       className="customVideo"
       onPause={()=>{if(videoRef.current)onPause?.(videoRef.current.currentTime)}}
     />
-    <div className="videoWatermark" aria-hidden="true">PROTECTED CONTENT • MARWAN SWEDAN ACADEMY</div>
+    <div className="videoWatermark" aria-hidden="true"><div>PROTECTED CONTENT • MARWAN SWEDAN ACADEMY</div><div className="videoWatermarkUser">{typeof window !== "undefined" ? (document.body.dataset.username || "") : ""}</div></div>
     {captureWarning&&<div className="captureShield" role="status" aria-live="polite">Screenshot / screen capture is disabled here.</div>}
     {downloadMessage&&<div className="downloadNotice" role="status" aria-live="polite">ممنوع الداونلوود يا سكر انا بتاع سكيوريتي مش بتاع كفتة😍</div>}
     <div className="customVideoControls">
