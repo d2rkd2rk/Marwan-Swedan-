@@ -95,24 +95,17 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     if(!slug)return;
     const current=progress[lessonId]?.progress_seconds||0;
     try{
-      const response=await fetch(`/api/courses/${slug}/progress/complete`,{
-        method:'POST',
+      const response=await fetch(\`/api/courses/\${slug}/progress\`,{
+        method:'PUT',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({lessonId,progressSeconds:current}),
+        body:JSON.stringify({lessonId,progressSeconds:current,completed:true}),
         cache:'no-store'
       });
       const result=await response.json();
-      if(!response.ok||!result.progress?.completed)throw new Error(result.error||'Could not complete lesson');
+      if(!response.ok||!result.progress?.completed)throw new Error(result.error||'Could not save completion');
       setProgress(prev=>({...prev,[lessonId]:result.progress}));
-      const verify=await fetch(`/api/courses/${slug}`,{cache:'no-store'});
-      const verified=await verify.json();
-      if(Array.isArray(verified.progress)){
-        const mapped:Record<string,Progress>={};
-        for(const item of verified.progress)mapped[item.lesson_id]=item;
-        setProgress(mapped);
-      }
     }catch{
-      // Do not show a false "completed" state when the database write fails.
+      // Keep the previous state when the database did not confirm completion.
     }
   };
 
