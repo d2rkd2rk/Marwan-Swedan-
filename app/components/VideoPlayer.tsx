@@ -24,6 +24,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
   const [duration,setDuration]=useState(0);
   const [fullscreen,setFullscreen]=useState(false);
   const [downloadMessage,setDownloadMessage]=useState(false);
+  const [captureWarning,setCaptureWarning]=useState(false);
 
   useEffect(()=>{
     const video=videoRef.current;
@@ -80,6 +81,19 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
     setMuted(video.muted);
     if(!video.muted&&video.volume===0){video.volume=.8;setVolume(.8);}
   };
+  useEffect(()=>{
+    const handleCaptureKey=(e:KeyboardEvent)=>{
+      const key=e.key.toLowerCase();
+      if(e.key==='PrintScreen'||(e.metaKey&&e.shiftKey&&key==='3')||(e.metaKey&&e.shiftKey&&key==='4')){
+        e.preventDefault();
+        setCaptureWarning(true);
+        window.setTimeout(()=>setCaptureWarning(false),1800);
+      }
+    };
+    window.addEventListener('keydown',handleCaptureKey);
+    return()=>window.removeEventListener('keydown',handleCaptureKey);
+  },[]);
+
   const showDownloadMessage=()=>{
     setDownloadMessage(true);
     window.setTimeout(()=>setDownloadMessage(false),5000);
@@ -108,13 +122,15 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
       className="customVideo"
       onPause={()=>{if(videoRef.current)onPause?.(videoRef.current.currentTime)}}
     />
+    <div className="videoWatermark" aria-hidden="true">PROTECTED CONTENT • MARWAN SWEDAN ACADEMY</div>
+    {captureWarning&&<div className="captureShield" role="status" aria-live="polite">Screenshot / screen capture is disabled here.</div>}
     {downloadMessage&&<div className="downloadNotice" role="status" aria-live="polite">ممنوع الداونلوود يا سكر انا بتاع سكيوريتي مش بتاع كفتة😍</div>}
     <div className="customVideoControls">
       <button type="button" className="videoControlButton" onClick={togglePlay} aria-label={playing?'Pause':'Play'}>{playing?'❚❚':'▶'}</button>
       <button type="button" className="videoControlButton" onClick={toggleMute} aria-label={muted?'Unmute':'Mute'}>{muted?'🔇':'🔊'}</button>
       <input className="videoSeek" type="range" min="0" max={Math.max(duration,0.01)} step="0.1" value={Math.min(current,duration||0)} onChange={e=>seek(Number(e.target.value))} aria-label="Video progress"/>
       <span className="videoTime">{formatTime(current)} / {formatTime(duration)}</span>
-      <button type="button" className="videoControlButton videoDownloadButton" onClick={showDownloadMessage} aria-label="Download disabled" title="Download disabled">Download</button>
+      <button type="button" className="videoControlButton videoDownloadButton" onClick={showDownloadMessage} aria-label="Download disabled" title="Download disabled">⇩</button>
       <input className="videoVolume" type="range" min="0" max="1" step="0.05" value={muted?0:volume} onChange={e=>changeVolume(Number(e.target.value))} aria-label="Volume"/>
       <button type="button" className="videoControlButton" onClick={toggleFullscreen} aria-label="Fullscreen">{fullscreen?'⤢':'⛶'}</button>
     </div>
