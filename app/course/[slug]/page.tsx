@@ -91,9 +91,29 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     }
   };
 
-  const markComplete=(lessonId:string)=>{
+  const markComplete=async(lessonId:string)=>{
+    if(!slug)return;
     const current=progress[lessonId]?.progress_seconds||0;
-    saveProgress(lessonId,current,true);
+    try{
+      const response=await fetch(`/api/courses/${slug}/progress/complete`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({lessonId,progressSeconds:current}),
+        cache:'no-store'
+      });
+      const result=await response.json();
+      if(!response.ok||!result.progress?.completed)throw new Error(result.error||'Could not complete lesson');
+      setProgress(prev=>({...prev,[lessonId]:result.progress}));
+      const verify=await fetch(`/api/courses/${slug}`,{cache:'no-store'});
+      const verified=await verify.json();
+      if(Array.isArray(verified.progress)){
+        const mapped:Record<string,Progress>={};
+        for(const item of verified.progress)mapped[item.lesson_id]=item;
+        setProgress(mapped);
+      }
+    }catch{
+      // Do not show a false "completed" state when the database write fails.
+    }
   };
 
   const ask=async(message?:string)=>{
