@@ -112,6 +112,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
 
   const c=data.course;
   const lessons=data.lessons||[];
+  const isVideoFile=(url:string='',name:string='')=>/\.(mp4|webm|ogg|mov|m4v)(?:[?#]|$)/i.test(url)||/\.(mp4|webm|ogg|mov|m4v)$/i.test(name);
   const completedCount=lessons.filter((l:any)=>progress[l.id]?.completed).length;
   const percent=lessons.length?Math.round((completedCount/lessons.length)*100):0;
   const courseComplete=lessons.length>0&&completedCount===lessons.length;
@@ -172,7 +173,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                       {p?.completed?'✓ Video completed':'Mark the video as completed when you finish watching.'}
                     </div>
                   </div>}
-                  {l.file_url&&<div className="actions"><a className="btn" href={l.file_url} target="_blank" rel="noreferrer">Open lesson file</a></div>}
+                  {l.file_url&&!isVideoFile(l.file_url,l.file_name||'')&&<div className="actions"><a className="btn" href={l.file_url} target="_blank" rel="noreferrer">Open lesson file</a></div>}
                   <div className="actions">
                     <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed}>
                       {p?.completed?'Lesson completed':'Mark as Completed'}
