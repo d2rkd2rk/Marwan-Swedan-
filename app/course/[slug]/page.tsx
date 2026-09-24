@@ -158,7 +158,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     {p?.completed&&<span className="tag">Completed</span>}
                   </div>
                   <div className="small muted">{l.duration_minutes} minutes {l.file_name?'· '+l.file_name:''}</div>
-                  {l.video_url&&<div id={\`lesson-video-${l.id}\`} style={{marginTop:14}}>
+                  {l.video_url&&<div id={`lesson-video-${l.id}`} style={{marginTop:14}}>
                     <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginBottom:10}} aria-label="Video progress">
                       <div style={{height:'100%',width:`${Math.min(100,Math.max(0,((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .15s ease'}}/>
                     </div>
@@ -173,7 +173,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                       {p?.completed?'✓ Video completed':'Mark the video as completed when you finish watching.'}
                     </div>
                   </div>}
-                  {l.file_url&&<div className="actions"><a className="btn" href={isVideoFile(l.file_url,l.file_name||'')?\`#lesson-video-${l.id}\`:l.file_url} target={isVideoFile(l.file_url,l.file_name||'')?undefined:'_blank'} rel={isVideoFile(l.file_url,l.file_name||'')?undefined:'noreferrer'} onClick={e=>{if(isVideoFile(l.file_url,l.file_name||'')){e.preventDefault();document.getElementById(\`lesson-video-${l.id}\`)?.scrollIntoView({behavior:'smooth',block:'center'});}}}>Open lesson file</a></div>}
+                  {l.file_url&&<div className="actions"><a className="btn" href={isVideoFile(l.file_url,l.file_name||'')?`#lesson-video-${l.id}`:l.file_url} target={isVideoFile(l.file_url,l.file_name||'')?undefined:'_blank'} rel={isVideoFile(l.file_url,l.file_name||'')?undefined:'noreferrer'} onClick={e=>{if(isVideoFile(l.file_url,l.file_name||'')){e.preventDefault();document.getElementById(`lesson-video-${l.id}`)?.scrollIntoView({behavior:'smooth',block:'center'});}}}>Open lesson file</a></div>}
                   <div className="actions">
                     <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed}>
                       {p?.completed?'Lesson completed':'Mark as Completed'}
