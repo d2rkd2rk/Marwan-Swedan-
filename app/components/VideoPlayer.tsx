@@ -23,6 +23,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
   const [current,setCurrent]=useState(0);
   const [duration,setDuration]=useState(0);
   const [fullscreen,setFullscreen]=useState(false);
+  const [downloadMessage,setDownloadMessage]=useState(false);
 
   useEffect(()=>{
     const video=videoRef.current;
@@ -79,6 +80,11 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
     setMuted(video.muted);
     if(!video.muted&&video.volume===0){video.volume=.8;setVolume(.8);}
   };
+  const showDownloadMessage=()=>{
+    setDownloadMessage(true);
+    window.setTimeout(()=>setDownloadMessage(false),2600);
+  };
+
   const toggleFullscreen=async()=>{
     const wrapper=videoRef.current?.parentElement?.parentElement as HTMLElement|null;
     if(!wrapper)return;
@@ -101,11 +107,13 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
       className="customVideo"
       onPause={()=>{if(videoRef.current)onPause?.(videoRef.current.currentTime)}}
     />
+    {downloadMessage&&<div className="downloadNotice" role="status" aria-live="polite">ممنوع الداونلود انا راجل بتاع سكيوريتي برضو يا قلبي😍</div>}
     <div className="customVideoControls">
       <button type="button" className="videoControlButton" onClick={togglePlay} aria-label={playing?'Pause':'Play'}>{playing?'❚❚':'▶'}</button>
       <button type="button" className="videoControlButton" onClick={toggleMute} aria-label={muted?'Unmute':'Mute'}>{muted?'🔇':'🔊'}</button>
       <input className="videoSeek" type="range" min="0" max={Math.max(duration,0.01)} step="0.1" value={Math.min(current,duration||0)} onChange={e=>seek(Number(e.target.value))} aria-label="Video progress"/>
       <span className="videoTime">{formatTime(current)} / {formatTime(duration)}</span>
+      <button type="button" className="videoControlButton videoDownloadButton" onClick={showDownloadMessage} aria-label="Download disabled" title="Download disabled">⇩</button>
       <input className="videoVolume" type="range" min="0" max="1" step="0.05" value={muted?0:volume} onChange={e=>changeVolume(Number(e.target.value))} aria-label="Volume"/>
       <button type="button" className="videoControlButton" onClick={toggleFullscreen} aria-label="Fullscreen">{fullscreen?'⤢':'⛶'}</button>
     </div>
