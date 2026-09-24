@@ -151,6 +151,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
           <div>
             {lessons.map((l:any)=>{
               const p=progress[l.id];
+              const lessonVideoUrl=l.video_url||((l.file_url&&isVideoFile(l.file_url,l.file_name||''))?l.file_url:'');
               return <div className="lesson" key={l.id} ref={el=>{lessonRefs.current[l.id]=el}}>
                 <div style={{flex:1}}>
                   <div style={{display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',flexWrap:'wrap'}}>
@@ -158,12 +159,12 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     {p?.completed&&<span className="tag">Completed</span>}
                   </div>
                   <div className="small muted">{l.duration_minutes} minutes {l.file_name?'· '+l.file_name:''}</div>
-                  {l.video_url&&<div id={`lesson-video-${l.id}`} style={{marginTop:14}}>
+                  {lessonVideoUrl&&<div id={`lesson-video-${l.id}`} style={{marginTop:14}}>
                     <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginBottom:10}} aria-label="Video progress">
                       <div style={{height:'100%',width:`${Math.min(100,Math.max(0,((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .15s ease'}}/>
                     </div>
                     <VideoPlayer
-                      src={l.video_url}
+                      src={lessonVideoUrl}
                       savedSeconds={progress[l.id]?.progress_seconds||0}
                       onTimeUpdate={(currentTime,duration)=>handleTimeUpdate(l.id,currentTime,duration)}
                       onPause={currentTime=>saveProgress(l.id,currentTime,Boolean(p?.completed))}
