@@ -3,6 +3,7 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
+import VideoPlayer from '@/app/components/VideoPlayer';
 
 const whatsappNumber='201515227612';
 const suggestedQuestions=[
@@ -160,21 +161,12 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginBottom:10}} aria-label="Video progress">
                       <div style={{height:'100%',width:`${Math.min(100,Math.max(0,((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .15s ease'}}/>
                     </div>
-                    <video
-                      controls
-                      controlsList="nodownload noremoteplayback"
-                      disablePictureInPicture
-                      preload="metadata"
-                      style={{width:'100%',borderRadius:12}}
+                    <VideoPlayer
                       src={l.video_url}
-                      onContextMenu={e=>e.preventDefault()}
-                      onLoadedMetadata={e=>{
-                        const saved=progress[l.id]?.progress_seconds||0;
-                        if(saved>0&&saved<e.currentTarget.duration-2)e.currentTarget.currentTime=saved;
-                      }}
-                      onTimeUpdate={e=>handleTimeUpdate(l.id,e.currentTarget.currentTime,e.currentTarget.duration)}
-                      onPause={e=>saveProgress(l.id,e.currentTarget.currentTime,Boolean(p?.completed))}
-                      onEnded={e=>saveProgress(l.id,e.currentTarget.duration,true)}
+                      savedSeconds={progress[l.id]?.progress_seconds||0}
+                      onTimeUpdate={(currentTime,duration)=>handleTimeUpdate(l.id,currentTime,duration)}
+                      onPause={currentTime=>saveProgress(l.id,currentTime,Boolean(p?.completed))}
+                      onEnded={duration=>saveProgress(l.id,duration,true)}
                     />
                     <div className="small muted" style={{marginTop:7}}>
                       {p?.completed?'✓ Video completed':'Mark the video as completed when you finish watching.'}
