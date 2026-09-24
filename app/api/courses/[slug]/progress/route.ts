@@ -12,6 +12,8 @@ async function getCourseAccess(userId:string, slug:string){
   if(!rows.length)return null;
   const course=rows[0] as any;
   if(course.is_free)return course;
+  const user=await db`select role from users where id=${userId} limit 1`;
+  if((user[0] as any)?.role==='admin')return course;
   const access=await db`select id from enrollments where user_id=${userId} and course_id=${course.id} and revoked_at is null limit 1`;
   return access.length?course:null;
 }
