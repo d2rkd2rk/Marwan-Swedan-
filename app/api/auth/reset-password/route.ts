@@ -7,7 +7,7 @@ import {audit} from '@/lib/security';
 export async function POST(request:Request){
   try{
     const {challengeId,code,newPassword}=await request.json();
-    if(!validPassword(String(newPassword||'')))return NextResponse.json({error:'New password must be 8+ characters with a number and special character.'},{status:400});
+    if(!validPassword(String(newPassword||'')))return NextResponse.json({error:'New password must be 8+ characters with an uppercase letter, a number and a special character.'},{status:400});
     const userId=await verifyOtp(String(challengeId||''),String(code||'').trim(),'password_reset');
     if(!userId)return NextResponse.json({error:'Invalid or expired verification code.'},{status:400});
     const passwordHash=await hashPassword(String(newPassword));
