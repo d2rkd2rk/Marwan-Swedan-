@@ -72,5 +72,5 @@ export async function session(){
 
 export async function requireUser(){const user=await session();if(!user)throw new Error('UNAUTHENTICATED');return user}
 export async function requireAdmin(){const user=await requireUser();if(user.role!=='admin')throw new Error('FORBIDDEN');return user}
-export function validPassword(password:string){return password.length>=8&&/[0-9]/.test(password)&&/[^A-Za-z0-9]/.test(password)}
+export function validPassword(password:string){return password.length>=8&&/[A-Z]/.test(password)&&/[0-9]/.test(password)&&/[^A-Za-z0-9]/.test(password)}
 export const adminEmail=process.env.ADMIN_EMAIL||'202501259@pua.edu.eg';
