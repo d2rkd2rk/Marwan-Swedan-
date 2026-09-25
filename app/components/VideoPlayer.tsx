@@ -28,6 +28,8 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
   const [downloadMessage,setDownloadMessage]=useState(false);
   const [captureWarning,setCaptureWarning]=useState(false);
   const [seekFeedback,setSeekFeedback]=useState<'forward'|'backward'|null>(null);
+  const [controlsVisible,setControlsVisible]=useState(true);
+  const hideControlsTimer=useRef<number|null>(null);
 
   useEffect(()=>{
     const video=videoRef.current;
@@ -56,6 +58,14 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
       video.removeEventListener('ended',handleEnd);
     };
   },[savedSeconds,onTimeUpdate,onEnded]);
+
+  const resetControlsTimer=()=>{
+    setControlsVisible(true);
+    if(hideControlsTimer.current!==null)window.clearTimeout(hideControlsTimer.current);
+    hideControlsTimer.current=window.setTimeout(()=>setControlsVisible(false),3000);
+  };
+
+  useEffect(()=>()=>{if(hideControlsTimer.current!==null)window.clearTimeout(hideControlsTimer.current);},[]);
 
   const togglePlay=()=>{
     const video=videoRef.current;
@@ -103,7 +113,10 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
     if(!video.muted&&video.volume===0){video.volume=.8;setVolume(.8);}
   };
 
+  const handlePlayerInteraction=()=>resetControlsTimer();
+
   const handleVideoDoubleTap=(e:React.MouseEvent<HTMLVideoElement>)=>{
+    resetControlsTimer();
     const now=Date.now();
     const rect=e.currentTarget.getBoundingClientRect();
     const x=e.clientX-rect.left;
@@ -174,7 +187,8 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
 
   return <div
     ref={playerRef}
-    className="customVideoPlayer"
+    className={`customVideoPlayer ${controlsVisible?'controlsVisible':'controlsHidden'}`}
+    onPointerDown={handlePlayerInteraction}
     onContextMenu={e=>e.preventDefault()}
     onDragStart={e=>e.preventDefault()}
   >
