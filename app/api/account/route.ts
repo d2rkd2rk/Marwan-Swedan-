@@ -34,7 +34,7 @@ export async function POST(request:Request){
  try{
   const user=await requireUser();await ensureAccountColumns();const body=await request.json();
   const next=String(body.newPassword||'');const challengeId=String(body.challengeId||'');const code=String(body.code||'').trim();
-  if(!validPassword(next))return NextResponse.json({error:'New password must be 8+ characters with a number and special character.'},{status:400});
+  if(!validPassword(next))return NextResponse.json({error:'New password must be 8+ characters with an uppercase letter, a number and a special character.'},{status:400});
   const accountRows=await db`select password_hash,email,password_change_allowed,role from users where id=${user.id} limit 1`;if(!accountRows.length)return NextResponse.json({error:'Account not found.'},{status:404});
   const account=accountRows[0] as any;
   const bootstrap=(await cookies()).get('marwan_admin_bootstrap')?.value==='1';
