@@ -93,9 +93,9 @@
 }
 
 
-.customVideoPlayer{position:relative;width:100%;overflow:hidden;border-radius:12px;background:#000;user-select:none}
+.customVideoPlayer{position:relative;width:100%;overflow:hidden;border-radius:12px;background:#000;user-select:none;touch-action:manipulation}.customVideoPlayer:fullscreen{width:100vw;height:100vh;border-radius:0;display:flex;align-items:center;justify-content:center;background:#000}.customVideoPlayer:fullscreen .customVideo{width:100%;height:100%;aspect-ratio:auto;object-fit:contain}.customVideoPlayer:fullscreen .customVideoControls{bottom:0}.customVideoPlayer:fullscreen .videoWatermark{font-size:clamp(14px,1.5vw,24px)}
 .customVideo{display:block;width:100%;height:auto;aspect-ratio:16/9;background:#000}
-.customVideoControls{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:9px;padding:10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.9));opacity:0;transform:translateY(4px);transition:opacity .18s ease,transform .18s ease}
+.customVideoControls{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:9px;padding:10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.9));opacity:0;transform:translateY(4px);transition:opacity .18s ease,transform .18s ease;z-index:5}
 .customVideoPlayer:hover .customVideoControls,.customVideoPlayer:focus-within .customVideoControls{opacity:1;transform:translateY(0)}
 .videoControlButton{border:0;background:rgba(255,255,255,.12);color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:grid;place-items:center}
 .videoControlButton:hover{background:rgba(255,255,255,.22)}
@@ -106,11 +106,15 @@
 .videoDownloadButton{font-size:17px}
 @keyframes downloadNoticeIn{from{opacity:0;transform:translate(-50%,6px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(max-width:600px){
-  .customVideoControls{gap:6px;padding:8px}
+  .customVideoControls{gap:5px;padding:8px}
   .videoVolume{display:none}
   .videoTime{font-size:10px}
-  .videoControlButton{width:30px;height:30px}
+  .videoControlButton{width:30px;height:30px;font-size:12px}
+  .videoSeek{min-width:45px}
 }
+.videoSeekFeedback{position:absolute;top:50%;z-index:4;transform:translateY(-50%);padding:12px 15px;border-radius:999px;background:rgba(0,0,0,.72);color:#fff;font-size:18px;font-weight:800;pointer-events:none;animation:videoSeekFeedback .55s ease-out}
+.videoSeekFeedback.forward{right:18%}.videoSeekFeedback.backward{left:18%}
+@keyframes videoSeekFeedback{0%{opacity:0;transform:translateY(-50%) scale(.8)}20%{opacity:1;transform:translateY(-50%) scale(1)}100%{opacity:0;transform:translateY(-50%) scale(1)}}
 
 .videoWatermark{position:absolute;inset:0;z-index:2;pointer-events:none;display:flex;align-items:center;justify-content:center;transform:rotate(-22deg);font-size:clamp(12px,1.25vw,20px);font-weight:800;letter-spacing:.16em;color:rgba(255,255,255,.12);text-align:center;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.35)}
 .captureShield{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:rgba(0,0,0,.96);color:#fff;font-size:clamp(14px,1.6vw,20px);font-weight:800;text-align:center;padding:24px;letter-spacing:.02em}
