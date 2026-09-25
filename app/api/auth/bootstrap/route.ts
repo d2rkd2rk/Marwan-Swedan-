@@ -8,7 +8,7 @@ export async function POST(request:Request){
     if(!secret||request.headers.get('x-admin-bootstrap-secret')!==secret)return NextResponse.json({error:'Bootstrap is not available.'},{status:403});
     const body=await request.json();
     const password=String(body.password||'');
-    if(!validPassword(password))return NextResponse.json({error:'Password must be 8+ characters with a number and special character.'},{status:400});
+    if(!validPassword(password))return NextResponse.json({error:'Password must be 8+ characters with an uppercase letter, a number and a special character.'},{status:400});
     const existing=await db`select id from users where role='admin' or lower(email)=lower(${adminEmail}) limit 1`;
     if(existing.length)return NextResponse.json({error:'Administrator account already exists.'},{status:409});
     const lock=await db`insert into admin_bootstrap_lock(id) values(1) on conflict(id) do nothing returning id`;
