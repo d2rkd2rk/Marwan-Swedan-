@@ -69,3 +69,28 @@
   .hero{padding-top:38px}
   .heroVisual{min-height:250px}
 }
+
+/* Responsive hardening: keep narrow screens inside the viewport without scaling the whole site down. */
+@media (max-width: 700px){
+  html,body{width:100%;max-width:100%;overflow-x:hidden}
+  .shell,.dash,.adminGrid,.adminMain,.card,.grid,.lessonBuilder,.lessonForm,.lessonList,.field,.actions,.adminTitle,.sectionhead,.tableWrap{min-width:0;max-width:100%}
+  .cardHead,.adminTitle,.actions,.sectionhead,.accessRow{flex-wrap:wrap}
+  .cardHead>*{min-width:0}
+  .field input,.field textarea,.field select{min-width:0;max-width:100%}
+  .tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .table{min-width:620px}
+  .adminSearchRow{width:100%}
+  .adminSearchRow input{min-width:0!important;width:100%}
+  .adminSearchRow .btn{flex:0 0 auto}
+  .accessRow>div{min-width:0;flex:1}
+  .accessRow b,.accessRow small{overflow-wrap:anywhere}
+  .courseListItem>button{min-width:0}
+  img,video,iframe{max-width:100%}
+  pre,code{max-width:100%;overflow-x:auto}
+}
+@media (max-width: 430px){
+  .shell{width:calc(100% - 20px)}
+  .card{padding:15px}
+  .adminSearchRow .btn{width:100%}
+  .adminSearchRow input{width:100%}
+}
