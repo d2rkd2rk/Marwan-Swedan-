@@ -17,7 +17,7 @@ export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){
   try{await fetch('/api/auth/logout',{method:'POST'});}finally{window.location.href='/';}
  };
  return <nav className={s.nav}>
-  <Link href="/" className={s.logo}><span className={s.logoMark}>M</span><span className={s.logoText}>Marwan Swedan<small>Cybersecurity · Academy · Portfolio</small></span></Link>
+  <Link href="/" className={s.logo}><span className={s.logoMark} aria-hidden="true" style={{clipPath:'none',borderRadius:'50%',backgroundImage:"url('/images/profile.jpg')",backgroundSize:'cover',backgroundPosition:'center',fontSize:0}}/><span className={s.logoText}>Marwan Swedan<small>Cybersecurity · Academy · Portfolio</small></span></Link>
   <div className={s.links}>
    <Link href="/">Home</Link>
    <Link href="/courses">Academy</Link>
