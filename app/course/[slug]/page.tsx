@@ -5,7 +5,7 @@ import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
 import VideoPlayer from '@/app/components/VideoPlayer';
 
-const whatsappNumber='201515227612';
+const defaultWhatsAppNumber='201515227612';
 const suggestedQuestions=[
   'الكورس ده مناسب للمبتدئين؟',
   'هتعلم إيه من الكورس ده؟',
@@ -26,8 +26,22 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [openVideos,setOpenVideos]=useState<Record<string,boolean>>({});
   const [progress,setProgress]=useState<Record<string,Progress>>({});
   const [certificate,setCertificate]=useState<{certificateId:string;issuedAt:string}|null>(null);
+  const [reviews,setReviews]=useState<any[]>([]);
+  const [myReview,setMyReview]=useState<any>(null);
+  const [reviewRating,setReviewRating]=useState(5);
+  const [reviewText,setReviewText]=useState('');
+  const [reviewBusy,setReviewBusy]=useState(false);
+  const [reviewMessage,setReviewMessage]=useState('');
   const lastSaved=useRef<Record<string,number>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
+
+  useEffect(()=>{
+    if(!slug)return;
+    fetch(`/api/courses/${slug}/reviews`,{cache:'no-store'}).then(r=>r.json()).then(j=>{
+      if(Array.isArray(j.reviews))setReviews(j.reviews);
+      if(j.myReview){setMyReview(j.myReview);setReviewRating(j.myReview.rating);setReviewText(j.myReview.review||'');}
+    }).catch(()=>{});
+  },[slug]);
 
   useEffect(()=>{
     if(!data?.course?.slug||!data?.lessons?.length)return;
@@ -57,6 +71,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     if(!data?.course||data.course.is_free)return '';
     const c=data.course;
     const message=`السلام عليكم، أريد شراء كورس ${c.title}.\\nالسعر الحالي: ${c.price} EGP\\nUsername/Email: `;
+    const whatsappNumber=c.whatsapp_number||defaultWhatsAppNumber;
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
   },[data]);
 
@@ -109,6 +124,19 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     }
   };
 
+  const submitReview=async()=>{
+    if(reviewBusy||!reviewText.trim())return;
+    setReviewBusy(true);setReviewMessage('');
+    try{
+      const r=await fetch(`/api/courses/${slug}/reviews`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rating:reviewRating,review:reviewText})});
+      const j=await r.json();
+      if(!r.ok)throw new Error(j.error||'Could not save review.');
+      setMyReview(j.review);setReviewMessage('Review saved.');
+      const refreshed=await fetch(`/api/courses/${slug}/reviews`,{cache:'no-store'}).then(x=>x.json());
+      setReviews(refreshed.reviews||[]);
+    }catch(e:any){setReviewMessage(e.message||'Could not save review.');}
+    finally{setReviewBusy(false);}
+  };
   const ask=async(message?:string)=>{
     const question=(message??q).trim();
     if(!question||busy)return;
@@ -213,6 +241,21 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
           <p className="muted">{c.is_free?'Create an account or sign in and the lessons will become available.':'The current price is shown above. Tap the WhatsApp button to send a ready-made purchase message. Payment is arranged with the instructor directly.'}</p>
           <div className="actions">{c.is_free?<><Link className="btn primary" href="/register">Register</Link><Link className="btn" href="/login">Sign in</Link></>:<a className="btn primary" href={purchaseUrl} target="_blank" rel="noreferrer">Buy this course</a>}</div>
         </div>}
+      </section>
+
+      <section className="section courseReviews" style={{paddingTop:25}}>
+        <div className="sectionhead"><div><div className="eyebrow">Student feedback</div><h2>Reviews & Ratings</h2></div><span className="small muted">{reviews.length} review{reviews.length===1?'':'s'}</span></div>
+        {data.enrolled&&<div className="card" style={{marginBottom:20}}>
+          <div className="cardHead"><div><h3>{myReview?'Edit your review':'Rate this course'}</h3><p className="small muted">Share your experience with other students.</p></div></div>
+          <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:14}}>{[1,2,3,4,5].map(n=><button key={n} type="button" className="iconBtn" aria-label={`Rate ${n} out of 5`} onClick={()=>setReviewRating(n)} style={{fontSize:22,padding:'4px 9px',color:n<=reviewRating?'#f3c969':'#66798a',borderColor:n<=reviewRating?'#8a7540':'var(--line)'}}>★</button>)}</div>
+          <div className="field"><label>Your review</label><textarea maxLength={1000} value={reviewText} onChange={e=>setReviewText(e.target.value)} placeholder="Write your review about this course…"/></div>
+          <div className="actions"><button className="btn primary" onClick={submitReview} disabled={reviewBusy||reviewText.trim().length<3}>{reviewBusy?'Saving…':myReview?'Update review':'Publish review'}</button>{reviewMessage&&<span className="small muted" style={{alignSelf:'center'}}>{reviewMessage}</span>}</div>
+        </div>}
+        {!data.enrolled&&<div className="card" style={{marginBottom:20}}><p className="muted" style={{margin:0}}>Reviews are visible to everyone. Get course access to write your own review.</p></div>}
+        {reviews.length===0?<div className="emptyAcademy"><div><h3>No reviews yet.</h3><p className="muted">Be the first student to share your experience.</p></div></div>:<div style={{display:'grid',gap:12}}>{reviews.map((r:any)=><article className="card" key={r.id}>
+          <div style={{display:'flex',gap:13,alignItems:'center'}}>{r.avatar_url?<img src={r.avatar_url} alt="" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',border:'1px solid var(--line)'}}/>:<div style={{width:44,height:44,borderRadius:'50%',background:'var(--soft)',display:'grid',placeItems:'center',fontFamily:'Space Grotesk',fontWeight:700}}>{String(r.name||'?').slice(0,1).toUpperCase()}</div>}<div><b>{r.name}</b><div className="small muted">@{r.username}</div></div><div style={{marginLeft:'auto',color:'#f3c969',letterSpacing:2}}>{'★'.repeat(Math.max(0,Math.min(5,Number(r.rating))))}</div></div>
+          <p style={{lineHeight:1.8,margin:'16px 0 0',whiteSpace:'pre-wrap'}}>{r.review}</p>
+        </article>)}</div>}
       </section>
     </div>
   </main>;
