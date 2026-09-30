@@ -37,3 +37,6 @@ create index if not exists lesson_progress_user_idx on lesson_progress(user_id,u
 create table if not exists course_certificates(id uuid primary key default gen_random_uuid(),certificate_id text not null unique,user_id uuid not null references users(id) on delete cascade,course_id uuid not null references courses(id) on delete cascade,issued_at timestamptz not null default now(),unique(user_id,course_id));
 create index if not exists course_certificates_course_idx on course_certificates(course_id,issued_at desc);
 create index if not exists course_certificates_user_idx on course_certificates(user_id,issued_at desc);
+
+create table if not exists course_reviews(id uuid primary key default gen_random_uuid(),course_id uuid not null references courses(id) on delete cascade,user_id uuid not null references users(id) on delete cascade,rating smallint not null check(rating between 1 and 5),review text not null,created_at timestamptz not null default now(),updated_at timestamptz not null default now(),unique(course_id,user_id));
+create index if not exists course_reviews_course_idx on course_reviews(course_id,created_at desc);
