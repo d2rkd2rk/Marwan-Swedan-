@@ -24,10 +24,12 @@ export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){
    <Link href="/courses">Courses</Link>
    <Link href="/#portfolio">Portfolio</Link>
    <Link href="/#about">About</Link>
+   {user&&<Link href="/dashboard">Dashboard</Link>}
   </div>
   <div className={s.navActions}>
    <span className={s.search}>⌕</span>
    {user ? <>
+    <Link className={s.btn} href="/dashboard">Dashboard</Link>
     <Link className={s.btn} href="/account">@{user.username}</Link>
     {user.role==='admin'&&<Link className={`${s.btn} ${s.primary}`} href="/admin">Dashboard</Link>}
     <button className={s.btn} onClick={logout} disabled={busy}>{busy?'Signing out…':'Sign out'}</button>
