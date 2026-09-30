@@ -22,7 +22,8 @@ function storage(){
 
 function validKey(key:string){
   const parts=key.split('/');
-  return parts.length>=3&&parts[0]==='courses'&&Boolean(parts[1]);
+  if(parts.length>=3&&parts[0]==='courses'&&Boolean(parts[1]))return true;
+  return parts.length===4&&parts[0]==='profiles'&&Boolean(parts[1])&&parts[2]==='avatar';
 }
 
 export async function GET(request:NextRequest){
@@ -30,12 +31,14 @@ export async function GET(request:NextRequest){
   const key=request.nextUrl.searchParams.get('key');
   if(!key||!validKey(key))return new NextResponse('Not found',{status:404});
 
-  const user=await session();
-  if(!user)return new NextResponse('Authentication required',{status:401});
+  const parts=key.split('/');
+  const isPublicAvatar=parts[0]==='profiles'&&parts[2]==='avatar';
+  const user=isPublicAvatar?null:await session();
+  if(!isPublicAvatar&&!user)return new NextResponse('Authentication required',{status:401});
 
-  const courseId=key.split('/')[1];
+  const courseId=parts[1];
   const isThumbnail=courseId==='course-thumbnails';
-  if(!isThumbnail){
+  if(!isPublicAvatar&&!isThumbnail){
     const course=await db`select is_free from courses where id=${courseId} limit 1`;
     if(!course.length)return new NextResponse('Not found',{status:404});
     const enrollment=await db`select id from enrollments where user_id=${user.id} and course_id=${courseId} and revoked_at is null limit 1`;
