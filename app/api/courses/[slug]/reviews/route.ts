@@ -54,3 +54,20 @@ export async function POST(request:Request,{params}:{params:Promise<{slug:string
   return NextResponse.json({review:rows[0]});
  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not save review.'},{status:e.message==='UNAUTHENTICATED'?401:400})}
 }
+
+export async function DELETE(request:Request,{params}:{params:Promise<{slug:string}>}){
+ try{
+  const user=await requireUser();
+  if(user.role!=='admin')return NextResponse.json({error:'Admin access required.'},{status:403});
+  await ensureReviewsTable();
+  const {slug}=await params;
+  const course=await getCourse(slug);
+  if(!course)return NextResponse.json({error:'Course not found.'},{status:404});
+  const body=await request.json().catch(()=>({}));
+  const reviewId=String(body.id||'');
+  if(!reviewId)return NextResponse.json({error:'Review id is required.'},{status:400});
+  const rows=await db`delete from course_reviews where id=${reviewId} and course_id=${course.id} returning id`;
+  if(!rows.length)return NextResponse.json({error:'Review not found.'},{status:404});
+  return NextResponse.json({ok:true});
+ }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not delete review.'},{status:e.message==='UNAUTHENTICATED'?401:500})}
+}
