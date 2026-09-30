@@ -32,6 +32,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [reviewText,setReviewText]=useState('');
   const [reviewBusy,setReviewBusy]=useState(false);
   const [reviewMessage,setReviewMessage]=useState('');
+  const [isReviewAdmin,setIsReviewAdmin]=useState(false);
   const lastSaved=useRef<Record<string,number>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
 
@@ -39,6 +40,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     if(!slug)return;
     fetch(`/api/courses/${slug}/reviews`,{cache:'no-store'}).then(r=>r.json()).then(j=>{
       if(Array.isArray(j.reviews))setReviews(j.reviews);
+      setIsReviewAdmin(Boolean(j.isAdmin));
       if(j.myReview){setMyReview(j.myReview);setReviewRating(j.myReview.rating);setReviewText(j.myReview.review||'');}
     }).catch(()=>{});
   },[slug]);
@@ -136,6 +138,15 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
       setReviews(refreshed.reviews||[]);
     }catch(e:any){setReviewMessage(e.message||'Could not save review.');}
     finally{setReviewBusy(false);}
+  };
+  const deleteReview=async(id:string)=>{
+    if(!isReviewAdmin||!confirm('Delete this review?'))return;
+    try{
+      const r=await fetch(`/api/courses/${slug}/reviews`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+      const j=await r.json();
+      if(!r.ok)throw new Error(j.error||'Could not delete review.');
+      setReviews(prev=>prev.filter(x=>x.id!==id));
+    }catch(e:any){setReviewMessage(e.message||'Could not delete review.');}
   };
   const ask=async(message?:string)=>{
     const question=(message??q).trim();
@@ -253,7 +264,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
         </div>}
         {!data.enrolled&&<div className="card" style={{marginBottom:20}}><p className="muted" style={{margin:0}}>Reviews are visible to everyone. Get course access to write your own review.</p></div>}
         {reviews.length===0?<div className="emptyAcademy"><div><h3>No reviews yet.</h3><p className="muted">Be the first student to share your experience.</p></div></div>:<div style={{display:'grid',gap:12}}>{reviews.map((r:any)=><article className="card" key={r.id}>
-          <div style={{display:'flex',gap:13,alignItems:'center'}}>{r.avatar_url?<img src={r.avatar_url} alt="" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',border:'1px solid var(--line)'}}/>:<div style={{width:44,height:44,borderRadius:'50%',background:'var(--soft)',display:'grid',placeItems:'center',fontFamily:'Space Grotesk',fontWeight:700}}>{String(r.name||'?').slice(0,1).toUpperCase()}</div>}<div><b>{r.name}</b><div className="small muted">@{r.username}</div></div><div style={{marginLeft:'auto',color:'#f3c969',letterSpacing:2}}>{'★'.repeat(Math.max(0,Math.min(5,Number(r.rating))))}</div></div>
+          <div style={{display:'flex',gap:13,alignItems:'center'}}>{r.avatar_url?<img src={r.avatar_url} alt="" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',border:'1px solid var(--line)'}}/>:<div style={{width:44,height:44,borderRadius:'50%',background:'var(--soft)',display:'grid',placeItems:'center',fontFamily:'Space Grotesk',fontWeight:700}}>{String(r.name||'?').slice(0,1).toUpperCase()}</div>}<div><b>{r.name}</b><div className="small muted">@{r.username}</div></div><div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:12}}><span style={{color:'#f3c969',letterSpacing:2}}>{'★'.repeat(Math.max(0,Math.min(5,Number(r.rating))))}</span>{isReviewAdmin&&<button type="button" className="btn" onClick={()=>deleteReview(r.id)}>Delete</button>}</div></div>
           <p style={{lineHeight:1.8,margin:'16px 0 0',whiteSpace:'pre-wrap'}}>{r.review}</p>
         </article>)}</div>}
       </section>
