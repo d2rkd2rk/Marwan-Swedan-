@@ -33,7 +33,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
    db`select r.id,r.rating,r.review,r.created_at,r.updated_at,u.name,u.username,u.avatar_url from course_reviews r join users u on u.id=r.user_id where r.course_id=${course.id} order by r.created_at desc limit 100`,
    db`select id,rating,review,created_at,updated_at from course_reviews where course_id=${course.id} and user_id=${user.id} limit 1`
   ]);
-  return NextResponse.json({reviews,myReview:myReview[0]||null});
+  return NextResponse.json({reviews,myReview:myReview[0]||null,isAdmin:user.role==='admin'});
  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not load reviews.'},{status:e.message==='UNAUTHENTICATED'?401:500})}
 }
 
