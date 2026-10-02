@@ -36,16 +36,24 @@ export default function PWAInstallPrompt(){
     setIos(isIOS);
 
     if(userLoggedIn){
-     if('Notification' in window && 'PushManager' in window){
-      const permission=Notification.permission;
-      if(permission==='granted'){
-       const reg=await navigator.serviceWorker.ready;
-       const sub=await reg.pushManager.getSubscription();
-       if(sub){
-        const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
-        if(response.ok)return;
-       }
+     if(!('Notification' in window)||!('PushManager' in window)){
+      setMessage('This device/browser does not support Academy notifications.');
+      setShow(true);
+      return;
+     }
+     const permission=Notification.permission;
+     if(permission==='granted'){
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.getSubscription();
+      if(sub){
+       const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
+       if(response.ok)return;
       }
+      setMessage('Notifications are required for this app. Tap Enable Notifications to activate them.');
+     }else if(permission==='denied'){
+      setMessage('Notifications are blocked. Enable notifications for Marwan Swedan Academy in your browser/device settings, then return here.');
+     }else{
+      setMessage('Notifications are required. Enable them to continue using Marwan Swedan Academy.');
      }
      setShow(true);
      return;
@@ -73,8 +81,8 @@ export default function PWAInstallPrompt(){
   setup();
   return()=>{cancelled=true};
  },[]);
+
  const complete=()=>{setShow(false);setInstallEvent(null)};
- const retryNotifications=()=>{setMessage('Please allow notifications for Marwan Swedan Academy in your browser or device settings, then press Try Again.');};
 
  const install=async()=>{
   if(!installEvent)return;
@@ -91,12 +99,13 @@ export default function PWAInstallPrompt(){
   setMessage('');
   try{
    if(!('Notification' in window)||!('PushManager' in window)){
-    setMessage('Notifications are not supported by this browser.');
+    setMessage('Notifications are not supported by this browser/device.');
     return;
    }
-   const permission=Notification.permission==='granted'? 'granted':await Notification.requestPermission();
+   let permission=Notification.permission;
+   if(permission!=='granted')permission=await Notification.requestPermission();
    if(permission!=='granted'){
-    setMessage('Notifications are required. Allow them in your browser/device settings, then try again.');
+    setMessage('Notifications are required. Allow them in your browser/device settings, then press Try Again.');
     return;
    }
    const reg=await navigator.serviceWorker.ready;
@@ -106,14 +115,13 @@ export default function PWAInstallPrompt(){
    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:config.publicKey});
    const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
    if(!response.ok)throw new Error('Could not enable notifications.');
-   setMessage('Notifications are enabled on this device.');
    complete();
   }catch(error){
    setMessage(error instanceof Error?error.message:'Could not enable notifications.');
   }finally{setBusy(false)}
  };
 
- if(!show)return null;
+ if(!show||!authChecked)return null;
 
  return <div className="pwaInstallOverlay">
   <div className="pwaInstallCard" role="dialog" aria-modal="true" aria-label="Marwan Swedan Academy install and notification prompt">
@@ -121,16 +129,14 @@ export default function PWAInstallPrompt(){
    <div className="pwaInstallIcon">MS</div>
    <div className="pwaInstallCopy">
     <div className="eyebrow">Marwan Swedan Academy</div>
-    <h3>{loggedIn?'Enable Academy Notifications':'Install the Academy'}</h3>
-    <p>{loggedIn?'Allow notifications to receive new lessons and course announcements on your device.':'Install Marwan Swedan Academy on your device for quick access. You can enable notifications after signing in.'}</p>
+    <h3>{loggedIn?'Notifications Required':'Install the Academy'}</h3>
+    <p>{loggedIn?'Academy notifications must be enabled to continue. You will receive notifications only for courses you have active access to.':'Install Marwan Swedan Academy on your device for quick access. You can enable notifications after signing in.'}</p>
     {ios&&<p className="pwaInstallHint">On iPhone/iPad: tap <b>Share</b>, then <b>Add to Home Screen</b>.</p>}
     {message&&<p className="pwaInstallHint">{message}</p>}
    </div>
    <div className="pwaInstallActions">
     {!loggedIn&&installEvent&&<button className="btn primary" onClick={install} disabled={busy}>{busy?'Installing…':'Install App'}</button>}
-    {loggedIn&&!ios&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
-    {loggedIn&&ios&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
-    {loggedIn&&message&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Checking…':'Try Again'}</button>}
+    {loggedIn&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':Notification.permission==='denied'?'Try Again':'Enable Notifications'}</button>}
     {!loggedIn&&ios&&!installEvent&&<button className="btn primary" onClick={complete}>Got it</button>}
    </div>
   </div>
