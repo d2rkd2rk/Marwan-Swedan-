@@ -1,4 +1,4 @@
-const SW_VERSION='msa-push-v3';
+const SW_VERSION='msa-push-v2';
 
 self.addEventListener('install',event=>{
  event.waitUntil(self.skipWaiting());
@@ -28,24 +28,6 @@ self.addEventListener('push',event=>{
    });
   }catch(error){
    console.error('PUSH_NOTIFICATION_DISPLAY_FAILED',error);
-  }
- })());
-});
-
-self.addEventListener('pushsubscriptionchange',event=>{
- event.waitUntil((async()=>{
-  try{
-   const oldSubscription=event.oldSubscription;
-   if(!oldSubscription)return;
-   const subscription=await self.registration.pushManager.subscribe(oldSubscription.options);
-   await fetch('/api/push/subscribe',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    credentials:'include',
-    body:JSON.stringify(subscription.toJSON())
-   });
-  }catch(error){
-   console.error('PUSH_RESUBSCRIBE_FAILED',error);
   }
  })());
 });
