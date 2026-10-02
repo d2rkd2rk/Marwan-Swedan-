@@ -8,7 +8,7 @@ export async function GET(request:Request){
     const q=(new URL(request.url).searchParams.get('q')||'').trim();
     const rows=q
       ? await db`select e.id,e.user_id,e.course_id,e.created_at,e.revoked_at,u.name,u.email,u.username,u.whatsapp,c.title as course_title from enrollments e join users u on u.id=e.user_id join courses c on c.id=e.course_id where e.revoked_at is null and (u.name ilike ${'%'+q+'%'} or u.username ilike ${'%'+q+'%'} or u.whatsapp ilike ${'%'+q+'%'} or u.email ilike ${'%'+q+'%'}) order by e.created_at desc`
-      : await db`select e.id,e.user_id,e.course_id,e.created_at,e.revoked_at,u.name,u.email,u.username,u.whatsapp,c.title as course_title from enrollments e join users u on u.id=e.user_id join courses c on c.id=e.course_id where e.revoked_at is null order by e.created_at desc limit 5`;
+      : await db`select e.id,e.user_id,e.course_id,e.created_at,e.revoked_at,u.name,u.email,u.username,u.whatsapp,c.title as course_title from enrollments e join users u on u.id=e.user_id join courses c on c.id=e.course_id where e.revoked_at is null order by e.created_at desc`;
     return NextResponse.json({enrollments:rows});
   }catch(e:any){
     return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Authentication required'},{status:e.message==='FORBIDDEN'?403:401});
