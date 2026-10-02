@@ -81,7 +81,7 @@ export default function PWAInstallPrompt(){
   try{
    await installEvent.prompt();
    const choice=await installEvent.userChoice;
-   if(choice.outcome==='accepted')complete();
+   if(choice.outcome==='accepted'){localStorage.setItem(INSTALL_KEY,'1');complete();}
   }catch{}finally{setBusy(false);setInstallEvent(null)}
  };
 
