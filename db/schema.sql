@@ -39,5 +39,6 @@ create index if not exists course_certificates_course_idx on course_certificates
 create index if not exists course_certificates_user_idx on course_certificates(user_id,issued_at desc);
 create table if not exists course_reviews(id uuid primary key default gen_random_uuid(),course_id uuid not null references courses(id) on delete cascade,user_id uuid not null references users(id) on delete cascade,rating smallint not null check(rating between 1 and 5),review text not null,created_at timestamptz not null default now(),updated_at timestamptz not null default now(),unique(course_id,user_id));
 create index if not exists course_reviews_course_idx on course_reviews(course_id,created_at desc);
-create table if not exists push_subscriptions(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,endpoint text not null unique,p256dh text not null,auth text not null,created_at timestamptz not null default now(),last_used_at timestamptz not null default now());
+create table if not exists push_subscriptions(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,endpoint text not null unique,p256dh text not null,auth text not null,created_at timestamptz not null default now(),last_used_at timestamptz not null default now(),disabled_at timestamptz);
+alter table push_subscriptions add column if not exists disabled_at timestamptz;
 create index if not exists push_subscriptions_user_idx on push_subscriptions(user_id,last_used_at desc);
