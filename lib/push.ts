@@ -32,7 +32,7 @@ async function sendToCourseSubscribers(courseId:string,title:string,body:string,
  await Promise.all(rows.map(async(row:any)=>{
   const sub:PushSubscriptionRecord={endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}};
   try{
-   await webpush.sendNotification(sub,JSON.stringify({title,body,url,tag}),{TTL:3600,urgency:'high'});
+   await webpush.sendNotification(sub,JSON.stringify({title,body,url,tag}),{TTL:3600,headers:{Urgency:'high'}});
    await db`update push_subscriptions set last_used_at=now() where id=${row.id}`;
    sent++;
   }catch(error:any){
