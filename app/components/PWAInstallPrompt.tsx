@@ -13,6 +13,7 @@ export default function PWAInstallPrompt(){
  const [message,setMessage]=useState('');
  const [loggedIn,setLoggedIn]=useState(false);
  const [authChecked,setAuthChecked]=useState(false);
+ const [notificationPermission,setNotificationPermission]=useState<NotificationPermission>('default');
 
  useEffect(()=>{
   let cancelled=false;
@@ -42,6 +43,7 @@ export default function PWAInstallPrompt(){
       return;
      }
      const permission=Notification.permission;
+     setNotificationPermission(permission);
      if(permission==='granted'){
       const reg=await navigator.serviceWorker.ready;
       const sub=await reg.pushManager.getSubscription();
@@ -104,6 +106,7 @@ export default function PWAInstallPrompt(){
    }
    let permission=Notification.permission;
    if(permission!=='granted')permission=await Notification.requestPermission();
+   setNotificationPermission(permission);
    if(permission!=='granted'){
     setMessage('Notifications are required. Allow them in your browser/device settings, then press Try Again.');
     return;
@@ -136,7 +139,7 @@ export default function PWAInstallPrompt(){
    </div>
    <div className="pwaInstallActions">
     {!loggedIn&&installEvent&&<button className="btn primary" onClick={install} disabled={busy}>{busy?'Installing…':'Install App'}</button>}
-    {loggedIn&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':Notification.permission==='denied'?'Try Again':'Enable Notifications'}</button>}
+    {loggedIn&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':notificationPermission==='denied'?'Try Again':'Enable Notifications'}</button>}
     {!loggedIn&&ios&&!installEvent&&<button className="btn primary" onClick={complete}>Got it</button>}
    </div>
   </div>
