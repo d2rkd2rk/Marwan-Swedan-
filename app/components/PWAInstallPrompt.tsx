@@ -26,7 +26,7 @@ export default function PWAInstallPrompt(){
     setAuthChecked(true);
 
     if('serviceWorker' in navigator){
-     await navigator.serviceWorker.register('/sw.js');
+     const registration=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});\n     await registration.update();
     }
 
     const standalone=window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone===true;
