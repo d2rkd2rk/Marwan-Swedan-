@@ -3,7 +3,7 @@
 import {useEffect,useState} from 'react';
 
 type BeforeInstallPromptEvent=Event&{prompt:()=>Promise<void>;userChoice:Promise<{outcome:'accepted'|'dismissed'}>};
-const COMPLETED_KEY='msa_pwa_prompt_completed';
+const INSTALL_KEY='msa_pwa_install_required_v2';
 
 export default function PWAInstallPrompt(){
  const [installEvent,setInstallEvent]=useState<BeforeInstallPromptEvent|null>(null);
@@ -11,49 +11,68 @@ export default function PWAInstallPrompt(){
  const [ios,setIos]=useState(false);
  const [busy,setBusy]=useState(false);
  const [message,setMessage]=useState('');
+ const [loggedIn,setLoggedIn]=useState(false);
+ const [authChecked,setAuthChecked]=useState(false);
 
  useEffect(()=>{
   let cancelled=false;
-  const syncExistingSubscription=async()=>{
-   if(!('Notification' in window)||Notification.permission!=='granted'||!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  const setup=async()=>{
    try{
-    const reg=await navigator.serviceWorker.ready;
-    const sub=await reg.pushManager.getSubscription();
-    if(!sub||cancelled)return;
-    await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
-   }catch{}
+    const authResponse=await fetch('/api/auth/me',{cache:'no-store'});
+    const authData=await authResponse.json();
+    const userLoggedIn=Boolean(authData.user);
+    if(cancelled)return;
+    setLoggedIn(userLoggedIn);
+    setAuthChecked(true);
+
+    if('serviceWorker' in navigator){
+     await navigator.serviceWorker.register('/sw.js');
+    }
+
+    const standalone=window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone===true;
+    const installDone=standalone||localStorage.getItem(INSTALL_KEY)==='1';
+    const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    setIos(isIOS);
+
+    if(userLoggedIn){
+     if('Notification' in window && 'PushManager' in window){
+      const permission=Notification.permission;
+      if(permission==='granted'){
+       const reg=await navigator.serviceWorker.ready;
+       const sub=await reg.pushManager.getSubscription();
+       if(sub){
+        await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
+        return;
+       }
+      }
+     }
+     setShow(true);
+     return;
+    }
+
+    if(installDone)return;
+    const handler=(e:Event)=>{
+     e.preventDefault();
+     setInstallEvent(e as BeforeInstallPromptEvent);
+     setShow(true);
+    };
+    window.addEventListener('beforeinstallprompt',handler);
+    const timer=window.setTimeout(()=>setShow(true),900);
+    const installed=()=>{localStorage.setItem(INSTALL_KEY,'1');setShow(false);setInstallEvent(null)};
+    window.addEventListener('appinstalled',installed);
+    return()=>{
+     window.removeEventListener('beforeinstallprompt',handler);
+     window.removeEventListener('appinstalled',installed);
+     window.clearTimeout(timer);
+    };
+   }catch{
+    if(!cancelled)setAuthChecked(true);
+   }
   };
-  if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').then(()=>syncExistingSubscription()).catch(()=>{});
-  const standalone=window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone===true;
-  if(standalone||localStorage.getItem(COMPLETED_KEY)==='1')return()=>{cancelled=true};
-
-  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  setIos(isIOS);
-
-  if('Notification' in window && Notification.permission==='granted'){
-   localStorage.setItem(COMPLETED_KEY,'1');
-   return()=>{cancelled=true};
-  }
-
-  const handler=(e:Event)=>{
-   e.preventDefault();
-   setInstallEvent(e as BeforeInstallPromptEvent);
-   setShow(true);
-  };
-  window.addEventListener('beforeinstallprompt',handler);
-  const timer=window.setTimeout(()=>setShow(true),900);
-  const installed=()=>{localStorage.setItem(COMPLETED_KEY,'1');setShow(false);setInstallEvent(null)};
-  window.addEventListener('appinstalled',installed);
-
-  return()=>{
-   cancelled=true;
-   window.removeEventListener('beforeinstallprompt',handler);
-   window.removeEventListener('appinstalled',installed);
-   window.clearTimeout(timer);
-  };
- },[]);;
-
- const complete=()=>{localStorage.setItem(COMPLETED_KEY,'1');setShow(false);setInstallEvent(null)};
+  setup();
+  return()=>{cancelled=true};
+ },[]);
+ const complete=()=>{setShow(false);setInstallEvent(null)};
 
  const install=async()=>{
   if(!installEvent)return;
@@ -95,19 +114,20 @@ export default function PWAInstallPrompt(){
 
  return <div className="pwaInstallOverlay">
   <div className="pwaInstallCard" role="dialog" aria-modal="true" aria-label="Marwan Swedan Academy">
+   <button className="pwaInstallClose" type="button" aria-label="Close" onClick={()=>setShow(false)}>×</button>
    <div className="pwaInstallIcon">MS</div>
    <div className="pwaInstallCopy">
     <div className="eyebrow">Marwan Swedan Academy</div>
-    <h3>Install the Academy</h3>
-    <p>Install the platform on your device for quick access, or enable browser notifications for new course updates.</p>
+    <h3>{loggedIn?'Enable Academy Notifications':'Install the Academy'}</h3>
+    <p>{loggedIn?'Allow notifications to receive new lessons and course announcements on your device.':'Install Marwan Swedan Academy on your device for quick access. You can enable notifications after signing in.'}</p>
     {ios&&<p className="pwaInstallHint">On iPhone/iPad: tap <b>Share</b>, then <b>Add to Home Screen</b>.</p>}
     {message&&<p className="pwaInstallHint">{message}</p>}
    </div>
    <div className="pwaInstallActions">
-    {installEvent&&<button className="btn primary" onClick={install} disabled={busy}>{busy?'Installing…':'Install App'}</button>}
-    {!ios&&<button className="btn" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
+    {!loggedIn&&installEvent&&<button className="btn primary" onClick={install} disabled={busy}>{busy?'Installing…':'Install App'}</button>}
+    {loggedIn&&!ios&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
+    {loggedIn&&ios&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
     {ios&&!installEvent&&<button className="btn primary" onClick={complete}>Got it</button>}
-    <button className="btn" onClick={()=>setShow(false)}>Not now</button>
    </div>
   </div>
  </div>;
