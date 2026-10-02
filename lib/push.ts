@@ -19,25 +19,33 @@ export async function ensurePushTable(){
   p256dh text not null,
   auth text not null,
   created_at timestamptz not null default now(),
-  last_used_at timestamptz not null default now()
+  last_used_at timestamptz not null default now(),
+  disabled_at timestamptz
  )`;
+ await db`alter table push_subscriptions add column if not exists disabled_at timestamptz`;
  await db`create index if not exists push_subscriptions_user_idx on push_subscriptions(user_id,last_used_at desc)`;
 }
 
-async function sendToPushSubscribers(title:string,body:string,url:string,tag:string){
+async function sendToPushSubscribers(courseId:string,title:string,body:string,url:string,tag:string){
  if(!configured())throw new Error('PUSH_NOT_CONFIGURED');
  await ensurePushTable();
- const rows=await db`select id,endpoint,p256dh,auth from push_subscriptions`;
+ const rows=await db`select ps.id,ps.endpoint,ps.p256dh,ps.auth
+  from push_subscriptions ps
+  where ps.disabled_at is null
+    and exists(
+      select 1 from enrollments e
+      where e.user_id=ps.user_id and e.course_id=${courseId} and e.revoked_at is null
+    )`;
  let sent=0,failed=0,expired=0;
  await Promise.all(rows.map(async(row:any)=>{
   const sub:PushSubscriptionRecord={endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}};
   try{
    await webpush.sendNotification(sub,JSON.stringify({title,body,url,tag}),{TTL:3600,headers:{Urgency:'high'}});
-   await db`update push_subscriptions set last_used_at=now() where id=${row.id}`;
+   await db`update push_subscriptions set last_used_at=now(),disabled_at=null where id=${row.id}`;
    sent++;
   }catch(error:any){
    if(error?.statusCode===404||error?.statusCode===410){
-    await db`delete from push_subscriptions where id=${row.id}`;
+    await db`update push_subscriptions set disabled_at=now() where id=${row.id}`;
     expired++;
    }else{
     failed++;
@@ -48,11 +56,11 @@ async function sendToPushSubscribers(title:string,body:string,url:string,tag:str
  return {sent,failed,expired,total:rows.length};
 }
 export async function sendCourseNotification(courseId:string,lessonTitle:string){
- return await sendToPushSubscribers('New lesson · Marwan Swedan Academy',lessonTitle,'/courses',`course-${courseId}`);
+ return await sendToPushSubscribers(courseId,'New lesson · Marwan Swedan Academy',lessonTitle,'/courses',`course-${courseId}`);
 }
 
 export async function sendCourseAnnouncement(courseId:string,title:string,body:string){
  const safeTitle=title.trim(),safeBody=body.trim();
  if(!safeTitle||!safeBody)throw new Error('ANNOUNCEMENT_REQUIRED');
- return await sendToPushSubscribers(safeTitle,safeBody,'/courses',`announcement-${courseId}-${Date.now()}`);
+ return await sendToPushSubscribers(courseId,safeTitle,safeBody,'/courses',`announcement-${courseId}-${Date.now()}`);
 }
