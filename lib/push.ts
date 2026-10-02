@@ -25,18 +25,21 @@ export async function ensurePushTable(){
 }
 
 async function sendToCourseSubscribers(courseId:string,title:string,body:string,url:string,tag:string){
- if(!configured())return;
+ if(!configured())throw new Error('PUSH_NOT_CONFIGURED');
  await ensurePushTable();
  const rows=await db`select ps.id,ps.endpoint,ps.p256dh,ps.auth from push_subscriptions ps join enrollments e on e.user_id=ps.user_id where e.course_id=${courseId} and e.revoked_at is null`;
+ let sent=0;
  await Promise.all(rows.map(async(row:any)=>{
   const sub:PushSubscriptionRecord={endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}};
   try{
    await webpush.sendNotification(sub,JSON.stringify({title,body,url,tag}));
    await db`update push_subscriptions set last_used_at=now() where id=${row.id}`;
+   sent++;
   }catch(error:any){
    if(error?.statusCode===404||error?.statusCode===410)await db`delete from push_subscriptions where id=${row.id}`;
   }
  }));
+ return sent;
 }
 export async function sendCourseNotification(courseId:string,lessonTitle:string){
  await sendToCourseSubscribers(courseId,'New lesson · Marwan Swedan Academy',lessonTitle,'/courses',`course-${courseId}`);
@@ -45,5 +48,5 @@ export async function sendCourseNotification(courseId:string,lessonTitle:string)
 export async function sendCourseAnnouncement(courseId:string,title:string,body:string){
  const safeTitle=title.trim(),safeBody=body.trim();
  if(!safeTitle||!safeBody)throw new Error('ANNOUNCEMENT_REQUIRED');
- await sendToCourseSubscribers(courseId,safeTitle,safeBody,'/courses',`announcement-${courseId}-${Date.now()}`);
+ return await sendToCourseSubscribers(courseId,safeTitle,safeBody,'/courses',`announcement-${courseId}-${Date.now()}`);
 }
