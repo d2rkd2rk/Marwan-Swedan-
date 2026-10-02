@@ -3,7 +3,7 @@
 import {useEffect,useState} from 'react';
 
 type BeforeInstallPromptEvent=Event&{prompt:()=>Promise<void>;userChoice:Promise<{outcome:'accepted'|'dismissed'}>};
-const COMPLETED_KEY='msa_pwa_prompt_completed';
+const INSTALL_KEY='msa_pwa_install_required_v2';
 
 export default function PWAInstallPrompt(){
  const [installEvent,setInstallEvent]=useState<BeforeInstallPromptEvent|null>(null);
@@ -25,15 +25,11 @@ export default function PWAInstallPrompt(){
   };
   if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').then(()=>syncExistingSubscription()).catch(()=>{});
   const standalone=window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone===true;
-  if(standalone||localStorage.getItem(COMPLETED_KEY)==='1')return()=>{cancelled=true};
+  if(standalone||localStorage.getItem(INSTALL_KEY)==='1')return()=>{cancelled=true};
+  localStorage.removeItem('msa_pwa_prompt_completed');
 
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   setIos(isIOS);
-
-  if('Notification' in window && Notification.permission==='granted'){
-   localStorage.setItem(COMPLETED_KEY,'1');
-   return()=>{cancelled=true};
-  }
 
   const handler=(e:Event)=>{
    e.preventDefault();
@@ -42,7 +38,7 @@ export default function PWAInstallPrompt(){
   };
   window.addEventListener('beforeinstallprompt',handler);
   const timer=window.setTimeout(()=>setShow(true),900);
-  const installed=()=>{localStorage.setItem(COMPLETED_KEY,'1');setShow(false);setInstallEvent(null)};
+  const installed=()=>{localStorage.setItem(INSTALL_KEY,'1');setShow(false);setInstallEvent(null)};
   window.addEventListener('appinstalled',installed);
 
   return()=>{
@@ -53,7 +49,7 @@ export default function PWAInstallPrompt(){
   };
  },[]);;
 
- const complete=()=>{localStorage.setItem(COMPLETED_KEY,'1');setShow(false);setInstallEvent(null)};
+ const complete=()=>{setShow(false);setInstallEvent(null)};
 
  const install=async()=>{
   if(!installEvent)return;
@@ -107,7 +103,6 @@ export default function PWAInstallPrompt(){
     {installEvent&&<button className="btn primary" onClick={install} disabled={busy}>{busy?'Installing…':'Install App'}</button>}
     {!ios&&<button className="btn" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
     {ios&&!installEvent&&<button className="btn primary" onClick={complete}>Got it</button>}
-    <button className="btn" onClick={()=>setShow(false)}>Not now</button>
    </div>
   </div>
  </div>;
