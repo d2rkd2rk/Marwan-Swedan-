@@ -13,15 +13,26 @@ export default function PWAInstallPrompt(){
  const [message,setMessage]=useState('');
 
  useEffect(()=>{
+  let cancelled=false;
+  const syncExistingSubscription=async()=>{
+   if(!('Notification' in window)||Notification.permission!=='granted'||!('serviceWorker' in navigator)||!('PushManager' in window))return;
+   try{
+    const reg=await navigator.serviceWorker.ready;
+    const sub=await reg.pushManager.getSubscription();
+    if(!sub||cancelled)return;
+    await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
+   }catch{}
+  };
+  if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').then(()=>syncExistingSubscription()).catch(()=>{});
   const standalone=window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone===true;
-  if(standalone||localStorage.getItem(COMPLETED_KEY)==='1')return;
+  if(standalone||localStorage.getItem(COMPLETED_KEY)==='1')return()=>{cancelled=true};
 
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   setIos(isIOS);
 
   if('Notification' in window && Notification.permission==='granted'){
    localStorage.setItem(COMPLETED_KEY,'1');
-   return;
+   return()=>{cancelled=true};
   }
 
   const handler=(e:Event)=>{
@@ -30,19 +41,17 @@ export default function PWAInstallPrompt(){
    setShow(true);
   };
   window.addEventListener('beforeinstallprompt',handler);
-
   const timer=window.setTimeout(()=>setShow(true),900);
   const installed=()=>{localStorage.setItem(COMPLETED_KEY,'1');setShow(false);setInstallEvent(null)};
   window.addEventListener('appinstalled',installed);
 
-  if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});
-
   return()=>{
+   cancelled=true;
    window.removeEventListener('beforeinstallprompt',handler);
    window.removeEventListener('appinstalled',installed);
    window.clearTimeout(timer);
   };
- },[]);
+ },[]);;
 
  const complete=()=>{localStorage.setItem(COMPLETED_KEY,'1');setShow(false);setInstallEvent(null)};
 
