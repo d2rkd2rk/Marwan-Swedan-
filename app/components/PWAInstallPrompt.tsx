@@ -42,8 +42,8 @@ export default function PWAInstallPrompt(){
        const reg=await navigator.serviceWorker.ready;
        const sub=await reg.pushManager.getSubscription();
        if(sub){
-        await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
-        return;
+        const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
+        if(response.ok)return;
        }
       }
      }
@@ -74,6 +74,7 @@ export default function PWAInstallPrompt(){
   return()=>{cancelled=true};
  },[]);
  const complete=()=>{setShow(false);setInstallEvent(null)};
+ const retryNotifications=()=>{setMessage('Please allow notifications for Marwan Swedan Academy in your browser or device settings, then press Try Again.');};
 
  const install=async()=>{
   if(!installEvent)return;
@@ -95,7 +96,7 @@ export default function PWAInstallPrompt(){
    }
    const permission=Notification.permission==='granted'? 'granted':await Notification.requestPermission();
    if(permission!=='granted'){
-    setMessage('Notifications were not enabled.');
+    setMessage('Notifications are required. Allow them in your browser/device settings, then try again.');
     return;
    }
    const reg=await navigator.serviceWorker.ready;
@@ -105,6 +106,7 @@ export default function PWAInstallPrompt(){
    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:config.publicKey});
    const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
    if(!response.ok)throw new Error('Could not enable notifications.');
+   setMessage('Notifications are enabled on this device.');
    complete();
   }catch(error){
    setMessage(error instanceof Error?error.message:'Could not enable notifications.');
@@ -115,7 +117,7 @@ export default function PWAInstallPrompt(){
 
  return <div className="pwaInstallOverlay">
   <div className="pwaInstallCard" role="dialog" aria-modal="true" aria-label="Marwan Swedan Academy install and notification prompt">
-   <button className="pwaInstallClose" type="button" aria-label="Close" onClick={()=>setShow(false)}>×</button>
+   {!loggedIn&&<button className="pwaInstallClose" type="button" aria-label="Close" onClick={()=>setShow(false)}>×</button>}
    <div className="pwaInstallIcon">MS</div>
    <div className="pwaInstallCopy">
     <div className="eyebrow">Marwan Swedan Academy</div>
@@ -128,7 +130,8 @@ export default function PWAInstallPrompt(){
     {!loggedIn&&installEvent&&<button className="btn primary" onClick={install} disabled={busy}>{busy?'Installing…':'Install App'}</button>}
     {loggedIn&&!ios&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
     {loggedIn&&ios&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Enabling…':'Enable Notifications'}</button>}
-    {ios&&!installEvent&&<button className="btn primary" onClick={complete}>Got it</button>}
+    {loggedIn&&message&&<button className="btn primary" onClick={enableNotifications} disabled={busy}>{busy?'Checking…':'Try Again'}</button>}
+    {!loggedIn&&ios&&!installEvent&&<button className="btn primary" onClick={complete}>Got it</button>}
    </div>
   </div>
  </div>;
