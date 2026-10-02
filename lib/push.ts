@@ -48,5 +48,6 @@ export async function sendCourseNotification(courseId:string,lessonTitle:string)
 export async function sendCourseAnnouncement(courseId:string,title:string,body:string){
  const safeTitle=title.trim(),safeBody=body.trim();
  if(!safeTitle||!safeBody)throw new Error('ANNOUNCEMENT_REQUIRED');
+ // Course announcements are intentionally scoped to active subscribers of that course.
  return await sendToCourseSubscribers(courseId,safeTitle,safeBody,'/courses',`announcement-${courseId}-${Date.now()}`);
 }
