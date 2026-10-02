@@ -13,7 +13,7 @@ export default function PWAInstallPrompt(){
  const [message,setMessage]=useState('');
  const [loggedIn,setLoggedIn]=useState(false);
  const [authChecked,setAuthChecked]=useState(false);
- const [notificationPermission,setNotificationPermission]=useState<NotificationPermission>('default');
+ const [notificationPermission,setNotificationPermission]=useState<'default'|'granted'|'denied'>('default');
 
  useEffect(()=>{
   let cancelled=false;
