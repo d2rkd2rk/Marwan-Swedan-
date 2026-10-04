@@ -22,7 +22,7 @@ function storage(){
 
 function validKey(key:string){
   const parts=key.split('/');
-  if(parts.length>=3&&parts[0]==='courses'&&Boolean(parts[1]))return true;
+  if(parts.length>=3&&(parts[0]==='courses'||parts[0]==='path-thumbnails')&&Boolean(parts[1]))return true;
   return parts.length===4&&parts[0]==='profiles'&&Boolean(parts[1])&&parts[2]==='avatar';
 }
 
@@ -37,7 +37,7 @@ export async function GET(request:NextRequest){
   if(!isPublicAvatar&&!user)return new NextResponse('Authentication required',{status:401});
 
   const courseId=parts[1];
-  const isThumbnail=courseId==='course-thumbnails';
+  const isThumbnail=courseId==='course-thumbnails'||parts[0]==='path-thumbnails';
   if(!isPublicAvatar&&!isThumbnail){
     const course=await db`select is_free from courses where id=${courseId} limit 1`;
     if(!course.length)return new NextResponse('Not found',{status:404});
