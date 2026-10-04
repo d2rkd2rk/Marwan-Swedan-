@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
+import {ensurePathTables,hasCourseAccess} from '@/lib/pathAccess';
 
 async function ensureProgressColumns(){
   await db`alter table lesson_progress add column if not exists progress_seconds integer not null default 0`;
@@ -14,8 +15,8 @@ async function getCourseAccess(userId:string, slug:string){
   if(course.is_free)return course;
   const user=await db`select role from users where id=${userId} limit 1`;
   if((user[0] as any)?.role==='admin')return course;
-  const access=await db`select id from enrollments where user_id=${userId} and course_id=${course.id} and revoked_at is null limit 1`;
-  return access.length?course:null;
+  await ensurePathTables();
+  return (await hasCourseAccess(userId,course.id))?course:null;
 }
 
 export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){

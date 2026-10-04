@@ -39,8 +39,10 @@ export async function POST(request:Request){
   if(!Number.isFinite(size)||size<=0||size>5_000_000_000)return NextResponse.json({error:'File size must be between 1 byte and 5 GB.'},{status:400});
 
   const {Bucket,client}=storage();
+  const namespace=String(b.namespace||'courses').trim();
+  if(namespace!=='courses'&&namespace!=='course-thumbnails'&&namespace!=='path-thumbnails')return NextResponse.json({error:'Invalid upload namespace.'},{status:400});
   const courseId=String(b.courseId||'uploads').replace(/[^a-zA-Z0-9_-]/g,'')||'uploads';
-  const key=`courses/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
+  const key=`${namespace}/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
   try {
     await client.send(new PutBucketCorsCommand({
       Bucket,

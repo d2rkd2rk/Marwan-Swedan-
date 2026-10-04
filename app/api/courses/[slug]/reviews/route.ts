@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
+import {ensurePathTables,hasCourseAccess} from '@/lib/pathAccess';
 
 let ready:Promise<void>|null=null;
 function ensureReviewsTable(){
@@ -18,8 +19,8 @@ async function getCourse(slug:string){
 
 async function hasAccess(userId:string,course:any){
  if(course.is_free)return true;
- const rows=await db`select id from enrollments where user_id=${userId} and course_id=${course.id} and revoked_at is null limit 1`;
- return rows.length>0;
+ await ensurePathTables();
+ return hasCourseAccess(userId,course.id);
 }
 
 export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
