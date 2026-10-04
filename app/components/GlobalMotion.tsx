@@ -16,7 +16,12 @@ export default function GlobalMotion(){
   const click=(e:MouseEvent)=>{const b=document.createElement('div');b.className='clickBurst';b.style.left=`${e.clientX}px`;b.style.top=`${e.clientY}px`;document.body.appendChild(b);b.addEventListener('animationend',()=>b.remove(),{once:true});const target=e.target as HTMLElement;const interactive=target?.closest?.('button,a,.btn');if(interactive)gsap.fromTo(interactive,{scale:1},{scale:.97,duration:.08,yoyo:true,repeat:1,ease:'power2.out',overwrite:true})};
   const tick=()=>{cx+=(mx-cx)*.18;cy+=(my-cy)*.18;cursor.style.left=`${cx}px`;cursor.style.top=`${cy}px`;raf=requestAnimationFrame(tick)};let raf=requestAnimationFrame(tick);
   window.addEventListener('mousemove',move,{passive:true});window.addEventListener('mouseleave',leave);window.addEventListener('click',click);
-  const ctx=gsap.context(()=>{gsap.utils.toArray<HTMLElement>('.card,.projectCard,.course,.feature,.whyItem,.lesson,.accessRow,.cert,.academyBanner').forEach((el,i)=>{gsap.fromTo(el,{y:18,opacity:.001},{y:0,opacity:1,duration:.7,ease:'power3.out',delay:(i%5)*.04,scrollTrigger:{trigger:el,start:'top 92%',once:true}})});});
+  const ctx=gsap.context(()=>{
+   const heroCopy=document.querySelector<HTMLElement>('.heroCopy');
+   const heroVisual=document.querySelector<HTMLElement>('.heroVisual');
+   if(heroCopy)gsap.from(heroCopy.children,{y:22,opacity:0,duration:.7,stagger:.06,ease:'power3.out'});
+   if(heroVisual){gsap.from(heroVisual,{y:16,opacity:0,scale:.985,duration:.9,delay:.08,ease:'power3.out'});gsap.to(heroVisual,{y:-6,duration:4,repeat:-1,yoyo:true,ease:'sine.inOut'});}
+   gsap.utils.toArray<HTMLElement>('.card,.projectCard,.course,.feature,.whyItem,.lesson,.accessRow,.cert,.academyBanner').forEach((el,i)=>{gsap.fromTo(el,{y:18,opacity:.001},{y:0,opacity:1,duration:.7,ease:'power3.out',delay:(i%5)*.04,scrollTrigger:{trigger:el,start:'top 92%',once:true}})});});
   return()=>{cancelAnimationFrame(raf);window.removeEventListener('mousemove',move);window.removeEventListener('mouseleave',leave);window.removeEventListener('click',click);ctx.revert();if(glow)glow.remove();cursor.remove()};
  },[]);
  return null;
