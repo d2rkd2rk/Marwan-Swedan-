@@ -1,43 +1,6 @@
 'use client';
-
 import Link from 'next/link';
 import {useEffect,useState} from 'react';
 import s from '../home.module.css';
-
 type NavUser={username:string;role:string}|null;
-
-export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){
- const [user,setUser]=useState<NavUser>(initialUser);
- const [busy,setBusy]=useState(false);
- useEffect(()=>{
-  fetch('/api/auth/me',{cache:'no-store'}).then(r=>r.json()).then(data=>setUser(data.user||null)).catch(()=>{});
- },[]);
- const logout=async()=>{
-  setBusy(true);
-  try{await fetch('/api/auth/logout',{method:'POST'});}finally{window.location.href='/';}
- };
- return <nav className={s.nav}>
-  <Link href="/" className={s.logo}><span className={s.logoMark} aria-hidden="true" style={{clipPath:'none',borderRadius:'50%',backgroundImage:"url('/images/profile.jpg')",backgroundSize:'cover',backgroundPosition:'center',fontSize:0}}/><span className={s.logoText}>Marwan Swedan<small>Cybersecurity · Academy · Portfolio</small></span></Link>
-  <div className={s.links}>
-   <Link href="/">Home</Link>
-   <Link href="/courses">Academy</Link>
-   <Link href="/courses">Courses</Link>
-   <Link href="/paths">Paths</Link>
-   <Link href="/#portfolio">Portfolio</Link>
-   <Link href="/#about">About</Link>
-   {user&&<Link href="/dashboard">Dashboard</Link>}
-  </div>
-  <div className={s.navActions}>
-   <span className={s.search}>⌕</span>
-   {user ? <>
-    {user.role!=='admin'&&<Link className={s.btn} href="/dashboard">Dashboard</Link>}
-    <Link className={s.btn} href="/account">@{user.username}</Link>
-    {user.role==='admin'&&<Link className={`${s.btn} ${s.primary}`} href="/admin">Dashboard</Link>}
-    <button className={s.btn} onClick={logout} disabled={busy}>{busy?'Signing out…':'Sign out'}</button>
-   </> : <>
-    <Link className={s.btn} href="/login">Login</Link>
-    <Link className={`${s.btn} ${s.primary}`} href="/register">Get Started</Link>
-   </>}
-  </div>
- </nav>;
-}
+export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){const[user,setUser]=useState<NavUser>(initialUser);const[open,setOpen]=useState(false);const[busy,setBusy]=useState(false);useEffect(()=>{fetch('/api/auth/me',{cache:'no-store'}).then(r=>r.json()).then(data=>setUser(data.user||null)).catch(()=>{});},[]);const logout=async()=>{setBusy(true);try{await fetch('/api/auth/logout',{method:'POST'});}finally{window.location.href='/';};return <nav className={s.eliteSecondaryNav}><Link href="/" className={s.eliteBrand}><span className={s.eliteBrandMark}>MS</span><span><b>Marwan Swedan</b><small>Cybersecurity · Academy</small></span></Link><div className={s.eliteSecondaryActions}>{user&&<Link href="/dashboard" className={s.eliteSecondaryUser}>@{user.username}</Link>}<button className={s.eliteMenuButton} onClick={()=>setOpen(v=>!v)} aria-expanded={open} aria-controls="site-secondary-menu"><span>Menu</span><span className={s.eliteMenuIcon}><i/><i/><i/></span></button></div>{open&&<div className={s.eliteSecondaryOverlay} id="site-secondary-menu" role="dialog" aria-label="Site navigation"><div className={s.eliteSecondaryPanel}><div className={s.eliteMenuTop}><span>NAVIGATION</span><button onClick={()=>setOpen(false)}>Close <b>×</b></button></div><nav className={s.eliteMenuLinks}><Link href="/" onClick={()=>setOpen(false)}><small>01</small><span>Home</span><b>↗</b></Link><Link href="/courses" onClick={()=>setOpen(false)}><small>02</small><span>Academy</span><b>↗</b></Link><Link href="/paths" onClick={()=>setOpen(false)}><small>03</small><span>Learning Paths</span><b>↗</b></Link><Link href="/dashboard" onClick={()=>setOpen(false)}><small>04</small><span>Dashboard</span><b>↗</b></Link>{user?.role==='admin'&&<Link href="/admin" onClick={()=>setOpen(false)}><small>05</small><span>Admin</span><b>↗</b></Link>}<Link href="/account" onClick={()=>setOpen(false)}><small>06</small><span>Account</span><b>↗</b></Link>{user?<button className={s.eliteSecondaryLogout} onClick={logout} disabled={busy}><small>07</small><span>{busy?'Signing out…':'Sign out'}</span><b>→</b></button>:<Link href="/login" onClick={()=>setOpen(false)}><small>07</small><span>Login</span><b>↗</b></Link>}{!user&&<Link href="/register" onClick={()=>setOpen(false)}><small>08</small><span>Get Started</span><b>↗</b></Link>}</nav></div></div>}</nav>}
