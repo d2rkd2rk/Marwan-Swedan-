@@ -42,3 +42,13 @@ create index if not exists course_reviews_course_idx on course_reviews(course_id
 create table if not exists push_subscriptions(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,endpoint text not null unique,p256dh text not null,auth text not null,created_at timestamptz not null default now(),last_used_at timestamptz not null default now(),disabled_at timestamptz);
 alter table push_subscriptions add column if not exists disabled_at timestamptz;
 create index if not exists push_subscriptions_user_idx on push_subscriptions(user_id,last_used_at desc);
+create table if not exists paths(id uuid primary key default gen_random_uuid(),title text not null default 'Untitled Path',slug text not null unique,description text not null default '',category text not null default 'Cybersecurity',level text not null default 'Beginner',thumbnail_url text,is_free boolean not null default true,price numeric(10,2) not null default 0,published boolean not null default false,whatsapp_number text,created_at timestamptz not null default now(),updated_at timestamptz not null default now());
+create table if not exists path_courses(id uuid primary key default gen_random_uuid(),path_id uuid not null references paths(id) on delete cascade,course_id uuid not null references courses(id) on delete cascade,position integer not null default 1,created_at timestamptz not null default now(),unique(path_id,course_id));
+create table if not exists path_enrollments(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,path_id uuid not null references paths(id) on delete cascade,granted_by uuid references users(id),created_at timestamptz not null default now(),revoked_at timestamptz,unique(user_id,path_id));
+create table if not exists path_certificates(id uuid primary key default gen_random_uuid(),certificate_id text not null unique,user_id uuid not null references users(id) on delete cascade,path_id uuid not null references paths(id) on delete cascade,issued_at timestamptz not null default now(),unique(user_id,path_id));
+create index if not exists path_courses_path_idx on path_courses(path_id,position);
+create index if not exists path_courses_course_idx on path_courses(course_id,path_id);
+create index if not exists path_enrollments_user_idx on path_enrollments(user_id,revoked_at);
+create index if not exists path_enrollments_path_idx on path_enrollments(path_id,revoked_at);
+create index if not exists path_certificates_user_idx on path_certificates(user_id,issued_at desc);
+create index if not exists path_certificates_path_idx on path_certificates(path_id,issued_at desc);
