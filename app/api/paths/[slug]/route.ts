@@ -7,7 +7,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
  try{
   const user=await requireUser(); await ensurePathTables();
   const {slug}=await params;
-  const rows=await db`select id,title,slug,description,category,level,thumbnail_url,is_free,price,published from paths where slug=${slug} and published=true limit 1`;
+  const rows=await db`select id,title,slug,description,category,level,thumbnail_url,is_free,price,published,whatsapp_number from paths where slug=${slug} and published=true limit 1`;
   if(!rows.length)return NextResponse.json({error:'Path not found.'},{status:404});
   const path=rows[0] as any;
   const enrolled=path.is_free||user.role==='admin'||await hasPathAccess(user.id,path.id);
