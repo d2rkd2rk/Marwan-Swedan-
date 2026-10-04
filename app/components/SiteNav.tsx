@@ -22,6 +22,7 @@ export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){
    <Link href="/">Home</Link>
    <Link href="/courses">Academy</Link>
    <Link href="/courses">Courses</Link>
+   <Link href="/paths">Paths</Link>
    <Link href="/#portfolio">Portfolio</Link>
    <Link href="/#about">About</Link>
    {user&&<Link href="/dashboard">Dashboard</Link>}
