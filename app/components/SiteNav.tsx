@@ -30,7 +30,7 @@ export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){
   <details className={s.mobileMenu}>
    <summary aria-label="Open navigation menu"><span></span><span></span><span></span></summary>
    <div className={s.mobileMenuPanel}>
-    <Link href="/">Home</Link><Link href="/courses">Academy</Link><Link href="/courses">Courses</Link><Link href="/paths">Paths</Link><Link href="/#portfolio">Portfolio</Link><Link href="/#about">About</Link>
+    <Link href="/">Home</Link><Link href="/courses">Academy</Link><Link href="/courses">Courses</Link><Link href="/paths">Paths</Link><Link href="/#portfolio">Portfolio</Link><Link href="/#about">About</Link><Link href="/#work">Experience</Link><Link href="/#projects">Projects</Link>
     {user&&<><Link href="/dashboard">Dashboard</Link><Link href="/account">@{user.username}</Link>{user.role==='admin'&&<Link href="/admin">Admin Dashboard</Link>}</>}
     {!user&&<><Link href="/login">Login</Link><Link href="/register">Get Started</Link></>}
     {user&&<button className={s.mobileSignOut} onClick={logout} disabled={busy}>{busy?'Signing out…':'Sign out'}</button>}
