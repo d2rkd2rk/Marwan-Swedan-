@@ -6,9 +6,9 @@ import SiteNav from '@/app/components/SiteNav';
 export default function PathPage({params}:{params:Promise<{slug:string}>}){
  const [slug,setSlug]=useState(''),[data,setData]=useState<any>(null);
  useEffect(()=>{params.then(p=>{setSlug(p.slug);fetch(`/api/paths/${p.slug}`,{cache:'no-store'}).then(r=>r.json()).then(setData).catch(()=>{})})},[params]);
+ useEffect(()=>{if(!data?.complete||data?.certificate)return;fetch(`/api/paths/${slug}/certificate`,{cache:'no-store'}).then(r=>r.json()).then(j=>{if(j.certificateId)setData((x:any)=>({...x,certificate:j}))}).catch(()=>{})},[data?.complete,data?.certificate,slug]);
  if(!data)return <main><div className="shell"><SiteNav/><section className="section"><p className="muted">Loading path…</p></section></div></main>;
  if(data.error)return <main><div className="shell"><SiteNav/><section className="section"><div className="error">{data.error}</div><Link className="btn" href="/paths">Back to paths</Link></section></div></main>;
- useEffect(()=>{if(!data?.complete||data?.certificate)return;fetch(`/api/paths/${slug}/certificate`,{cache:'no-store'}).then(r=>r.json()).then(j=>{if(j.certificateId)setData((x:any)=>({...x,certificate:j}))}).catch(()=>{})},[data?.complete,data?.certificate,slug]);
  const p=data.path,courses=data.courses||[];
  const requestUrl=(()=>{const n=p.whatsapp_number||'201515227612';const m=`السلام عليكم، أريد شراء مسار ${p.title}.\nالسعر الحالي: ${p.price} EGP\nUsername/Email: `;return `https://wa.me/${n}?text=${encodeURIComponent(m)}`})();
  return <main><div className="shell"><SiteNav/><section className="coursehero pathHero">
