@@ -14,7 +14,7 @@ export async function GET(){
       db`select p.id,p.title,p.slug,p.description,p.thumbnail_url,p.is_free,p.price,pe.created_at as enrolled_at,
         count(pc.course_id)::int as course_count,coalesce(sum(c.duration_minutes),0)::int as duration_minutes
         from path_enrollments pe join paths p on p.id=pe.path_id left join path_courses pc on pc.path_id=p.id left join courses c on c.id=pc.course_id
-        where pe.user_id=${user.id} and pe.revoked_at is null and p.published=true group by p.id,pe.created_at order by pe.created_at desc`,
+        where pe.user_id=${user.id} and pe.revoked_at is null group by p.id,pe.created_at order by pe.created_at desc`,
       db`select pc.certificate_id,pc.issued_at,p.id as path_id,p.title as path_title from path_certificates pc join paths p on p.id=pc.path_id where pc.user_id=${user.id} order by pc.issued_at desc`
     ]);
     return NextResponse.json({courses,certificates,paths,pathCertificates});
