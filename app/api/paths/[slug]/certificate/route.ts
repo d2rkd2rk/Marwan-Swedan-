@@ -8,10 +8,12 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
  try{
   const user=await requireUser(); await ensurePathTables();
   const {slug}=await params;
-  const rows=await db`select id,title,description,published,is_free from paths where slug=${slug} and published=true limit 1`;
+  const rows=await db`select id,title,description,published,is_free from paths where slug=${slug} limit 1`;
   if(!rows.length)return NextResponse.json({error:'Path not found.'},{status:404});
   const path=rows[0] as any;
-  const access=path.is_free||user.role==='admin'||await hasPathAccess(user.id,path.id);
+  const pathAccess=user.role==='admin'||await hasPathAccess(user.id,path.id);
+  if(!path.published&&!pathAccess)return NextResponse.json({error:'Path unavailable.'},{status:404});
+  const access=pathAccess||(path.is_free&&path.published);
   if(!access)return NextResponse.json({error:'Path access required.'},{status:403});
   const courses=await db`select pc.course_id,count(l.id)::int as lesson_count,count(lp.lesson_id) filter(where lp.completed=true)::int as completed_count
     from path_courses pc join lessons l on l.course_id=pc.course_id and l.published=true
