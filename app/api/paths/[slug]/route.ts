@@ -7,10 +7,12 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
  try{
   const user=await requireUser(); await ensurePathTables();
   const {slug}=await params;
-  const rows=await db`select id,title,slug,description,category,level,thumbnail_url,is_free,price,published,whatsapp_number from paths where slug=${slug} and published=true limit 1`;
+  const rows=await db`select id,title,slug,description,category,level,thumbnail_url,is_free,price,published,whatsapp_number from paths where slug=${slug} limit 1`;
   if(!rows.length)return NextResponse.json({error:'Path not found.'},{status:404});
   const path=rows[0] as any;
-  const enrolled=path.is_free||user.role==='admin'||await hasPathAccess(user.id,path.id);
+  const pathEnrolled=await hasPathAccess(user.id,path.id);
+  if(!path.published&&user.role!=='admin'&&!pathEnrolled)return NextResponse.json({error:'Path unavailable.'},{status:404});
+  const enrolled=path.is_free||user.role==='admin'||pathEnrolled;
   const courses=await db`select pc.id as path_course_id,pc.course_id,pc.position,c.title,c.slug,c.description,c.category,c.level,c.duration_minutes,c.thumbnail_url,c.is_free,c.price,c.published
     from path_courses pc join courses c on c.id=pc.course_id where pc.path_id=${path.id} and c.published=true order by pc.position asc`;
   const resultCourses=await Promise.all(courses.map(async(c:any)=>{
