@@ -23,7 +23,6 @@ export default function Animations(){
 
    gsap.to('.heroImg',{scale:1.13,y:-45,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
    gsap.to('.heroTitle',{y:-80,opacity:.18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
-   gsap.to('.heroOrb',{rotation:360,scale:1.15,duration:18,repeat:-1,ease:'none'});
    gsap.to('.heroFrame',{y:-12,repeat:-1,yoyo:true,duration:3,ease:'sine.inOut'});
    gsap.to('.dot',{scale:1.5,opacity:.45,repeat:-1,yoyo:true,duration:1.1,ease:'sine.inOut'});
    gsap.to('.logoMark',{rotation:360,duration:16,repeat:-1,ease:'none'});
