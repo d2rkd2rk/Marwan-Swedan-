@@ -14,7 +14,7 @@ const focus=[['01','Cybersecurity','SOC · Incident Response · Threat Hunting']
 
 export default async function Landing(){
  const user=await session();
- const courses=await db`select c.id,c.title,c.slug,c.description,c.level,c.thumbnail_url,c.duration_minutes,count(l.id)::int as lesson_count from courses c left join lessons l on l.course_id=c.id and l.published=true where c.published=true group by c.id order by c.created_at desc limit 3`;
+ const courses=await db`select c.id,c.title,c.slug,c.description,c.category,c.level,c.thumbnail_url,c.duration_minutes,count(l.id)::int as lesson_count from courses c left join lessons l on l.course_id=c.id and l.published=true where c.published=true group by c.id order by c.created_at desc limit 3`;
  return <main className={s.page}>
   <div className={s.ambient}/><div className={s.cursorGlow}/><div className={s.noise}/>
   <div className={s.wrap}>
@@ -35,7 +35,7 @@ export default async function Landing(){
 
    <section id="about" className={s.aboutStage+' '+s.section}>
     <div className={s.sectionNumber}>02</div>
-    <div className={s.aboutVisual}><Image src="/images/digital-forensics.jpg" alt="Digital forensics investigation" fill sizes="(max-width:900px) 100vw, 32vw" className={s.aboutVisualImage}/><div className={s.aboutVisualOverlay}/><span className={s.aboutVisualLabel}>DIGITAL FORENSICS</span></div><div className={s.aboutCopy}><div className={s.label}>ABOUT ME</div><h2>Turning curiosity into <span>capability.</span></h2><p>I work across cybersecurity, networking, digital forensics and software engineering. My focus is simple: learn deeply, build practically, and turn what I learn into useful experiences for other people.</p><div className={s.aboutMeta}><div><b>3.64 / 4.00</b><span>GPA</span></div><div><b>150+</b><span>Students mentored</span></div><div><b>33</b><span>Certifications</span></div></div></div>
+    <div className={s.aboutVisual}><Image src="/images/digital-forensics.svg" alt="Digital forensics investigation" fill sizes="(max-width:900px) 100vw, 32vw" className={s.aboutVisualImage}/><div className={s.aboutVisualOverlay}/><span className={s.aboutVisualLabel}>DIGITAL FORENSICS</span></div><div className={s.aboutCopy}><div className={s.label}>ABOUT ME</div><h2>Turning curiosity into <span>capability.</span></h2><p>I work across cybersecurity, networking, digital forensics and software engineering. My focus is simple: learn deeply, build practically, and turn what I learn into useful experiences for other people.</p><div className={s.aboutMeta}><div><b>3.64 / 4.00</b><span>GPA</span></div><div><b>150+</b><span>Students mentored</span></div><div><b>33</b><span>Certifications</span></div></div></div>
     <div className={s.focusGrid}>{focus.map(([n,t,d])=><article className={s.focusCard} key={n}><span>{n}</span><div><h3>{t}</h3><p>{d}</p></div><i>↗</i></article>)}</div>
    </section>
 
