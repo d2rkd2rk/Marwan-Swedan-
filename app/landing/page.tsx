@@ -27,7 +27,7 @@ export default async function Landing(){
       <p className={s.heroLead}>Cybersecurity analyst building practical skills, digital-forensics experience and an academy for the next generation of tech learners.</p>
       <div className={s.actions}><Link className={s.primary+' '+s.btn} href="/courses">Enter Academy <span>↗</span></Link><a className={s.btn} href="#experience">Explore Portfolio <span>↓</span></a></div>
     </div>
-    <div className={s.heroArt}><Image className={s.heroImg} src="/images/profile.jpg" alt="Marwan Swedan" fill priority sizes="(max-width:900px) 100vw,55vw"/><div className={s.heroOrb}/><div className={s.heroFrame}><span>BASED IN EGYPT</span><span>AVAILABLE FOR COLLABORATION</span></div></div>
+    <div className={s.heroArt}><Image className={s.heroImg} src="/images/profile.jpg" alt="Marwan Swedan" fill priority sizes="(max-width:900px) 100vw,55vw"/><div className={s.heroFrame}><span>BASED IN EGYPT</span><span>AVAILABLE FOR COLLABORATION</span></div></div>
     <div className={s.heroBottom}><span>SCROLL TO EXPLORE</span><span className={s.scrollLine}/><span>2026 — PRESENT</span></div>
    </section>
 
