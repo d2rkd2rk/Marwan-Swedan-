@@ -87,7 +87,16 @@ export default function GlobalMotion(){
    }
 
    gsap.utils.toArray<HTMLElement>('.section,.academyBanner,.signature,.footer').forEach((el,i)=>{
-    gsap.fromTo(el,{y:30,opacity:.001},{y:0,opacity:1,duration:.75,ease:'power3.out',delay:(i%3)*.04,scrollTrigger:{trigger:el,start:'top 88%',once:true}});
+    gsap.fromTo(el,{y:55,opacity:.001,scale:.985},{y:0,opacity:1,scale:1,duration:.9,ease:'power4.out',delay:(i%3)*.04,scrollTrigger:{trigger:el,start:'top 88%',once:true}});
+   });
+
+   gsap.utils.toArray<HTMLElement>('.cinematicSection').forEach(el=>{
+    const heading=el.querySelector<HTMLElement>('h2');
+    const eyebrow=el.querySelector<HTMLElement>('.eyebrow');
+    const body=el.querySelectorAll<HTMLElement>('p,.projectCard,.cert,.role,.courseCard');
+    if(eyebrow)gsap.fromTo(eyebrow,{y:24,opacity:0,filter:'blur(8px)'},{y:0,opacity:1,filter:'blur(0px)',duration:.65,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 82%',once:true}});
+    if(heading)gsap.fromTo(heading,{y:70,opacity:0,clipPath:'inset(0 0 100% 0)'},{y:0,opacity:1,clipPath:'inset(0 0 0% 0)',duration:1,ease:'power4.out',scrollTrigger:{trigger:el,start:'top 82%',once:true}});
+    gsap.fromTo(body,{y:32,opacity:0},{y:0,opacity:1,duration:.7,stagger:.06,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 76%',once:true}});
    });
 
    gsap.utils.toArray<HTMLElement>('.card,.projectCard,.course,.courseCard,.feature,.whyItem,.lesson,.accessRow,.cert,.pathCard,.pathCourseRow,.role').forEach((el,i)=>{
@@ -95,16 +104,12 @@ export default function GlobalMotion(){
    });
 
    gsap.utils.toArray<HTMLElement>('h1,h2').forEach(el=>{
+    if(el.closest('.cinematicSection'))return;
     gsap.fromTo(el,{y:18,opacity:.001},{y:0,opacity:1,duration:.7,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 90%',once:true}});
    });
 
-   gsap.utils.toArray<HTMLElement>('.btn').forEach(el=>{
-    const enter=()=>gsap.to(el,{y:-2,duration:.2,ease:'power2.out',overwrite:true});
-    const exit=()=>gsap.to(el,{y:0,duration:.25,ease:'power2.out',overwrite:true});
-    el.addEventListener('mouseenter',enter);
-    el.addEventListener('mouseleave',exit);
-   });
-
+   const landingHero= document.querySelector<HTMLElement>('.heroVisual');
+   if(landingHero)gsap.to(landingHero,{yPercent:-9,scale:1.035,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
    gsap.to('.ambient',{backgroundPosition:'50% 8%',duration:12,repeat:-1,yoyo:true,ease:'sine.inOut'});
   });
 

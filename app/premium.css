@@ -21,3 +21,14 @@ body{background:radial-gradient(circle at 78% 0%,rgba(192,132,252,.09),transpare
 .mobileMenuPanel{animation:menuIn .22s cubic-bezier(.2,.8,.2,1)}
 @keyframes menuIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.motionProgress,.hero:after,.heroVisual:after,.section:after{animation:none!important}}
+
+/* Cinematic landing motion inspired by the reference video — palette intentionally unchanged */
+.cinematicSection{transform-origin:center top;overflow:clip}
+.cinematicSection h2{will-change:transform,opacity,clip-path}
+.cinematicSection .sectionhead,.cinematicSection p,.cinematicSection .projectCard,.cinematicSection .cert,.cinematicSection .role,.cinematicSection .courseCard{will-change:transform,opacity}
+.hero{perspective:1200px}
+.heroCopy,.heroVisual{will-change:transform,opacity}
+.signature{overflow:hidden}
+.signature>div{will-change:transform,opacity}
+@media(max-width:900px){.cinematicSection h2{font-size:28px}}
+@media(prefers-reduced-motion:reduce){.cinematicSection h2,.cinematicSection .sectionhead,.cinematicSection p,.cinematicSection .projectCard,.cinematicSection .cert,.cinematicSection .role,.cinematicSection .courseCard{will-change:auto}}
