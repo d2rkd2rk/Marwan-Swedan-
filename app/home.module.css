@@ -94,3 +94,7 @@
  .finalStage{padding:100px 0!important}.finalStage h2{font-size:clamp(52px,15vw,76px)}.finalMark{display:none}.footer{grid-template-columns:1fr;padding-top:50px}
  .cursorGlow{display:none}.marqueeTrack{gap:20px}.marqueeTrack span{font-size:10px}.marqueeTrack b{margin-left:20px}
 }
+
+.interactionSpot{position:absolute;width:190px;height:190px;border-radius:50%;pointer-events:none;z-index:0;transform:translate(-50%,-50%);opacity:0;background:radial-gradient(circle,rgba(192,132,252,.16),rgba(139,92,246,.06) 35%,transparent 70%);filter:blur(10px);mix-blend-mode:screen}.focusCard>*:not(.interactionSpot),.courseCard>*:not(.interactionSpot),.experienceInteractive>*:not(.interactionSpot),.certInteractive>*:not(.interactionSpot){position:relative;z-index:1}.focusCard,.courseCard,.experienceInteractive,.certInteractive{overflow:hidden}
+.heroCinematic .heroImg{will-change:transform}.heroCinematic .copy{position:relative;z-index:5}.heroCinematic .actions{position:relative;z-index:6}
+@media(max-width:900px){.interactionSpot{display:none}}
