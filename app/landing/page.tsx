@@ -4,6 +4,7 @@ import {session} from '@/lib/auth';
 import db from '@/lib/db';
 import Animations from './Animations';
 import SiteNav from '@/app/components/SiteNav';
+import CourseThumbnail from '@/app/components/CourseThumbnail';
 import s from '../home.module.css';
 
 const roles=[['Jul 2026 — Present','Security Operations Center Analyst','Alignerr'],['Jul 2026 — Present','Information Security Intern','Commercial International Bank (CIB Egypt)'],['Jul 2026 — Present','Member','International Association of Engineers (IAENG)'],['Jun 2026 — Present','Network Engineer (Contract)','Internet Society'],['Feb 2026 — Present','CTF Player & Digital Forensics Analyst','Information Technology Institute'],['Apr 2026 — Present','Founder & Chairman','Sudo Academy'],['Apr 2026 — May 2026','Cyber Security Instructor','Pharos University in Alexandria (PUA)'],['Mar 2026 — May 2026','Back-End Developer & HR Specialist','IEEE PUA Student Branch']];
@@ -40,7 +41,7 @@ export default async function Landing(){
 
    {courses.length>0&&<section className={s.section+' '+s.courseStage}>
     <div className={s.sectionHead}><div><div className={s.label}>03 / ACADEMY</div><h2>Latest courses<span>.</span></h2></div><Link className={s.view} href="/courses">View all ↗</Link></div>
-    <div className={s.courses}>{courses.map((c:any,i:number)=><Link href={'/courses/'+c.slug} className={s.course+' '+s.courseCard} key={c.id}><div className={s.courseNo}>0{i+1}</div><div className={s.courseImg}>{c.thumbnail_url&&<div role="img" aria-label={c.title} style={{position:'absolute',inset:0,backgroundImage:'url('+c.thumbnail_url+')',backgroundSize:'cover',backgroundPosition:'center'}}/>}<span className={s.badge}>{c.level||'Beginner'}</span><span className={s.courseArrow}>↗</span></div><div className={s.courseBody}><h3>{c.title}</h3><p>{c.description||'Practical training from Marwan Swedan Academy.'}</p><div className={s.meta}><span>{c.lesson_count} LESSONS</span><span>{c.duration_minutes?(Math.floor(c.duration_minutes/60)+'H '+(c.duration_minutes%60)+'M'):'SELF-PACED'}</span></div></div></Link>)}</div>
+    <div className={s.courses}>{courses.map((c:any,i:number)=><Link href={'/courses/'+c.slug} className={s.course+' '+s.courseCard} key={c.id}><div className={s.courseNo}>0{i+1}</div><div className={s.courseImg}><CourseThumbnail src={c.thumbnail_url} alt={c.title} category={c.category}/><span className={s.badge}>{c.level||'Beginner'}</span><span className={s.courseArrow}>↗</span></div><div className={s.courseBody}><h3>{c.title}</h3><p>{c.description||'Practical training from Marwan Swedan Academy.'}</p><div className={s.meta}><span>{c.lesson_count} LESSONS</span><span>{c.duration_minutes?(Math.floor(c.duration_minutes/60)+'H '+(c.duration_minutes%60)+'M'):'SELF-PACED'}</span></div></div></Link>)}</div>
    </section>}
 
    <section id="experience" className={s.section+' '+s.experienceStage}>
