@@ -69,6 +69,38 @@ export default function Animations(){
     el.addEventListener('mousemove',tilt);el.addEventListener('mouseleave',reset);
     cleanups.push(()=>{el.removeEventListener('mousemove',tilt);el.removeEventListener('mouseleave',reset);});
    });
+   // Cinematic interaction layer
+   gsap.utils.toArray<HTMLElement>('.heroKicker,.heroIndex,.heroLead,.heroBottom').forEach((el,i)=>{
+    gsap.to(el,{x:i%2?12:-12,scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1.4}});
+   });
+   gsap.utils.toArray<HTMLElement>('.focusCard').forEach((el,i)=>{
+    gsap.to(el,{y:i%2?-18:18,rotateZ:i%2?-1.2:1.2,scrollTrigger:{trigger:'.aboutStage',start:'top bottom',end:'bottom top',scrub:1.8}});
+   });
+   gsap.utils.toArray<HTMLElement>('.courseCard').forEach((el,i)=>{
+    gsap.to(el,{y:i%3===0?-24:i%3===1?12:-12,scrollTrigger:{trigger:'.courseStage',start:'top bottom',end:'bottom top',scrub:1.5}});
+   });
+   gsap.utils.toArray<HTMLElement>('.experienceInteractive').forEach((el,i)=>{
+    gsap.fromTo(el,{x:i%2?-45:45},{x:0,scrollTrigger:{trigger:el,start:'top 92%',end:'top 65%',scrub:1}});
+   });
+   gsap.utils.toArray<HTMLElement>('.certInteractive').forEach((el,i)=>{
+    gsap.fromTo(el,{clipPath:i%2?'inset(0 0 0 100%)':'inset(0 100% 0 0)'},{clipPath:'inset(0 0% 0 0%)',scrollTrigger:{trigger:el,start:'top 92%',end:'top 70%',scrub:1}});
+   });
+   gsap.to('.finalMark',{rotation:-8,x:35,y:-20,scrollTrigger:{trigger:'.finalStage',start:'top bottom',end:'bottom top',scrub:2}});
+   gsap.utils.toArray<HTMLElement>('.section').forEach((el,i)=>{
+    gsap.to(el,{backgroundPosition:i%2?'72% 38%':'28% 62%',scrollTrigger:{trigger:el,start:'top bottom',end:'bottom top',scrub:2}});
+   });
+
+   // Hover spotlight follows each interactive surface.
+   gsap.utils.toArray<HTMLElement>('.focusCard,.courseCard,.experienceInteractive,.certInteractive').forEach(el=>{
+    const spot=document.createElement('span');
+    spot.className='interactionSpot';
+    el.appendChild(spot);
+    const moveSpot=(e:MouseEvent)=>{const r=el.getBoundingClientRect();spot.style.left=(e.clientX-r.left)+'px';spot.style.top=(e.clientY-r.top)+'px';};
+    const enter=()=>gsap.to(spot,{opacity:1,duration:.25});
+    const leave=()=>gsap.to(spot,{opacity:0,duration:.35});
+    el.addEventListener('mousemove',moveSpot);el.addEventListener('mouseenter',enter);el.addEventListener('mouseleave',leave);
+    cleanups.push(()=>{el.removeEventListener('mousemove',moveSpot);el.removeEventListener('mouseenter',enter);el.removeEventListener('mouseleave',leave);spot.remove();});
+   });
 
    return()=>{window.removeEventListener('mousemove',move);cleanups.forEach(fn=>fn());};
   });
