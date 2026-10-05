@@ -34,7 +34,7 @@ export default async function Landing(){
 
    <section id="about" className={s.aboutStage+' '+s.section}>
     <div className={s.sectionNumber}>02</div>
-    <div className={s.aboutCopy}><div className={s.label}>ABOUT ME</div><h2>Turning curiosity into <span>capability.</span></h2><p>I work across cybersecurity, networking, digital forensics and software engineering. My focus is simple: learn deeply, build practically, and turn what I learn into useful experiences for other people.</p><div className={s.aboutMeta}><div><b>3.77 / 4.00</b><span>GPA</span></div><div><b>150+</b><span>Students mentored</span></div><div><b>33</b><span>Certifications</span></div></div></div>
+    <div className={s.aboutVisual}><div className={s.aboutVisualGlow}/><div className={s.aboutVisualRing}/><div className={s.aboutVisualCore}><span>DF</span><small>DIGITAL<br/>FORENSICS</small></div><div className={s.aboutVisualOrbit}>✦</div></div><div className={s.aboutCopy}><div className={s.label}>ABOUT ME</div><h2>Turning curiosity into <span>capability.</span></h2><p>I work across cybersecurity, networking, digital forensics and software engineering. My focus is simple: learn deeply, build practically, and turn what I learn into useful experiences for other people.</p><div className={s.aboutMeta}><div><b>3.64 / 4.00</b><span>GPA</span></div><div><b>150+</b><span>Students mentored</span></div><div><b>33</b><span>Certifications</span></div></div></div>
     <div className={s.focusGrid}>{focus.map(([n,t,d])=><article className={s.focusCard} key={n}><span>{n}</span><div><h3>{t}</h3><p>{d}</p></div><i>↗</i></article>)}</div>
    </section>
 
