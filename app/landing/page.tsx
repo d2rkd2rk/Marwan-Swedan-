@@ -13,7 +13,7 @@ const focus=[['01','Cybersecurity','SOC · Incident Response · Threat Hunting']
 
 export default async function Landing(){
  const user=await session();
- const courses=await db\`select c.id,c.title,c.slug,c.description,c.level,c.thumbnail_url,c.duration_minutes,count(l.id)::int as lesson_count from courses c left join lessons l on l.course_id=c.id and l.published=true where c.published=true group by c.id order by c.created_at desc limit 3\`;
+ const courses=await db`select c.id,c.title,c.slug,c.description,c.level,c.thumbnail_url,c.duration_minutes,count(l.id)::int as lesson_count from courses c left join lessons l on l.course_id=c.id and l.published=true where c.published=true group by c.id order by c.created_at desc limit 3`;
  return <main className={s.page}>
   <div className={s.ambient}/><div className={s.cursorGlow}/><div className={s.noise}/>
   <div className={s.wrap}>
