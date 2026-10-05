@@ -13,3 +13,84 @@
 .cinematicSection{overflow:hidden}
 .cinematicSection h2{will-change:transform,opacity,clip-path}
 @media(max-width:560px){.experienceItem{grid-template-columns:1fr;gap:7px}.certGrid{grid-template-columns:1fr}.certCount{font-size:32px}}
+
+/* Portfolio v2 — same palette, completely new visual system */
+.page{background:#090611;color:#f8f5ff;cursor:default}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.cursorGlow{position:fixed;left:0;top:0;width:280px;height:280px;border-radius:50%;pointer-events:none;z-index:2;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(192,132,252,.09),transparent 65%);filter:blur(4px)}
+.heroCinematic{min-height:calc(100vh - 74px);height:780px;grid-template-columns:1.04fr .96fr;overflow:visible}
+.heroCinematic:before{background:radial-gradient(circle at 78% 44%,rgba(192,132,252,.18),transparent 28%),linear-gradient(90deg,#090611 0%,rgba(9,6,17,.9) 44%,rgba(9,6,17,.2) 100%)}
+.heroCinematic:after{content:'MS';position:absolute;right:-4%;bottom:-7%;font-family:'Space Grotesk';font-size:clamp(180px,31vw,480px);font-weight:700;letter-spacing:-.13em;line-height:.75;color:rgba(216,180,254,.025);pointer-events:none}
+.heroKicker{position:absolute;top:38px;left:0;z-index:4;font-size:9px;letter-spacing:.2em;color:#cbb9dd;border-left:2px solid #c084fc;padding-left:10px}
+.heroIndex{font-size:9px;color:#786b86;letter-spacing:.16em;margin-bottom:18px}
+.heroTitle{font-family:'Space Grotesk',sans-serif!important;font-size:clamp(72px,9vw,142px)!important;line-height:.78!important;letter-spacing:-.09em!important;margin:0 0 30px!important;display:flex;flex-direction:column;text-transform:uppercase!important;max-width:none!important}
+.heroTitle span{color:#f8f5ff!important;background:none!important;-webkit-text-fill-color:initial}
+.heroTitle em{font-style:normal;color:#c084fc}
+.heroLead{max-width:510px!important;font-size:14px!important;line-height:1.8!important;color:#aaa0b8!important}
+.heroArt{height:720px!important}
+.heroImg{height:760px!important;mask-image:linear-gradient(to right,transparent 0%,black 12%,black 90%,transparent 100%)!important;filter:contrast(1.06) saturate(.75)!important}
+.heroOrb{position:absolute;width:76%;aspect-ratio:1;border:1px solid rgba(192,132,252,.16);border-radius:50%;top:13%;left:12%;box-shadow:0 0 100px rgba(192,132,252,.08),inset 0 0 100px rgba(139,92,246,.06)}
+.heroFrame{position:absolute;right:4%;bottom:13%;z-index:3;display:flex;flex-direction:column;gap:7px;padding:12px 14px;border-left:1px solid #c084fc;background:rgba(9,6,17,.55);backdrop-filter:blur(12px);font-size:8px;letter-spacing:.14em;color:#a99db5}
+.heroBottom{position:absolute;bottom:24px;left:0;right:0;display:flex;align-items:center;gap:14px;font-size:8px;letter-spacing:.16em;color:#71677b;z-index:4}
+.scrollLine{width:70px;height:1px;background:linear-gradient(90deg,#c084fc,transparent)}
+.marquee{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:#0d0815;white-space:nowrap}
+.marqueeTrack{display:flex;width:max-content;align-items:center;gap:35px;padding:17px 0}
+.marqueeTrack span{font-family:'Space Grotesk';font-size:12px;letter-spacing:.15em;color:#8d8299}
+.marqueeTrack b{color:#c084fc;margin-left:35px;font-size:9px}
+.section{padding:125px 0;background-size:180% 180%}
+.sectionNumber{font-family:'Space Grotesk';font-size:10px;color:#c084fc;letter-spacing:.18em;margin-bottom:38px;opacity:.55}
+.aboutStage{display:grid;grid-template-columns:1.05fr .95fr;gap:80px;background:radial-gradient(circle at 18% 30%,rgba(139,92,246,.07),transparent 35%),#090611}
+.aboutCopy h2{font-family:'Space Grotesk';font-size:clamp(48px,6vw,82px);line-height:.95;letter-spacing:-.065em;margin:12px 0 24px}
+.aboutCopy h2 span,.section h2 span{color:#c084fc}
+.aboutCopy>p{max-width:560px;color:#9990a5;font-size:13px;line-height:1.85}
+.aboutMeta{display:flex;gap:42px;margin-top:42px;padding-top:24px;border-top:1px solid var(--line)}
+.aboutMeta div{display:flex;flex-direction:column;gap:5px}.aboutMeta b{font-family:'Space Grotesk';font-size:20px;color:#eee7fa}.aboutMeta span{font-size:8px;letter-spacing:.12em;color:#766b82;text-transform:uppercase}
+.focusGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:center;perspective:900px}
+.focusCard{min-height:190px;padding:20px;border:1px solid rgba(216,180,254,.11);background:linear-gradient(145deg,rgba(25,16,38,.8),rgba(12,8,20,.8));display:flex;flex-direction:column;justify-content:space-between;transition:border-color .35s,background .35s,box-shadow .35s;transform-style:preserve-3d}
+.focusCard:hover{border-color:rgba(192,132,252,.45);background:rgba(124,58,237,.07);box-shadow:0 25px 70px rgba(0,0,0,.3),0 0 35px rgba(192,132,252,.06)}
+.focusCard>span{font-size:9px;color:#776a87}.focusCard h3{font-family:'Space Grotesk';font-size:20px;margin:0 0 6px}.focusCard p{font-size:9px;color:#8d8299;margin:0}.focusCard i{font-style:normal;color:#c084fc;align-self:flex-end}
+.courseStage{background:radial-gradient(circle at 80% 45%,rgba(192,132,252,.08),transparent 30%),#0b0710}
+.courseStage .sectionHead h2,.experienceStage .sectionHead h2{font-size:clamp(48px,6vw,82px)}
+.courseStage .courses{grid-template-columns:repeat(3,1fr);gap:14px}
+.courseCard{position:relative;min-height:430px;transition:transform .5s cubic-bezier(.2,.8,.2,1),border-color .4s,box-shadow .4s;transform-style:preserve-3d}
+.courseCard:hover{transform:translateY(-12px)!important}
+.courseNo{position:absolute;z-index:4;top:15px;left:15px;font-size:9px;color:#d8b4fe}
+.courseImg{height:260px!important}
+.courseArrow{position:absolute;z-index:3;right:14px;top:14px;width:34px;height:34px;border:1px solid rgba(255,255,255,.16);border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(9,6,17,.5);transition:transform .3s,background .3s}
+.courseCard:hover .courseArrow{transform:rotate(45deg) scale(1.12);background:#8b5cf6}
+.courseBody{padding:22px!important}.courseBody h3{font-family:'Space Grotesk';font-size:17px!important}.courseBody p{font-size:10px!important;min-height:45px!important}
+.experienceStage{background:linear-gradient(110deg,#090611,#10091a 45%,#090611);background-size:180% 180%}
+.experienceStage .sectionHead{margin-bottom:50px}
+.experienceList{border-top:1px solid rgba(216,180,254,.14)}
+.experienceInteractive{grid-template-columns:160px 1fr 40px;gap:35px;padding:28px 8px;transition:padding .35s,background .35s,border-color .35s;position:relative}
+.experienceInteractive:before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:#c084fc;transform:scaleY(0);transform-origin:top;transition:transform .4s}
+.experienceInteractive:hover{padding-left:24px;background:rgba(192,132,252,.035);border-color:rgba(192,132,252,.3)}
+.experienceInteractive:hover:before{transform:scaleY(1)}
+.experienceInteractive time{font-size:8px;line-height:1.8;color:#796e87;letter-spacing:.08em}
+.experienceInteractive h3{font-family:'Space Grotesk';font-size:20px!important;margin:0 0 7px!important}.experienceInteractive p{font-size:10px!important;color:#a59aaa!important}.experienceArrow{align-self:center;color:#8d7a9d;transition:transform .3s,color .3s}.experienceInteractive:hover .experienceArrow{transform:translate(5px,-5px);color:#c084fc}
+.certStage{background:radial-gradient(circle at 70% 20%,rgba(124,58,237,.08),transparent 30%),#0a0610}
+.certTop{display:flex;justify-content:space-between;align-items:end;margin-bottom:42px}.certTop h2{font-family:'Space Grotesk';font-size:clamp(48px,6vw,82px);line-height:.9;margin:10px 0}.certTop p{color:#8d8299;font-size:11px}.certTop>strong{font-family:'Space Grotesk';font-size:100px;line-height:.75;color:#d8b4fe}.certTop small{font-family:inherit;font-size:8px;color:#71667d;letter-spacing:.12em}
+.certGrid{grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line)}
+.certInteractive{border-radius:0;border:0;border-bottom:1px solid var(--line);padding:23px 8px;display:grid;grid-template-columns:42px 1fr 25px;align-items:center;transition:padding .35s,background .35s;transform-style:preserve-3d}
+.certInteractive:nth-child(odd){border-right:1px solid var(--line)}
+.certInteractive>span{font-size:8px;color:#74697f}.certInteractive>b{font-size:11px;font-weight:500;color:#bcb2c7}.certInteractive>i{font-style:normal;color:#806c91;transition:transform .3s,color .3s}.certInteractive:hover{background:rgba(124,58,237,.055);padding-left:18px}.certInteractive:hover>i{transform:rotate(45deg);color:#c084fc}
+.finalStage{padding:150px 0!important;background:radial-gradient(circle at 75% 50%,rgba(192,132,252,.15),transparent 30%),linear-gradient(120deg,#10091a,#0c0712 55%,#140b20);background-size:180% 180%;position:relative}
+.finalNoise{position:absolute;inset:0;background:radial-gradient(circle at 15% 30%,rgba(139,92,246,.1),transparent 25%);pointer-events:none}
+.finalStage .journeyInner{width:min(1180px,calc(100% - 56px));margin:auto;position:relative;z-index:1}
+.finalStage h2{font-family:'Space Grotesk';font-size:clamp(60px,8vw,110px);line-height:.84;letter-spacing:-.075em;margin:12px 0 25px}.finalStage h2 span{color:#c084fc}.finalStage p{max-width:420px;color:#9a90a5;font-size:12px;line-height:1.7}
+.finalMark{font-family:'Space Grotesk';font-size:clamp(150px,24vw,330px);line-height:.7;letter-spacing:-.15em;color:rgba(216,180,254,.06);user-select:none}.finalMark span{color:rgba(192,132,252,.5)}
+.statusDot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#c084fc;box-shadow:0 0 12px #c084fc;margin-right:6px}
+.footer{background:#07040c;padding-top:70px}.footerBrand{font-family:'Space Grotesk';font-size:18px;letter-spacing:-.04em}.footer h4{letter-spacing:.14em;color:#c4b6d1}.footer a:hover{color:#c084fc}
+
+@media(max-width:900px){
+ .heroCinematic{height:auto;min-height:calc(100vh - 64px);grid-template-columns:1fr}.heroKicker{top:28px}.heroArt{height:520px!important;grid-row:2}.heroImg{height:560px!important}.heroBottom{bottom:14px}.aboutStage{grid-template-columns:1fr;gap:55px}.courseStage .courses{grid-template-columns:1fr 1fr}.finalStage .journeyInner{width:min(100% - 30px,1180px)}
+}
+@media(max-width:560px){
+ .heroCinematic{min-height:760px}.heroTitle{font-size:clamp(58px,18vw,86px)!important}.heroLead{font-size:12px!important}.heroArt{height:390px!important}.heroImg{height:430px!important}.heroFrame{right:0;bottom:8%;font-size:7px}.heroBottom{font-size:7px}.heroBottom .scrollLine{width:35px}
+ .section{padding:90px 0}.aboutMeta{gap:18px;flex-wrap:wrap}.aboutMeta b{font-size:17px}.focusGrid{grid-template-columns:1fr}.focusCard{min-height:150px}
+ .courseStage .courses{grid-template-columns:1fr}.courseCard{min-height:390px}.courseImg{height:225px!important}
+ .experienceInteractive{grid-template-columns:48px 1fr 20px;gap:12px;padding:22px 0}.experienceInteractive h3{font-size:14px!important}
+ .certTop{align-items:start;gap:20px}.certTop>strong{font-size:58px}.certTop small{display:block}.certGrid{grid-template-columns:1fr}.certInteractive:nth-child(odd){border-right:0}.certInteractive{grid-template-columns:32px 1fr 20px;padding:19px 0}
+ .finalStage{padding:100px 0!important}.finalStage h2{font-size:clamp(52px,15vw,76px)}.finalMark{display:none}.footer{grid-template-columns:1fr;padding-top:50px}
+ .cursorGlow{display:none}.marqueeTrack{gap:20px}.marqueeTrack span{font-size:10px}.marqueeTrack b{margin-left:20px}
+}
