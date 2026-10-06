@@ -25,7 +25,6 @@ export default function Animations(){
    gsap.to('.heroTitle',{y:-80,opacity:.18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
    gsap.to('.heroFrame',{y:-12,repeat:-1,yoyo:true,duration:3,ease:'sine.inOut'});
    gsap.to('.dot',{scale:1.5,opacity:.45,repeat:-1,yoyo:true,duration:1.1,ease:'sine.inOut'});
-   gsap.to('.logoMark',{rotation:360,duration:16,repeat:-1,ease:'none'});
 
    gsap.to('.marqueeTrack',{xPercent:-50,ease:'none',duration:28,repeat:-1});
 
