@@ -10,6 +10,7 @@ export const metadata:Metadata={
  title:'Marwan Swedan Academy',
  description:'Cybersecurity portfolio and private academy by Marwan Swedan',
  manifest:'/manifest.json',
- themeColor:'#06111a'
+ themeColor:'#06111a',
+ icons:{icon:'/images/marwan-app-icon.svg',apple:'/images/marwan-app-icon.svg'}
 };
 export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="en"><body><GlobalMotion/><CourseImageManager/><AdminEnhancements/><PWAInstallPrompt/>{children}</body></html>}
