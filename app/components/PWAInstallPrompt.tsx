@@ -118,7 +118,7 @@ export default function PWAInstallPrompt(){
  return <div className="pwaInstallOverlay">
   <div className="pwaInstallCard" role="dialog" aria-modal="true" aria-label="Marwan Swedan Academy install and notification prompt">
    {!loggedIn&&<button className="pwaInstallClose" type="button" aria-label="Close" onClick={()=>setShow(false)}>×</button>}
-   <div className="pwaInstallIcon">MS</div>
+   <div className="pwaInstallIcon"><img src="/images/marwan-app-icon.svg" alt="" width="56" height="56"/></div>
    <div className="pwaInstallCopy">
     <div className="eyebrow">Marwan Swedan Academy</div>
     <h3>{loggedIn?'Enable Academy Notifications':'Install the Academy'}</h3>
