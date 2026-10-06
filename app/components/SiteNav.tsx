@@ -20,7 +20,7 @@ export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){
  };
  const closeMenu=()=>setMenuOpen(false);
  return <nav className={s.nav}>
-  <Link href="/" className={s.logo} onClick={closeMenu}><span className={s.logoMark} aria-hidden="true" style={{clipPath:'none',borderRadius:'50%',backgroundImage:"url('/images/profile.jpg')",backgroundSize:'cover',backgroundPosition:'center',fontSize:0}}/><span className={s.logoText}>Marwan Swedan<small>Cybersecurity · Academy · Portfolio</small></span></Link>
+  <Link href="/" className={s.logo} onClick={closeMenu}><span className={s.logoMark} aria-hidden="true" style={{clipPath:'none',borderRadius:'10px',backgroundImage:"url('/images/marwan-app-icon.svg')",backgroundSize:'cover',backgroundPosition:'center',fontSize:0}}/><span className={s.logoText}>Marwan Swedan<small>Cybersecurity · Academy · Portfolio</small></span></Link>
   <div className={s.links}>
    <Link href="/">Home</Link><Link href="/courses">Academy</Link><Link href="/courses">Courses</Link><Link href="/paths">Paths</Link><Link href="/#portfolio">Portfolio</Link>
   </div>
