@@ -20,8 +20,8 @@ self.addEventListener('push',event=>{
   try{
    await self.registration.showNotification(data.title,{
     body:data.body,
-    icon:'/images/profile.jpg',
-    badge:'/images/profile.jpg',
+    icon:'/images/marwan-app-icon.svg',
+    badge:'/images/marwan-app-icon.svg',
     data:{url:data.url||'/'},
     tag:data.tag||'marwan-academy',
     requireInteraction:false
