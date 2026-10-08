@@ -64,3 +64,31 @@ export async function sendCourseAnnouncement(courseId:string,title:string,body:s
  if(!safeTitle||!safeBody)throw new Error('ANNOUNCEMENT_REQUIRED');
  return await sendToPushSubscribers(courseId,safeTitle,safeBody,'/courses',`announcement-${courseId}-${Date.now()}`);
 }
+
+export async function sendBroadcastAnnouncement(title:string,body:string){
+ const safeTitle=title.trim(),safeBody=body.trim();
+ if(!safeTitle||!safeBody)throw new Error('ANNOUNCEMENT_REQUIRED');
+ if(!configured())throw new Error('PUSH_NOT_CONFIGURED');
+ await ensurePushTable();
+ const rows=await db\`select ps.id,ps.endpoint,ps.p256dh,ps.auth
+  from push_subscriptions ps
+  where ps.disabled_at is null\`;
+ let sent=0,failed=0,expired=0;
+ await Promise.all(rows.map(async(row:any)=>{
+  const sub:PushSubscriptionRecord={endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}};
+  try{
+   await webpush.sendNotification(sub,JSON.stringify({title:safeTitle,body:safeBody,url:'/courses',tag:`broadcast-1791467716757`}),{TTL:3600,headers:{Urgency:'high'}});
+   await db\`update push_subscriptions set last_used_at=now(),disabled_at=null where id=${row.id}\`;
+   sent++;
+  }catch(error:any){
+   if(error?.statusCode===404||error?.statusCode===410){
+    await db\`update push_subscriptions set disabled_at=now() where id=${row.id}\`;
+    expired++;
+   }else{
+    failed++;
+    console.error('PUSH_BROADCAST_DELIVERY_FAILED',{statusCode:error?.statusCode,body:error?.body});
+   }
+  }
+ }));
+ return {sent,failed,expired,total:rows.length};
+}
