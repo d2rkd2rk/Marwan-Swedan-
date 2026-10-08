@@ -23,7 +23,7 @@ function storage(){
 function validKey(key:string){
   const parts=key.split('/');
   if(parts.length>=3&&(['courses','course-thumbnails','path-thumbnails'].includes(parts[0]))&&Boolean(parts[1]))return true;
-  return parts.length===4&&parts[0]==='profiles'&&Boolean(parts[1])&&parts[2]==='avatar';
+  return parts.length===4&&parts[0]==='profiles'&&Boolean(parts[1])&&(['avatar','cv'].includes(parts[2]));
 }
 
 export async function GET(request:NextRequest){
@@ -33,13 +33,15 @@ export async function GET(request:NextRequest){
 
   const parts=key.split('/');
   const isPublicAvatar=parts[0]==='profiles'&&parts[2]==='avatar';
+  const isProfileCv=parts[0]==='profiles'&&parts[2]==='cv';
   const isPublicThumbnail=parts[0]==='course-thumbnails'||parts[0]==='path-thumbnails';
   const isPublicMedia=isPublicAvatar||isPublicThumbnail;
   const user=isPublicMedia?null:await session();
   if(!isPublicMedia&&!user)return new NextResponse('Authentication required',{status:401});
+  if(isProfileCv&&user?.id!==parts[1]&&user?.role!=='admin')return new NextResponse('Forbidden',{status:403});
 
   const courseId=parts[1];
-  if(!isPublicMedia){
+  if(!isPublicMedia&&!isProfileCv){
     const course=await db`select is_free from courses where id=${courseId} limit 1`;
     if(!course.length)return new NextResponse('Not found',{status:404});
     const enrollment=await db`select id from enrollments where user_id=${user.id} and course_id=${courseId} and revoked_at is null limit 1`;
