@@ -30,7 +30,15 @@ export async function PATCH(request:Request){
    }catch{}
    if(!validAvatar)return NextResponse.json({error:'Invalid profile image.'},{status:400});
   }
-  if(cvUrl&&!cvUrl.startsWith('/api/file?pathname=profiles/'))return NextResponse.json({error:'Invalid CV file.'},{status:400});
+  if(cvUrl){
+   let validCv=false;
+   try{
+    const parsed=new URL(cvUrl,'https://academy.invalid');
+    const key=parsed.searchParams.get('key')||'';
+    validCv=parsed.origin==='https://academy.invalid'&&parsed.pathname==='/api/file'&&key.startsWith(`profiles/${user.id}/cv/`)&&!key.includes('..');
+   }catch{}
+   if(!validCv)return NextResponse.json({error:'Invalid CV file.'},{status:400});
+  }
   const duplicate=await db`select id from users where (lower(username)=${username} or lower(email)=${email}) and id<>${user.id} limit 1`;if(duplicate.length)return NextResponse.json({error:'Email or username is already in use.'},{status:409});
   const usernameChanged=username!==String(current.username).toLowerCase();
   if(usernameChanged&&current.username_updated_at){const nextAllowed=new Date(new Date(current.username_updated_at).getTime()+14*24*60*60*1000);if(nextAllowed>new Date())return NextResponse.json({error:`You can change your username again on ${nextAllowed.toISOString().slice(0,10)}.`},{status:429})}
