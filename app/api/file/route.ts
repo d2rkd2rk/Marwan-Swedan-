@@ -34,18 +34,29 @@ export async function GET(request:NextRequest){
   const parts=key.split('/');
   const isPublicAvatar=parts[0]==='profiles'&&parts[2]==='avatar';
   const isProfileCv=parts[0]==='profiles'&&parts[2]==='cv';
-  const isPublicThumbnail=parts[0]==='course-thumbnails'||parts[0]==='path-thumbnails';
+  const isPublicThumbnailNamespace=parts[0]==='course-thumbnails'||parts[0]==='path-thumbnails';
+
+  // Older thumbnails were accidentally saved in the private "courses" namespace.
+  // Only make a legacy object public when its exact URL is registered as a published course thumbnail.
+  const thumbnailUrl=`/api/file?key=${encodeURIComponent(key)}`;
+  const legacyThumbnail=parts[0]==='courses'
+    ?await db`select published from courses where thumbnail_url=${thumbnailUrl} limit 1`
+    :[];
+  const isLegacyCourseThumbnail=legacyThumbnail.length>0;
+  const isPublishedLegacyThumbnail=Boolean(legacyThumbnail[0]?.published);
+  const isPublicThumbnail=isPublicThumbnailNamespace||isPublishedLegacyThumbnail;
   const isPublicMedia=isPublicAvatar||isPublicThumbnail;
   const user=isPublicMedia?null:await session();
   if(!isPublicMedia&&!user)return new NextResponse('Authentication required',{status:401});
   if(isProfileCv&&user?.id!==parts[1]&&user?.role!=='admin')return new NextResponse('Forbidden',{status:403});
+  if(isLegacyCourseThumbnail&&!isPublishedLegacyThumbnail&&user?.role!=='admin')return new NextResponse('Not found',{status:404});
 
   const courseId=parts[1];
-  if(!isPublicMedia&&!isProfileCv){
+  if(!isPublicMedia&&!isProfileCv&&!isLegacyCourseThumbnail){
     const course=await db`select is_free from courses where id=${courseId} limit 1`;
     if(!course.length)return new NextResponse('Not found',{status:404});
-    const enrollment=await db`select id from enrollments where user_id=${user.id} and course_id=${courseId} and revoked_at is null limit 1`;
-    const allowed=Boolean(course[0].is_free)||Boolean(enrollment.length)||user.role==='admin';
+    const enrollment=await db`select id from enrollments where user_id=${user!.id} and course_id=${courseId} and revoked_at is null limit 1`;
+    const allowed=Boolean(course[0].is_free)||Boolean(enrollment.length)||user!.role==='admin';
     if(!allowed)return new NextResponse('Course access has not been granted.',{status:403});
   }
 
