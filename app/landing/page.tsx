@@ -1,11 +1,65 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import type {Metadata} from 'next';
 import {session} from '@/lib/auth';
 import db from '@/lib/db';
 import Animations from './Animations';
 import SiteNav from '@/app/components/SiteNav';
 import CourseThumbnail from '@/app/components/CourseThumbnail';
 import s from '../home.module.css';
+
+const siteUrl='https://marwanswedan.online';
+
+export const metadata:Metadata={
+ title:{absolute:'Marwan Swedan | Cybersecurity & Digital Forensics'},
+ description:'Meet Marwan Swedan, a cybersecurity analyst in Egypt focused on SOC operations, digital forensics, incident response, networking, and practical technology education.',
+ alternates:{canonical:'/'},
+ robots:{index:true,follow:true},
+ openGraph:{
+  type:'website',
+  siteName:'Marwan Swedan Academy',
+  title:'Marwan Swedan | Cybersecurity & Digital Forensics',
+  description:'Cybersecurity, digital forensics, SOC operations, and practical technology education by Marwan Swedan in Egypt.',
+  url:siteUrl,
+  locale:'en_US',
+  images:[{url:'/images/profile.jpg',alt:'Marwan Swedan'}],
+ },
+ twitter:{
+  card:'summary_large_image',
+  title:'Marwan Swedan | Cybersecurity & Digital Forensics',
+  description:'Cybersecurity, digital forensics, SOC operations, and practical technology education by Marwan Swedan.',
+  images:[{url:'/images/profile.jpg',alt:'Marwan Swedan'}],
+ },
+};
+
+const structuredData={
+ '@context':'https://schema.org',
+ '@graph':[
+  {
+   '@type':'Person',
+   '@id':siteUrl+'/#person',
+   name:'Marwan Swedan',
+   alternateName:'مروان سويدان',
+   url:siteUrl,
+   image:siteUrl+'/images/profile.jpg',
+   jobTitle:'Cybersecurity Analyst',
+   description:'Cybersecurity analyst focused on SOC operations, digital forensics, incident response, networking, and practical technology education.',
+   sameAs:[
+    'https://www.linkedin.com/in/marwan-swedan',
+    'https://github.com/d2rkd2rk'
+   ],
+  },
+  {
+   '@type':'WebSite',
+   '@id':siteUrl+'/#website',
+   name:'Marwan Swedan Academy',
+   alternateName:'Marwan Swedan',
+   url:siteUrl,
+   inLanguage:'en',
+   publisher:{'@id':siteUrl+'/#person'},
+  },
+ ],
+};
 
 const roles=[['Jul 2026 — Present','Security Operations Center Analyst','Alignerr'],['Jul 2026 — Present','Information Security Intern','Commercial International Bank (CIB Egypt)'],['Jul 2026 — Present','Member','International Association of Engineers (IAENG)'],['Jun 2026 — Present','Network Engineer (Contract)','Internet Society'],['Feb 2026 — Present','CTF Player & Digital Forensics Analyst','Information Technology Institute'],['Apr 2026 — Present','Founder & Chairman','Sudo Academy'],['Apr 2026 — May 2026','Cyber Security Instructor','Pharos University in Alexandria (PUA)'],['Mar 2026 — May 2026','Back-End Developer & HR Specialist','IEEE PUA Student Branch']];
 const featuredCerts=['LetsDefend — SOC Member','Netriders — System Operator Certification (SOC)','Netriders — Digital Forensics Fundamentals','Basel Institute on Governance — Open-Source Intelligence (OSINT)','ITI — Global Cyber Championship CTF','IBM — Incident Response & Digital Forensics','MaharaTech — Incident Handling & Response','MaharaTech — Digital Forensics and Investigations','Cisco — Network Basics Certificate','Cisco — Introduction to Cybersecurity'];
@@ -16,6 +70,7 @@ export default async function Landing(){
  const user=await session();
  const courses=await db`select c.id,c.title,c.slug,c.description,c.category,c.level,c.thumbnail_url,c.duration_minutes,count(l.id)::int as lesson_count from courses c left join lessons l on l.course_id=c.id and l.published=true where c.published=true group by c.id order by c.created_at desc limit 3`;
  return <main className={s.page}>
+  <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData).replace(/</g,'\\u003c')}}/>
   <div className={s.ambient}/><div className={s.cursorGlow}/><div className={s.noise}/>
   <div className={s.wrap}>
    <SiteNav initialUser={user?{username:user.username,role:user.role}:null}/>
