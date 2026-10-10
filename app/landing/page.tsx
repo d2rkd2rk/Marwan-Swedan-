@@ -12,7 +12,7 @@ const siteUrl='https://marwanswedan.online';
 
 export const metadata:Metadata={
  title:{absolute:'Marwan Swedan | Cybersecurity & Digital Forensics'},
- description:'Meet Marwan Swedan, a cybersecurity analyst in Egypt focused on SOC operations, digital forensics, incident response, networking, and practical technology education.',
+ description:'Meet Marwan Swedan (مروان سويدان), a cybersecurity analyst in Egypt focused on SOC operations, digital forensics, incident response, networking, and practical technology education.',
  alternates:{canonical:'/'},
  robots:{index:true,follow:true},
  openGraph:{
