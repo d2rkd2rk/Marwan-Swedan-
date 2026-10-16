@@ -50,7 +50,7 @@ export async function POST(request:Request,{params}:{params:Promise<{slug:string
   const rating=Number(body.rating);
   const review=String(body.review||'').trim();
   if(!Number.isInteger(rating)||rating<1||rating>5)return NextResponse.json({error:'Rating must be between 1 and 5.'},{status:400});
-  if(review.length<3||review.length>1000)return NextResponse.json({error:'Review must be between 3 and 1000 characters.'},{status:400});
+  if(review.length<5||review.length>1000)return NextResponse.json({error:'Review must be between 5 and 1000 characters.'},{status:400});
   const rows=await db`insert into course_reviews(course_id,user_id,rating,review,updated_at) values(${course.id},${user.id},${rating},${review},now()) on conflict(course_id,user_id) do update set rating=excluded.rating,review=excluded.review,updated_at=now() returning id,rating,review,created_at,updated_at`;
   return NextResponse.json({review:rows[0]});
  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not save review.'},{status:e.message==='UNAUTHENTICATED'?401:400})}

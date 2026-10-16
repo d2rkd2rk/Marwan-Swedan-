@@ -5,6 +5,11 @@ import {requireUser} from '@/lib/auth';
 
 async function ensureCertificateFlag(){await db`alter table courses add column if not exists certificate_enabled boolean not null default false`}
 
+async function ensureReviewsTable(){
+  await db`create table if not exists course_reviews(id uuid primary key default gen_random_uuid(),course_id uuid not null references courses(id) on delete cascade,user_id uuid not null references users(id) on delete cascade,rating smallint not null check(rating between 1 and 5),review text not null,created_at timestamptz not null default now(),updated_at timestamptz not null default now(),unique(course_id,user_id))`;
+  await db`create index if not exists course_reviews_course_idx on course_reviews(course_id,created_at desc)`;
+}
+
 async function ensureCertificateTable(){
   await db`create table if not exists course_certificates(id uuid primary key default gen_random_uuid(),certificate_id text not null unique,user_id uuid not null references users(id) on delete cascade,course_id uuid not null references courses(id) on delete cascade,issued_at timestamptz not null default now(),unique(user_id,course_id))`;
   await db`create index if not exists course_certificates_course_idx on course_certificates(course_id,issued_at desc)`;
@@ -29,10 +34,14 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     const user=await requireUser();
     await ensureCertificateFlag();
     await ensureCertificateTable();
+    await ensureReviewsTable();
     const {slug}=await params;
     const result=await getEligible(user.id,slug);
     if(!result)return NextResponse.json({error:'Course not found.'},{status:404});
     if(!result.eligible)return NextResponse.json({eligible:false},{status:200});
+    const reviewRows=await db`select review from course_reviews where user_id=${user.id} and course_id=${result.course.id} limit 1`;
+    const submittedReview=String(reviewRows[0]?.review||'').trim();
+    if(submittedReview.length<5)return NextResponse.json({eligible:true,needsReview:true},{status:200});
     const existing=await db`select certificate_id,issued_at from course_certificates where user_id=${user.id} and course_id=${result.course.id} limit 1`;
     if(existing.length)return NextResponse.json({eligible:true,certificateId:existing[0].certificate_id,issuedAt:existing[0].issued_at});
     const certificateId=`MS-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
