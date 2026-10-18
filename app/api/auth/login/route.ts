@@ -26,7 +26,7 @@ export async function POST(request:Request){
   if(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date())return NextResponse.json({error:'Account is temporarily blocked.'},{status:403});
   if(!(await verifyPassword(password,user.password_hash))){await securityEvent(user.id,'failed_login','medium',request,{identifier:value});return NextResponse.json({error:'Invalid email/username or password.'},{status:401})}
   const isProtectedAdmin=String(user.email).toLowerCase()===String(adminEmail).toLowerCase();
-  if(!user.email_verified&&!isProtectedAdmin)return NextResponse.json({error:'Please verify your email before signing in. Check your inbox or resend the verification email.'},{status:403});
+  if(!user.email_verified&&!isProtectedAdmin)return NextResponse.json({error:'Please verify your email before signing in. Check your inbox or resend the verification email.',email:user.email},{status:403});
   user=await promoteProtectedAdmin(user);
   await db`update users set last_login_at=now() where id=${user.id}`;
   await createSession(user);
