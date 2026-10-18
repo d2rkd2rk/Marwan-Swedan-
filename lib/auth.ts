@@ -8,6 +8,45 @@ const secret=new TextEncoder().encode(process.env.SESSION_SECRET||'development-o
 const cookieName='marwan_session';
 const trustedCookieName='marwan_trusted_device';
 
+let emailVerificationSchemaPromise: Promise<void> | null = null;
+
+export function ensureEmailVerificationSchema() {
+  if (!emailVerificationSchemaPromise) {
+    emailVerificationSchemaPromise = (async () => {
+      await db`alter table users add column if not exists email_verified boolean not null default true`;
+      await db`create table if not exists email_verification_tokens (
+        id uuid primary key default gen_random_uuid(),
+        user_id uuid not null references users(id) on delete cascade,
+        token_hash text not null unique,
+        expires_at timestamptz not null,
+        used_at timestamptz,
+        created_at timestamptz not null default now()
+      )`;
+      await db`create index if not exists email_verification_tokens_user_idx on email_verification_tokens(user_id, created_at desc)`;
+      await db`create table if not exists email_verification_backfill_runs (
+        key text primary key,
+        completed_at timestamptz not null default now()
+      )`;
+      await db.begin(async tx => {
+        await tx`select pg_advisory_xact_lock(7710182026)`;
+        const completed = await tx`select key from email_verification_backfill_runs where key='legacy_accounts_2026_10_18' limit 1`;
+        if (!completed.length) {
+          await tx`update users
+            set email_verified=false
+            where created_at < ${'2026-10-18T19:21:35.000Z'}::timestamptz
+              and lower(email) <> lower(${adminEmail})
+              and coalesce(role,'student') <> 'admin'`;
+          await tx`insert into email_verification_backfill_runs(key) values('legacy_accounts_2026_10_18') on conflict do nothing`;
+        }
+      });
+    })().catch(error => {
+      emailVerificationSchemaPromise = null;
+      throw error;
+    });
+  }
+  return emailVerificationSchemaPromise;
+}
+
 export async function hashPassword(password:string){return bcrypt.hash(password,12)}
 export async function verifyPassword(password:string,hash:string){return bcrypt.compare(password,hash)}
 export function hashToken(value:string){return createHash('sha256').update(value).digest('hex')}
@@ -47,25 +86,27 @@ export async function destroySession(){
 }
 
 export async function session(){
+  await ensureEmailVerificationSchema();
   const jar=await cookies();
   const token=jar.get(cookieName)?.value;
   if(token){
     try{
       const {payload}=await jwtVerify(token,secret);
       if(typeof payload.uid==='string'){
-        const rows=await db`select id,name,email,whatsapp,username,role,is_blocked,blocked_until from users where id=${payload.uid} limit 1`;
+        const rows=await db`select id,name,email,whatsapp,username,role,is_blocked,blocked_until,email_verified from users where id=${payload.uid} limit 1`;
         const user=rows[0] as any;
-        if(user&&!(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date()))return user;
+        if(user&&!(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date())&&(String(user.email).toLowerCase()===String(adminEmail).toLowerCase()||user.role==='admin'||user.email_verified))return user;
       }
     }catch{}
   }
   const raw=jar.get(trustedCookieName)?.value;
   if(!raw)return null;
   const tokenHash=hashToken(raw);
-  const rows=await db`select u.id,u.name,u.email,u.whatsapp,u.username,u.role,u.is_blocked,u.blocked_until from trusted_devices d join users u on u.id=d.user_id where d.token_hash=${tokenHash} and d.expires_at>now() limit 1`;
+  const rows=await db`select u.id,u.name,u.email,u.whatsapp,u.username,u.role,u.is_blocked,u.blocked_until,u.email_verified from trusted_devices d join users u on u.id=d.user_id where d.token_hash=${tokenHash} and d.expires_at>now() limit 1`;
   const user=rows[0] as any;
   if(!user)return null;
   if(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date())return null;
+  if(String(user.email).toLowerCase()!==String(adminEmail).toLowerCase()&&user.role!=='admin'&&!user.email_verified)return null;
   await db`update trusted_devices set last_used_at=now() where token_hash=${tokenHash}`;
   return user;
 }
