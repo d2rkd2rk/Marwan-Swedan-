@@ -3,6 +3,7 @@ import {GetObjectCommand,S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import db from '@/lib/db';
 import {session} from '@/lib/auth';
+import {ensurePathTables,hasCourseAccess} from '@/lib/pathAccess';
 
 function storage(){
   const accessKeyId=process.env.TIGRIS_STORAGE_ACCESS_KEY_ID;
@@ -55,8 +56,11 @@ export async function GET(request:NextRequest){
   if(!isPublicMedia&&!isProfileCv&&!isLegacyCourseThumbnail){
     const course=await db`select is_free from courses where id=${courseId} limit 1`;
     if(!course.length)return new NextResponse('Not found',{status:404});
-    const enrollment=await db`select id from enrollments where user_id=${user!.id} and course_id=${courseId} and revoked_at is null limit 1`;
-    const allowed=Boolean(course[0].is_free)||Boolean(enrollment.length)||user!.role==='admin';
+    let allowed=Boolean(course[0].is_free)||user!.role==='admin';
+    if(!allowed){
+      await ensurePathTables();
+      allowed=await hasCourseAccess(user!.id,courseId);
+    }
     if(!allowed)return new NextResponse('Course access has not been granted.',{status:403});
   }
 

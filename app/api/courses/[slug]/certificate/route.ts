@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server';
 import crypto from 'crypto';
 import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
+import {ensurePathTables,hasCourseAccess} from '@/lib/pathAccess';
 
 async function ensureCertificateFlag(){await db`alter table courses add column if not exists certificate_enabled boolean not null default false`}
 
@@ -17,7 +18,7 @@ async function ensureCertificateTable(){
 }
 
 async function getEligible(userId:string,slug:string){
-  const rows=await db`select id,title,slug from courses where slug=${slug} and published=true and certificate_enabled=true limit 1`;
+  const rows=await db`select id,title,slug,is_free from courses where slug=${slug} and published=true and certificate_enabled=true limit 1`;
   if(!rows.length)return null;
   const course=rows[0] as any;
   const lessons=await db`select l.id,l.duration_minutes,coalesce(lp.completed,false) as completed,coalesce(lp.progress_seconds,0) as progress_seconds
@@ -38,6 +39,12 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     const {slug}=await params;
     const result=await getEligible(user.id,slug);
     if(!result)return NextResponse.json({error:'Course not found.'},{status:404});
+    if(!result.course.is_free&&user.role!=='admin'){
+      await ensurePathTables();
+      if(!(await hasCourseAccess(user.id,result.course.id))){
+        return NextResponse.json({error:'Course access required.'},{status:403});
+      }
+    }
     if(!result.eligible)return NextResponse.json({eligible:false},{status:200});
     const reviewRows=await db`select review from course_reviews where user_id=${user.id} and course_id=${result.course.id} limit 1`;
     const submittedReview=String(reviewRows[0]?.review||'').trim();
