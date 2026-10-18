@@ -38,9 +38,10 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('ADMIN_EMAIL_SEND_FAILED', {message: error instanceof Error ? error.message : 'unknown'});
     const forbidden = error?.message === 'FORBIDDEN';
+    const unauthenticated = error?.message === 'UNAUTHENTICATED';
     const notConfigured = error?.message === 'EMAIL_NOT_CONFIGURED';
     return NextResponse.json({
-      error: forbidden ? 'Forbidden' : notConfigured ? 'Email delivery is not configured on the server.' : 'Could not send the email.',
-    }, {status: forbidden ? 403 : notConfigured ? 503 : 401});
+      error: forbidden ? 'Forbidden' : unauthenticated ? 'Authentication required' : notConfigured ? 'Email delivery is not configured on the server.' : 'Could not send the email.',
+    }, {status: forbidden ? 403 : unauthenticated ? 401 : notConfigured ? 503 : 500});
   }
 }
