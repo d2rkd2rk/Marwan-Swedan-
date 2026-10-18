@@ -2,6 +2,7 @@ import {NextResponse} from 'next/server';
 import db from '@/lib/db';
 import {adminEmail,createSession,verifyPassword} from '@/lib/auth';
 import {audit,securityEvent} from '@/lib/security';
+import {ensureEmailVerificationSchema} from '@/lib/email-verification';
 
 async function promoteProtectedAdmin(user:any){
   if(String(user.email).toLowerCase()!==String(adminEmail).toLowerCase())return user;
@@ -18,11 +19,14 @@ export async function POST(request:Request){
   const password=String(body.password||'');
   if(!value||!password)return NextResponse.json({error:'Enter your email or username and password.'},{status:400});
   if(!process.env.DATABASE_URL)return NextResponse.json({error:'Database is not configured.'},{status:503});
-  const rows=await db`select id,name,email,whatsapp,username,password_hash,role,is_blocked,blocked_until from users where lower(email)=${value} or lower(username)=${value} limit 1`;
+  await ensureEmailVerificationSchema();
+  const rows=await db`select id,name,email,whatsapp,username,password_hash,role,is_blocked,blocked_until,email_verified from users where lower(email)=${value} or lower(username)=${value} limit 1`;
   let user=rows[0] as any;
   if(!user)return NextResponse.json({error:'Invalid email/username or password.'},{status:401});
   if(user.is_blocked&&user.blocked_until&&new Date(user.blocked_until)>new Date())return NextResponse.json({error:'Account is temporarily blocked.'},{status:403});
   if(!(await verifyPassword(password,user.password_hash))){await securityEvent(user.id,'failed_login','medium',request,{identifier:value});return NextResponse.json({error:'Invalid email/username or password.'},{status:401})}
+  const isProtectedAdmin=String(user.email).toLowerCase()===String(adminEmail).toLowerCase();
+  if(!user.email_verified&&!isProtectedAdmin)return NextResponse.json({error:'Please verify your email before signing in. Check your inbox or resend the verification email.'},{status:403});
   user=await promoteProtectedAdmin(user);
   await db`update users set last_login_at=now() where id=${user.id}`;
   await createSession(user);

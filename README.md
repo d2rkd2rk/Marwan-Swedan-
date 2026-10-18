@@ -7,6 +7,8 @@ Production-oriented cybersecurity portfolio and private course platform.
 - Premium responsive cybersecurity portfolio based on the supplied CV
 - Next.js application for dynamic hosting
 - Registration with name, email, WhatsApp, username and strong password policy
+- Email verification for new accounts through Resend (single-use links expire after 24 hours)
+- Existing accounts remain verified; the protected administrator account is not locked out by verification
 - Secure HttpOnly session cookies and bcrypt password hashing
 - Email OTP for first login on a device, password reset and password changes
 - Server-side course enrollment and lesson authorization
@@ -21,9 +23,9 @@ Production-oriented cybersecurity portfolio and private course platform.
 
 ## Required environment
 
-Copy `.env.example` to the deployment environment and set `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_BOOTSTRAP_SECRET`, `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY` and `EMAIL_FROM`.
+Set `DATABASE_URL`, `SESSION_SECRET`, `ADMIN_BOOTSTRAP_SECRET`, `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY` and `EMAIL_FROM` in Vercel. Use a verified sender address from your Resend account for `EMAIL_FROM`.
 
-Run `db/schema.sql` against a PostgreSQL database before using accounts or protected courses, then apply the migrations in `db/migrations` in order.
+The email verification migration is safe for existing accounts: it defaults existing users to verified, while new registrations are explicitly unverified. The app also ensures this small schema change at runtime. For a fresh database, run `db/schema.sql` and apply `db/migrations` in order.
 
 The administrator uses a server-protected one-time login-link flow. The generated link is short-lived, single-use and never stored in the repository.
 
