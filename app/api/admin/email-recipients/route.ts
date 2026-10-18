@@ -20,6 +20,7 @@ export async function GET(request: Request) {
     return NextResponse.json({users});
   } catch (error: any) {
     const forbidden = error?.message === 'FORBIDDEN';
-    return NextResponse.json({error: forbidden ? 'Forbidden' : 'Authentication required'}, {status: forbidden ? 403 : 401});
+    const unauthenticated = error?.message === 'UNAUTHENTICATED';
+    return NextResponse.json({error: forbidden ? 'Forbidden' : unauthenticated ? 'Authentication required' : 'Could not load recipients.'}, {status: forbidden ? 403 : unauthenticated ? 401 : 500});
   }
 }
