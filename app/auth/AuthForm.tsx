@@ -9,13 +9,18 @@ export function AuthForm({mode}:{mode:'login'|'register'}){
  const submit=async(e:FormEvent<HTMLFormElement>)=>{
   e.preventDefault();setBusy(true);setError('');setVerificationMessage('');
   const form=new FormData(e.currentTarget);
-  const payload=mode==='login'?{login:String(form.get('login')||''),password:String(form.get('password')||'')}:Object.fromEntries(form.entries());
+  const typedEmail=String(form.get(mode==='login'?'login':'email')||'');
+  const payload=mode==='login'?{login:typedEmail,password:String(form.get('password')||'')}:Object.fromEntries(form.entries());
   try{
    const res=await fetch(`/api/auth/${mode}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
    const json=await res.json();
-   if(!res.ok){setError(json.error||'Something went wrong.');return}
+   if(!res.ok){
+    setError(json.error||'Something went wrong.');
+    if(mode==='login'&&String(json.error||'').toLowerCase().includes('verify your email'))setVerificationEmail(typedEmail);
+    return;
+   }
    if(mode==='register'&&json.registered){
-    setVerificationEmail(String(json.email||payload.email||''));
+    setVerificationEmail(String(json.email||typedEmail));
     setVerificationMessage(json.emailSent?'Account created. Check your inbox and click the verification link before signing in.':'Your account was created, but the verification email could not be sent yet. Use the resend button below after email setup is complete.');
     return;
    }
@@ -27,7 +32,7 @@ export function AuthForm({mode}:{mode:'login'|'register'}){
   if(!verificationEmail)return;
   setResendBusy(true);setError('');
   try{
-   const res=await fetch('/api/auth/resend-verification',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:verificationEmail})});
+   const res=await fetch('/api/auth/resend-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:verificationEmail})});
    const json=await res.json();
    if(!res.ok){setError(json.error||'Unable to resend the verification email.');return}
    setVerificationMessage(json.message||'If the account needs verification, an email will be sent shortly. Check your inbox and spam folder.');
