@@ -24,7 +24,7 @@ export async function POST(request: Request) {
 
     const excludedEmail = String(adminEmail).toLowerCase();
     const recipients = await db`select id,email from users
-      where id = any(${db.array(recipientIds, 'uuid')})
+      where id = any(${db.array(recipientIds, 2950)})
         and lower(email) <> lower(${excludedEmail})
         and coalesce(role,'student') <> 'admin'
       order by created_at desc`;
