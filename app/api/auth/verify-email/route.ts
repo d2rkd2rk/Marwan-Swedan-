@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import db from '@/lib/db';
-import {hashToken} from '@/lib/auth';
+import {adminEmail,hashToken} from '@/lib/auth';
 import {ensureEmailVerificationSchema} from '@/lib/email-verification';
 
 export async function GET(request:Request){
@@ -12,7 +12,7 @@ export async function GET(request:Request){
     await ensureEmailVerificationSchema();
     const tokenHash=hashToken(token);
     const result=await db.begin(async tx=>{
-      const rows=await tx`select id,user_id from email_verification_tokens where token_hash=${tokenHash} and used_at is null and expires_at>now() for update`;
+      const rows=await tx`select t.id,t.user_id from email_verification_tokens t join users u on u.id=t.user_id where t.token_hash=${tokenHash} and t.used_at is null and t.expires_at>now() and lower(u.email)<>lower(${adminEmail}) and coalesce(u.role,'student') <> 'admin' for update of t`;
       if(!rows.length)return false;
       await tx`update email_verification_tokens set used_at=now() where id=${rows[0].id}`;
       await tx`update users set email_verified=true where id=${rows[0].user_id}`;
