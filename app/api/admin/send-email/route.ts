@@ -10,9 +10,8 @@ export async function POST(request: Request) {
   try {
     const admin = await requireAdmin();
     const body = await request.json();
-    const recipientIds = Array.isArray(body.recipientIds)
-      ? [...new Set(body.recipientIds.map((id: unknown) => String(id)))]
-      : [];
+    const rawRecipientIds: unknown[] = Array.isArray(body.recipientIds) ? body.recipientIds : [];
+    const recipientIds: string[] = [...new Set<string>(rawRecipientIds.map(id => String(id)))];
     const subject = String(body.subject || '').trim();
     const message = String(body.message || '').trim();
 
@@ -25,7 +24,7 @@ export async function POST(request: Request) {
 
     const excludedEmail = String(adminEmail).toLowerCase();
     const recipients = await db`select id,email from users
-      where id = any(${recipientIds}::uuid[])
+      where id = any(${db.array(recipientIds, 'uuid')})
         and lower(email) <> lower(${excludedEmail})
         and coalesce(role,'student') <> 'admin'
       order by created_at desc`;
