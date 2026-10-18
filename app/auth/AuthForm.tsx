@@ -16,7 +16,7 @@ export function AuthForm({mode}:{mode:'login'|'register'}){
    const json=await res.json();
    if(!res.ok){
     setError(json.error||'Something went wrong.');
-    if(mode==='login'&&String(json.error||'').toLowerCase().includes('verify your email'))setVerificationEmail(typedEmail);
+    if(mode==='login'&&String(json.error||'').toLowerCase().includes('verify your email'))setVerificationEmail(String(json.email||typedEmail));
     return;
    }
    if(mode==='register'&&json.registered){
