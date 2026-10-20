@@ -19,12 +19,12 @@ function supportsIOSWebPush(){
 function isStandalone(){
  return window.matchMedia('(display-mode: standalone)').matches||(navigator as Navigator&{standalone?:boolean}).standalone===true;
 }
-function applicationServerKey(value:string):Uint8Array{
+function applicationServerKey(value:string):ArrayBuffer{
  const padded=value+'='.repeat((4-value.length%4)%4);
  const raw=window.atob(padded.replace(/-/g,'+').replace(/_/g,'/'));
  const bytes=new Uint8Array(raw.length);
  for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
- return bytes;
+ return bytes.buffer as ArrayBuffer;
 }
 
 export default function PWAInstallPrompt(){
