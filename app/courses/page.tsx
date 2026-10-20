@@ -3,7 +3,7 @@ import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
 const defaultWhatsAppNumber='201515227612';
-function purchaseUrl(course:any){const whatsappNumber=course.whatsapp_number||defaultWhatsAppNumber;const message=`السلام عليكم، أريد شراء كورس ${course.title}.\\nالسعر الحالي: ${course.price} EGP\\nUsername/Email: `;return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`}
+function purchaseUrl(course:any){const whatsappNumber=course.whatsapp_number||defaultWhatsAppNumber;const message=`السلام عليكم، أريد شراء كورس ${course.title}.\nالسعر الحالي: ${course.price} EGP\nUsername/Email: `;return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`}
 export default function Courses(){
  const [courses,setCourses]=useState<any[]>([]),[loading,setLoading]=useState(true),[isLoggedIn,setIsLoggedIn]=useState(false);
  useEffect(()=>{
