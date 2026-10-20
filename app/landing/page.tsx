@@ -68,7 +68,7 @@ const focus=[['01','Cybersecurity','SOC · Incident Response · Threat Hunting']
 
 export default async function Landing(){
  const user=await session();
- const courses=await db`select c.id,c.title,c.slug,c.description,c.category,c.level,c.thumbnail_url,c.duration_minutes,count(l.id)::int as lesson_count from courses c left join lessons l on l.course_id=c.id and l.published=true where c.published=true group by c.id order by c.created_at desc limit 3`;
+ const courses=await db`select c.id,c.title,c.slug,c.description,c.category,c.level,c.thumbnail_url,c.duration_minutes,c.is_free,c.price,count(l.id)::int as lesson_count from courses c left join lessons l on l.course_id=c.id and l.published=true where c.published=true group by c.id order by c.created_at desc limit 3`;
  return <main className={s.page}>
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData).replace(/</g,'\\u003c')}}/>
   <div className={s.ambient}/><div className={s.cursorGlow}/><div className={s.noise}/>
@@ -96,7 +96,7 @@ export default async function Landing(){
 
    {courses.length>0&&<section className={s.section+' '+s.courseStage}>
     <div className={s.sectionHead}><div><div className={s.label}>03 / ACADEMY</div><h2>Latest courses<span>.</span></h2></div><Link className={s.view} href="/courses">View all ↗</Link></div>
-    <div className={s.courses}>{courses.map((c:any,i:number)=><Link href={'/courses/'+c.slug} className={s.course+' '+s.courseCard} key={c.id}><div className={s.courseNo}>0{i+1}</div><div className={s.courseImg}><CourseThumbnail src={c.thumbnail_url} alt={c.title} category={c.category}/><span className={s.badge}>{c.level||'Beginner'}</span><span className={s.courseArrow}>↗</span></div><div className={s.courseBody}><h3>{c.title}</h3><p>{c.description||'Practical training from Marwan Swedan Academy.'}</p><div className={s.meta}><span>{c.lesson_count} LESSONS</span><span>{c.duration_minutes?(Math.floor(c.duration_minutes/60)+'H '+(c.duration_minutes%60)+'M'):'SELF-PACED'}</span></div></div></Link>)}</div>
+    <div className={s.courses}>{courses.map((c:any,i:number)=>{const content=<><div className={s.courseNo}>0{i+1}</div><div className={s.courseImg}><CourseThumbnail src={c.thumbnail_url} alt={c.title} category={c.category}/><span className={s.badge}>{c.level||'Beginner'}</span>{user&&<span className={s.courseArrow}>↗</span>}</div><div className={s.courseBody}><h3>{c.title}</h3>{user&&<p>{c.description||'Practical training from Marwan Swedan Academy.'}</p>}<div className={s.meta}>{user&&<span>{c.lesson_count} LESSONS</span>}<span>{c.duration_minutes?(Math.floor(c.duration_minutes/60)+'H '+(c.duration_minutes%60)+'M'):'SELF-PACED'}</span></div><strong className={s.coursePriceHighlight}>{c.is_free?'Free':Number(c.price||0).toLocaleString()+' EGP'}</strong></div></>;return user?<Link href={'/courses/'+c.slug} className={s.course+' '+s.courseCard} key={c.id}>{content}</Link>:<article className={s.course+' '+s.courseCard} key={c.id}>{content}<div className={s.coursePublicAction}><Link className={s.btn} href="/login">LOG IN TO ACCESS ↗</Link></div></article>})}</div>
    </section>}
 
    <section id="experience" className={s.section+' '+s.experienceStage}>
