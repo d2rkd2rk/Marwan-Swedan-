@@ -22,7 +22,16 @@ export const metadata:Metadata={
  publisher:'Marwan Swedan Academy',
  manifest:'/manifest.json',
  themeColor:'#06111a',
- icons:{icon:'/images/marwan-app-icon.svg',apple:'/images/marwan-app-icon.svg'},
+ appleWebApp:{
+  capable:true,
+  statusBarStyle:'black-translucent',
+  title:'Marwan Academy',
+ },
+ icons:{
+  icon:'/images/marwan-app-icon.svg',
+  shortcut:'/images/marwan-app-icon.svg',
+  apple:{url:'/images/marwan-app-icon.svg',sizes:'512x512',type:'image/svg+xml'},
+ },
  openGraph:{
   type:'website',
   siteName:'Marwan Swedan Academy',
