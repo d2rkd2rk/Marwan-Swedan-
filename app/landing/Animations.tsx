@@ -8,6 +8,7 @@ export default function Animations(){
  useLayoutEffect(()=>{
   gsap.registerPlugin(ScrollTrigger);
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const isTouch=window.matchMedia('(pointer: coarse), (max-width: 900px)').matches;
   const ctx=gsap.context(()=>{
    const intro=gsap.timeline({defaults:{ease:'power4.out'}});
    intro.from('.nav',{y:-35,opacity:0,duration:.8})
@@ -21,8 +22,10 @@ export default function Animations(){
     .from('.heroFrame',{opacity:0,scale:.96,duration:.7},'-.45')
     .from('.heroBottom',{y:18,opacity:0,duration:.5},'-.3');
 
-   gsap.to('.heroImg',{scale:1.13,y:-45,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
-   gsap.to('.heroTitle',{y:-80,opacity:.18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+   if(!isTouch){
+    gsap.to('.heroImg',{scale:1.13,y:-45,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+    gsap.to('.heroTitle',{y:-80,opacity:.18,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+   }
    gsap.to('.heroFrame',{y:-12,repeat:-1,yoyo:true,duration:3,ease:'sine.inOut'});
    gsap.to('.dot',{scale:1.5,opacity:.45,repeat:-1,yoyo:true,duration:1.1,ease:'sine.inOut'});
 
@@ -40,17 +43,18 @@ export default function Animations(){
    gsap.utils.toArray<HTMLElement>('.section h2').forEach(el=>{
     gsap.fromTo(el,{y:90,opacity:0,letterSpacing:'-.08em'},{y:0,opacity:1,letterSpacing:'-.055em',duration:1.05,ease:'power4.out',scrollTrigger:{trigger:el,start:'top 82%',once:true}});
    });
-   gsap.utils.toArray<HTMLElement>('.aboutStage,.courseStage,.experienceStage,.certStage,.finalStage').forEach(el=>{
+   if(!isTouch)gsap.utils.toArray<HTMLElement>('.aboutStage,.courseStage,.experienceStage,.certStage,.finalStage').forEach(el=>{
     gsap.fromTo(el,{backgroundPosition:'0% 50%'},{backgroundPosition:'100% 50%',ease:'none',scrollTrigger:{trigger:el,start:'top bottom',end:'bottom top',scrub:1.5}});
    });
 
+   const cleanups:Array<()=>void>=[];
+   if(!isTouch){
    const cursor=document.querySelector('.cursorGlow') as HTMLElement|null;
    const quickX=cursor?gsap.quickTo(cursor,'x',{duration:.45,ease:'power3'}):null;
    const quickY=cursor?gsap.quickTo(cursor,'y',{duration:.45,ease:'power3'}):null;
    const move=(e:MouseEvent)=>{quickX?.(e.clientX);quickY?.(e.clientY);};
    window.addEventListener('mousemove',move,{passive:true});
 
-   const cleanups:Array<()=>void>=[];
    gsap.utils.toArray<HTMLElement>('.btn,.focusCard,.courseCard,.experienceInteractive,.certInteractive').forEach(el=>{
     const qx=gsap.quickTo(el,'x',{duration:.28,ease:'power3.out'});
     const qy=gsap.quickTo(el,'y',{duration:.28,ease:'power3.out'});
@@ -100,7 +104,8 @@ export default function Animations(){
     cleanups.push(()=>{el.removeEventListener('mousemove',moveSpot);el.removeEventListener('mouseenter',enter);el.removeEventListener('mouseleave',leave);spot.remove();});
    });
 
-   return()=>{window.removeEventListener('mousemove',move);cleanups.forEach(fn=>fn());};
+   }
+   return()=>{if(!isTouch)window.removeEventListener('mousemove',move);cleanups.forEach(fn=>fn());};
   });
   return()=>ctx.revert();
  },[]);
