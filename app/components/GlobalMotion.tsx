@@ -90,7 +90,7 @@ export default function GlobalMotion(){
    }
 
    gsap.utils.toArray<HTMLElement>('.section,.academyBanner,.signature,.footer').forEach((el,i)=>{
-    gsap.fromTo(el,{y:mobile?24:55,opacity:.001,scale:mobile?1:.985},{y:0,opacity:1,scale:1,duration:mobile?.55:.9,ease:'power3.out',delay:(i%3)*.025,scrollTrigger:{trigger:el,start:'top 90%',once:true}});
+    gsap.fromTo(el,{y:mobile?24:55,opacity:.001,scale:mobile?1:.985},{y:0,opacity:1,scale:1,duration:mobile ? 0.55 : 0.9,ease:'power3.out',delay:(i%3)*.025,scrollTrigger:{trigger:el,start:'top 90%',once:true}});
    });
 
    gsap.utils.toArray<HTMLElement>('.cinematicSection').forEach(el=>{
@@ -103,7 +103,7 @@ export default function GlobalMotion(){
    });
 
    gsap.utils.toArray<HTMLElement>('.card,.projectCard,.course,.courseCard,.feature,.whyItem,.lesson,.accessRow,.cert,.pathCard,.pathCourseRow,.role').forEach((el,i)=>{
-    gsap.fromTo(el,{y:mobile?14:22,opacity:.001,scale:1},{y:0,opacity:1,duration:mobile?.45:.65,ease:'power3.out',delay:mobile?0:(i%6)*.025,scrollTrigger:{trigger:el,start:'top 94%',once:true}});
+    gsap.fromTo(el,{y:mobile?14:22,opacity:.001,scale:1},{y:0,opacity:1,duration:mobile ? 0.45 : 0.65,ease:'power3.out',delay:mobile?0:(i%6)*.025,scrollTrigger:{trigger:el,start:'top 94%',once:true}});
    });
 
    gsap.utils.toArray<HTMLElement>('h1,h2').forEach(el=>{
