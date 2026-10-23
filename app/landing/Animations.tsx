@@ -104,8 +104,9 @@ export default function Animations(){
     cleanups.push(()=>{el.removeEventListener('mousemove',moveSpot);el.removeEventListener('mouseenter',enter);el.removeEventListener('mouseleave',leave);spot.remove();});
    });
 
+   window.removeEventListener('mousemove',move);
    }
-   return()=>{if(!isTouch)window.removeEventListener('mousemove',move);cleanups.forEach(fn=>fn());};
+   return()=>{cleanups.forEach(fn=>fn());};
   });
   return()=>ctx.revert();
  },[]);
