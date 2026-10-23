@@ -12,16 +12,17 @@ export default function GlobalMotion(){
   progress.className='motionProgress';
   document.body.appendChild(progress);
 
+  const finePointer=window.matchMedia('(pointer:fine)').matches;
+  const mobile=window.matchMedia('(max-width: 900px)').matches;
   const cursor=document.createElement('div');
   cursor.className='motionCursor';
-  document.body.appendChild(cursor);
+  if(finePointer)document.body.appendChild(cursor);
 
   const photo=document.querySelector<HTMLElement>('.heroArt,.heroVisual');
-  const glow=photo?Object.assign(document.createElement('div'),{className:'photoGlow'}):null;
+  const glow=photo&&finePointer?Object.assign(document.createElement('div'),{className:'photoGlow'}):null;
   if(photo&&glow)photo.appendChild(glow);
 
   let mx=0,my=0,cx=0,cy=0,lastRipple=0;
-  const finePointer=window.matchMedia('(pointer:fine)').matches;
 
   const move=(e:MouseEvent)=>{
    mx=e.clientX;my=e.clientY;
@@ -69,11 +70,13 @@ export default function GlobalMotion(){
    cursor.style.left=`${cx}px`;cursor.style.top=`${cy}px`;
    raf=requestAnimationFrame(tick);
   };
-  let raf=requestAnimationFrame(tick);
-
-  window.addEventListener('mousemove',move,{passive:true});
-  window.addEventListener('mouseleave',leave);
-  window.addEventListener('click',click);
+  let raf=0;
+  if(finePointer){
+   raf=requestAnimationFrame(tick);
+   window.addEventListener('mousemove',move,{passive:true});
+   window.addEventListener('mouseleave',leave);
+   window.addEventListener('click',click);
+  }
   window.addEventListener('scroll',scroll,{passive:true});
   scroll();
 
@@ -87,7 +90,7 @@ export default function GlobalMotion(){
    }
 
    gsap.utils.toArray<HTMLElement>('.section,.academyBanner,.signature,.footer').forEach((el,i)=>{
-    gsap.fromTo(el,{y:55,opacity:.001,scale:.985},{y:0,opacity:1,scale:1,duration:.9,ease:'power4.out',delay:(i%3)*.04,scrollTrigger:{trigger:el,start:'top 88%',once:true}});
+    gsap.fromTo(el,{y:mobile?24:55,opacity:.001,scale:mobile?1:.985},{y:0,opacity:1,scale:1,duration:mobile?.55:.9,ease:'power3.out',delay:(i%3)*.025,scrollTrigger:{trigger:el,start:'top 90%',once:true}});
    });
 
    gsap.utils.toArray<HTMLElement>('.cinematicSection').forEach(el=>{
@@ -100,7 +103,7 @@ export default function GlobalMotion(){
    });
 
    gsap.utils.toArray<HTMLElement>('.card,.projectCard,.course,.courseCard,.feature,.whyItem,.lesson,.accessRow,.cert,.pathCard,.pathCourseRow,.role').forEach((el,i)=>{
-    gsap.fromTo(el,{y:22,opacity:.001,scale:.985},{y:0,opacity:1,scale:1,duration:.65,ease:'power3.out',delay:(i%6)*.045,scrollTrigger:{trigger:el,start:'top 92%',once:true}});
+    gsap.fromTo(el,{y:mobile?14:22,opacity:.001,scale:1},{y:0,opacity:1,duration:mobile?.45:.65,ease:'power3.out',delay:mobile?0:(i%6)*.025,scrollTrigger:{trigger:el,start:'top 94%',once:true}});
    });
 
    gsap.utils.toArray<HTMLElement>('h1,h2').forEach(el=>{
@@ -109,20 +112,22 @@ export default function GlobalMotion(){
    });
 
    const landingHero= document.querySelector<HTMLElement>('.heroVisual');
-   if(landingHero)gsap.to(landingHero,{yPercent:-9,scale:1.035,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
-   gsap.to('.ambient',{backgroundPosition:'50% 8%',duration:12,repeat:-1,yoyo:true,ease:'sine.inOut'});
+   if(landingHero&&!mobile)gsap.to(landingHero,{yPercent:-9,scale:1.035,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+   if(!mobile)gsap.to('.ambient',{backgroundPosition:'50% 8%',duration:12,repeat:-1,yoyo:true,ease:'sine.inOut'});
   });
 
   return()=>{
    cancelAnimationFrame(raf);
-   window.removeEventListener('mousemove',move);
-   window.removeEventListener('mouseleave',leave);
-   window.removeEventListener('click',click);
+   if(finePointer){
+    window.removeEventListener('mousemove',move);
+    window.removeEventListener('mouseleave',leave);
+    window.removeEventListener('click',click);
+   }
    window.removeEventListener('scroll',scroll);
    ctx.revert();
    if(glow)glow.remove();
    progress.remove();
-   cursor.remove();
+   if(finePointer)cursor.remove();
   };
  },[]);
  return null;
