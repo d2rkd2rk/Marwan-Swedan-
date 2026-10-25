@@ -22,7 +22,8 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     return {...c,accessible,total_lessons:Number(total[0]?.count||0),completed_lessons:Number(done[0]?.count||0),progress:Number(total[0]?.count?Math.round(Number(done[0].count)/Number(total[0].count)*100):0)};
   }));
   const allDone=enrolled&&resultCourses.length>0&&resultCourses.every(c=>c.progress===100);
-  const cert=allDone&&path.certificate_enabled?await db`select certificate_id,issued_at from path_certificates where user_id=${user.id} and path_id=${path.id} limit 1`:[];
-  return NextResponse.json({path, enrolled, courses:resultCourses,complete:allDone,certificateEnabled:Boolean(path.certificate_enabled),certificate:cert[0]||null});
+  const cert=allDone&&path.certificate_enabled?await db`select certificate_id,issued_at from path_certificates where user_id=${user.id} and path_id=${path.id} limit 1`: [];
+  const certificate=cert[0]?{certificateId:cert[0].certificate_id,issuedAt:cert[0].issued_at}:null;
+  return NextResponse.json({path,enrolled,courses:resultCourses,complete:allDone,certificateEnabled:Boolean(path.certificate_enabled),certificate});
  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not load path.'},{status:e.message==='UNAUTHENTICATED'?401:500})}
 }
