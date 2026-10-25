@@ -8,9 +8,10 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
  try{
   const user=await requireUser(); await ensurePathTables();
   const {slug}=await params;
-  const rows=await db`select id,title,description,published,is_free from paths where slug=${slug} limit 1`;
+  const rows=await db`select id,title,description,published,is_free,certificate_enabled from paths where slug=${slug} limit 1`;
   if(!rows.length)return NextResponse.json({error:'Path not found.'},{status:404});
   const path=rows[0] as any;
+  if(!path.certificate_enabled)return NextResponse.json({eligible:false,error:'Path certificates are disabled.'},{status:403});
   const pathAccess=user.role==='admin'||await hasPathAccess(user.id,path.id);
   if(!path.published&&!pathAccess)return NextResponse.json({error:'Path unavailable.'},{status:404});
   const access=pathAccess||(path.is_free&&path.published);
