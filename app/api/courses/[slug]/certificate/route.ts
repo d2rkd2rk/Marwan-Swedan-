@@ -2,7 +2,7 @@ import {NextResponse} from 'next/server';
 import crypto from 'crypto';
 import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
-import {ensurePathTables,hasCourseAccess,hasCourseAccessViaPath} from '@/lib/pathAccess';
+import {ensurePathTables,hasStandaloneCourseAccess} from '@/lib/pathAccess';
 
 async function ensureCertificateFlag(){await db`alter table courses add column if not exists certificate_enabled boolean not null default false`}
 
@@ -39,16 +39,10 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     const {slug}=await params;
     const result=await getEligible(user.id,slug);
     if(!result)return NextResponse.json({error:'Course not found.'},{status:404});
-    if(!result.course.is_free&&user.role!=='admin'){
+    if(user.role!=='admin'&&!result.course.is_free){
       await ensurePathTables();
-      if(!(await hasCourseAccess(user.id,result.course.id))){
-        return NextResponse.json({error:'Course access required.'},{status:403});
-      }
-    }
-    if(user.role!=='admin'){
-      await ensurePathTables();
-      if(await hasCourseAccessViaPath(user.id,result.course.id)){
-        return NextResponse.json({eligible:false,blockedByPath:true,error:'Course certificates are unavailable for courses included in a learning path. Complete the path to receive its path certificate.'},{status:403});
+      if(!(await hasStandaloneCourseAccess(user.id,result.course.id))){
+        return NextResponse.json({eligible:false,blockedByPath:true,error:'A standalone course enrollment is required for this course certificate. Access through a learning path does not qualify.'},{status:403});
       }
     }
     if(!result.eligible)return NextResponse.json({eligible:false},{status:200});
