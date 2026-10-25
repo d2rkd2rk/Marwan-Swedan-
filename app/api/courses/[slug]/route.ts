@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server';
 import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
-import {ensurePathTables,hasCourseAccess,hasCourseAccessViaPath} from '@/lib/pathAccess';
+import {ensurePathTables,hasCourseAccess,hasCourseAccessViaPath,hasStandaloneCourseAccess} from '@/lib/pathAccess';
 
 export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
   try{
@@ -23,7 +23,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
       await db`alter table lesson_progress add column if not exists last_viewed_at timestamptz`;
       progress=await db`select lp.lesson_id,lp.completed,lp.progress_seconds,lp.updated_at,lp.last_viewed_at from lesson_progress lp join lessons l on l.id=lp.lesson_id where lp.user_id=${user.id} and l.course_id=${course.id}`;
     }
-    const certificateBlockedByPath=!isAdmin&&await hasCourseAccessViaPath(user.id,course.id);
+    const certificateBlockedByPath=!isAdmin&&!course.is_free&&!(await hasStandaloneCourseAccess(user.id,course.id))&&await hasCourseAccessViaPath(user.id,course.id);
     return NextResponse.json({course:{...course,ai_context:undefined},lessons:safeLessons,progress,enrolled,requiresPurchase:!course.is_free&&!enrolled,certificateBlockedByPath});
   }catch(e:any){return NextResponse.json({error:'Authentication required'},{status:401})}
 }
