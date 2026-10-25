@@ -60,7 +60,14 @@ export async function hasCourseAccess(userId:string,courseId:string){
   await ensurePathTables();
   const direct=await db`select id from enrollments where user_id=${userId} and course_id=${courseId} and revoked_at is null limit 1`;
   if(direct.length)return true;
-  const path=await db`select 1 from path_enrollments pe join path_courses pc on pc.path_id=pe.path_id where pe.user_id=${userId} and pe.revoked_at is null and pc.course_id=${courseId} limit 1`;
+  // A published free path grants viewing access to every course inside it,
+  // but does not create standalone enrollment or grant an individual certificate.
+  const path=await db`select 1 from path_courses pc
+    join paths p on p.id=pc.path_id
+    left join path_enrollments pe on pe.path_id=p.id and pe.user_id=${userId} and pe.revoked_at is null
+    where pc.course_id=${courseId}
+      and (pe.id is not null or (p.is_free=true and p.published=true))
+    limit 1`;
   return path.length>0;
 }
 
