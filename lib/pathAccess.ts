@@ -16,6 +16,7 @@ export async function ensurePathTables(){
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
   )`;
+  await db`alter table paths add column if not exists certificate_enabled boolean not null default false`;
   await db`create table if not exists path_courses(
     id uuid primary key default gen_random_uuid(),
     path_id uuid not null references paths(id) on delete cascade,
