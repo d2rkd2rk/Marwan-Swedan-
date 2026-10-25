@@ -2,7 +2,7 @@ import {NextResponse} from 'next/server';
 import crypto from 'crypto';
 import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
-import {ensurePathTables,hasCourseAccess} from '@/lib/pathAccess';
+import {ensurePathTables,hasCourseAccess,hasCourseAccessViaPath} from '@/lib/pathAccess';
 
 async function ensureCertificateFlag(){await db`alter table courses add column if not exists certificate_enabled boolean not null default false`}
 
@@ -43,6 +43,12 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
       await ensurePathTables();
       if(!(await hasCourseAccess(user.id,result.course.id))){
         return NextResponse.json({error:'Course access required.'},{status:403});
+      }
+    }
+    if(user.role!=='admin'){
+      await ensurePathTables();
+      if(await hasCourseAccessViaPath(user.id,result.course.id)){
+        return NextResponse.json({eligible:false,blockedByPath:true,error:'Course certificates are unavailable for courses included in a learning path. Complete the path to receive its path certificate.'},{status:403});
       }
     }
     if(!result.eligible)return NextResponse.json({eligible:false},{status:200});
