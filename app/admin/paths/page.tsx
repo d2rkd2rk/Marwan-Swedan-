@@ -4,7 +4,7 @@ import Link from 'next/link';
 import styles from './page.module.css';
 
 type Path=any; type Course=any; type Enrollment=any;
-const emptyPath={title:'',slug:'',description:'',category:'Cybersecurity',level:'Beginner',thumbnailUrl:'',isFree:true,price:0,published:false,whatsappNumber:''};
+const emptyPath={title:'',slug:'',description:'',category:'Cybersecurity',level:'Beginner',thumbnailUrl:'',isFree:true,price:0,published:false,whatsappNumber:'',certificateEnabled:false};
 
 export default function PathsAdmin(){
  const [me,setMe]=useState<any>(null),[paths,setPaths]=useState<Path[]>([]),[courses,setCourses]=useState<Course[]>([]),[pathCourses,setPathCourses]=useState<any[]>([]);
@@ -46,7 +46,7 @@ export default function PathsAdmin(){
    setMsg(editingPathId?'Path updated.':'Path created.');setForm(emptyPath);setThumbnailFile(null);setEditingPathId('');await load();if(body.id)loadPathCourses(body.id);
   }catch(e:any){setMsg(e.message||'Could not save path.')}
  };
- const editPath=(p:Path)=>{setEditingPathId(p.id);setForm({title:p.title,slug:p.slug,description:p.description,category:p.category,level:p.level,thumbnailUrl:p.thumbnail_url||'',isFree:p.is_free,price:p.price,published:p.published,whatsappNumber:p.whatsapp_number||''});setThumbnailFile(null);setSelectedPath(p.id);window.scrollTo({top:0,behavior:'smooth'})};
+ const editPath=(p:Path)=>{setEditingPathId(p.id);setForm({title:p.title,slug:p.slug,description:p.description,category:p.category,level:p.level,thumbnailUrl:p.thumbnail_url||'',isFree:p.is_free,price:p.price,published:p.published,whatsappNumber:p.whatsapp_number||'',certificateEnabled:p.certificate_enabled!==false});setThumbnailFile(null);setSelectedPath(p.id);window.scrollTo({top:0,behavior:'smooth'})};
  const deletePath=async(id:string)=>{if(!confirm('Delete this path and its access records?'))return;const r=await fetch('/api/admin/paths',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});setMsg(r.ok?'Path deleted.':'Could not delete path.');if(selectedPath===id){setSelectedPath('');setPathCourses([])}load()};
  const addCourse=async(courseId:string)=>{if(!selectedPath||!courseId)return;const r=await fetch('/api/admin/paths/courses',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pathId:selectedPath,courseId})});const j=await r.json();setMsg(r.ok?'Course added to path.':j.error||'Could not add course.');if(r.ok){await loadPathCourses(selectedPath);load()}};
  const removeCourse=async(courseId:string)=>{if(!selectedPath||!confirm('Remove this course from the path?'))return;const r=await fetch('/api/admin/paths/courses',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({pathId:selectedPath,courseId})});setMsg(r.ok?'Course removed from path.':'Could not remove course.');if(r.ok){await loadPathCourses(selectedPath);load()}};
@@ -80,6 +80,7 @@ export default function PathsAdmin(){
       {!form.isFree&&<label>Price · EGP<input type="number" min="1" step="0.01" value={form.price||''} onChange={e=>setForm({...form,price:Number(e.target.value)})}/></label>}
       <label>WhatsApp Request Access number<input inputMode="numeric" value={form.whatsappNumber} onChange={e=>setForm({...form,whatsappNumber:e.target.value.replace(/\D/g,'').slice(0,15)})} placeholder="201515227612"/><small>Digits only. Leave empty for 201515227612.</small></label>
       <label>Publishing<select value={form.published?'published':'draft'} onChange={e=>setForm({...form,published:e.target.value==='published'})}><option value="draft">Draft</option><option value="published">Published</option></select></label>
+      <label>Certificate<select value={form.certificateEnabled?'enabled':'disabled'} onChange={e=>setForm({...form,certificateEnabled:e.target.value==='enabled'})}><option value="disabled">Disabled — hide path certificate</option><option value="enabled">Enabled — allow certificate after completion</option></select><small>When disabled, students cannot issue a certificate for this path.</small></label>
      </div></div>
      <div className={styles.actions}><button className={styles.primaryBtn} disabled={uploading} onClick={savePath}>{uploading?'Uploading…':editingPathId?'Save changes':'Create path'}</button></div>
     </div>

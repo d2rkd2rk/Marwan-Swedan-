@@ -6,7 +6,7 @@ import SiteNav from '@/app/components/SiteNav';
 export default function PathPage({params}:{params:Promise<{slug:string}>}){
  const [slug,setSlug]=useState(''),[data,setData]=useState<any>(null);
  useEffect(()=>{params.then(p=>{setSlug(p.slug);fetch(`/api/paths/${p.slug}`,{cache:'no-store'}).then(r=>r.json()).then(setData).catch(()=>{})})},[params]);
- useEffect(()=>{if(!data?.complete||data?.certificate)return;fetch(`/api/paths/${slug}/certificate`,{cache:'no-store'}).then(r=>r.json()).then(j=>{if(j.certificateId)setData((x:any)=>({...x,certificate:j}))}).catch(()=>{})},[data?.complete,data?.certificate,slug]);
+ useEffect(()=>{if(!data?.complete||!data?.certificateEnabled||data?.certificate)return;fetch(`/api/paths/${slug}/certificate`,{cache:'no-store'}).then(r=>r.json()).then(j=>{if(j.certificateId)setData((x:any)=>({...x,certificate:j}))}).catch(()=>{})},[data?.complete,data?.certificate,slug]);
  if(!data)return <main><div className="shell"><SiteNav/><section className="section"><p className="muted">Loading path…</p></section></div></main>;
  if(data.error)return <main><div className="shell"><SiteNav/><section className="section"><div className="error">{data.error}</div><Link className="btn" href="/paths">Back to paths</Link></section></div></main>;
  const p=data.path,courses=data.courses||[];
@@ -20,6 +20,6 @@ export default function PathPage({params}:{params:Promise<{slug:string}>}){
   <div className="section compact"><div className="sectionhead"><div><div className="eyebrow">Your journey</div><h2>Courses in this path</h2></div></div>
    <div className="pathCourseList">{courses.map((c:any)=><article className="pathCourseRow" key={c.course_id}><div className="pathCourseNumber">{c.position}</div><div className="pathCourseInfo"><h3>{c.title}</h3><p className="muted">{c.description||'Course in this learning path.'}</p><span className="small muted">{Math.round(Number(c.duration_minutes||0)/60*10)/10} hours · {c.progress}% complete</span></div><div>{c.accessible?<Link className="btn primary pathAccentBtn" href={`/courses/${c.slug}`}>{c.progress===100?'Review course':'Open course'}</Link>:<span className="btn" style={{opacity:.5}}>Locked</span>}</div></article>)}</div>
   </div>
-  {data.complete&&data.certificate?.certificateId&&<div className="certificateUnlock pathCertificateUnlock"><div><div className="eyebrow">Achievement unlocked</div><h3>Your Path Certificate is ready.</h3><p className="small muted">You completed every course in <b>{p.title}</b>.</p></div><Link className="btn primary pathAccentBtn" href={`/path-certificate/${data.certificate.certificateId}`}>View certificate</Link></div>}
+  {data.complete&&data.certificateEnabled&&data.certificate?.certificateId&&<div className="certificateUnlock pathCertificateUnlock"><div><div className="eyebrow">Achievement unlocked</div><h3>Your Path Certificate is ready.</h3><p className="small muted">You completed every course in <b>{p.title}</b>.</p></div><Link className="btn primary pathAccentBtn" href={`/path-certificate/${data.certificate.certificateId}`}>View certificate</Link></div>}
  </section></div></main>;
 }

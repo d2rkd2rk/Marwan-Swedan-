@@ -4,7 +4,7 @@ import {requireAdmin} from '@/lib/auth';
 import {audit} from '@/lib/security';
 import {ensurePathTables} from '@/lib/pathAccess';
 
-async function ensureWhatsAppNumber(){await db`alter table paths add column if not exists whatsapp_number text`}
+async function ensureWhatsAppNumber(){await db`alter table paths add column if not exists whatsapp_number text`;await db`alter table paths add column if not exists certificate_enabled boolean not null default false`}
 function makeSlug(value:string){const base=value.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');return base||`path-${Date.now()}`}
 async function uniqueSlug(raw:string,id?:string){
  const base=makeSlug(raw);
@@ -38,8 +38,8 @@ export async function POST(request:Request){
   const isFree=Boolean(b.isFree),price=isFree?0:Math.max(0,Number(b.price||0));
   const whatsappNumber=String(b.whatsappNumber||'').trim();
   if(whatsappNumber&&!/^\d{8,15}$/.test(whatsappNumber))return NextResponse.json({error:'WhatsApp number must be 8–15 digits in international format, without +, spaces, or dashes.'},{status:400});
-  const rows=await db`insert into paths(title,slug,description,category,level,thumbnail_url,is_free,price,published,whatsapp_number)
-    values(${title},${slug},${description},${category},${level},${b.thumbnailUrl||null},${isFree},${price},${Boolean(b.published)},${whatsappNumber||null}) returning *`;
+  const rows=await db`insert into paths(title,slug,description,category,level,thumbnail_url,is_free,price,published,whatsapp_number,certificate_enabled)
+    values(${title},${slug},${description},${category},${level},${b.thumbnailUrl||null},${isFree},${price},${Boolean(b.published)},${whatsappNumber||null},${Boolean(b.certificateEnabled)}) returning *`;
   await audit(admin.id,'create_path',request,{pathId:rows[0].id});
   return NextResponse.json({path:rows[0]},{status:201});
  }catch(e:any){return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Could not create path'},{status:e.message==='FORBIDDEN'?403:400})}
@@ -53,7 +53,7 @@ export async function PUT(request:Request){
   const isFree=Boolean(b.isFree),price=isFree?0:Math.max(0,Number(b.price||0));
   const whatsappNumber=String(b.whatsappNumber||'').trim();
   if(whatsappNumber&&!/^\d{8,15}$/.test(whatsappNumber))return NextResponse.json({error:'WhatsApp number must be 8–15 digits in international format, without +, spaces, or dashes.'},{status:400});
-  const rows=await db`update paths set title=${title},slug=${slug},description=${String(b.description||'')},category=${String(b.category||'Cybersecurity')},level=${String(b.level||'Beginner')},thumbnail_url=${b.thumbnailUrl||null},is_free=${isFree},price=${price},published=${Boolean(b.published)},whatsapp_number=${whatsappNumber||null},updated_at=now() where id=${id} returning *`;
+  const rows=await db`update paths set title=${title},slug=${slug},description=${String(b.description||'')},category=${String(b.category||'Cybersecurity')},level=${String(b.level||'Beginner')},thumbnail_url=${b.thumbnailUrl||null},is_free=${isFree},price=${price},published=${Boolean(b.published)},whatsapp_number=${whatsappNumber||null},certificate_enabled=${Boolean(b.certificateEnabled)},updated_at=now() where id=${id} returning *`;
   if(!rows.length)return NextResponse.json({error:'Path not found.'},{status:404});
   await audit(admin.id,'update_path',request,{pathId:id});
   return NextResponse.json({path:rows[0]});
