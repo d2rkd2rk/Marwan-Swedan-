@@ -12,7 +12,6 @@ async function getCourseAccess(userId:string, slug:string){
   const rows=await db`select id,is_free from courses where slug=${slug} and published=true limit 1`;
   if(!rows.length)return null;
   const course=rows[0] as any;
-  if(course.is_free)return course;
   const user=await db`select role from users where id=${userId} limit 1`;
   if((user[0] as any)?.role==='admin')return course;
   await ensurePathTables();
