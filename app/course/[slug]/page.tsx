@@ -32,7 +32,8 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [reviewRating,setReviewRating]=useState(5);
   const [reviewText,setReviewText]=useState('');
   const [reviewBusy,setReviewBusy]=useState(false);
-  const [reviewMessage,setReviewMessage]=useState('');\n  const [enrollBusy,setEnrollBusy]=useState(false);\n  const [enrollMessage,setEnrollMessage]=useState('');
+  const [reviewMessage,setReviewMessage]=useState('');
+  const [enrollBusy,setEnrollBusy]=useState(false);\n  const [enrollMessage,setEnrollMessage]=useState('');
   const [isReviewAdmin,setIsReviewAdmin]=useState(false);
   const lastSaved=useRef<Record<string,number>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
