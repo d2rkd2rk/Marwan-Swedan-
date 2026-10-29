@@ -13,7 +13,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     if(!course)return NextResponse.json({error:'Course not found.'},{status:404});
     await ensurePathTables();
     const isAdmin=user.role==='admin';
-    let enrolled=course.is_free||isAdmin;
+    let enrolled=isAdmin;
     if(!enrolled)enrolled=await hasCourseAccess(user.id,course.id);
     const lessons=await db`select id,title,slug,position,duration_minutes,published,video_url,file_url,file_name from lessons where course_id=${course.id} and published=true order by position asc`;
     const safeLessons=enrolled?lessons:lessons.map((l:any)=>({id:l.id,title:l.title,slug:l.slug,position:l.position,duration_minutes:l.duration_minutes,published:l.published}));
