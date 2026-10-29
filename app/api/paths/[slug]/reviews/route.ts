@@ -1,0 +1,14 @@
+import {NextResponse} from 'next/server';
+import db from '@/lib/db';
+import {requireUser} from '@/lib/auth';
+import {ensurePathTables,hasPathAccess} from '@/lib/pathAccess';
+
+async function ensureReviews(){
+ await db`create table if not exists path_reviews(id uuid primary key default gen_random_uuid(),path_id uuid not null references paths(id) on delete cascade,user_id uuid not null references users(id) on delete cascade,rating smallint not null check(rating between 1 and 5),review text not null,created_at timestamptz not null default now(),unique(path_id,user_id))`;
+}
+export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
+ try{const user=await requireUser();await ensurePathTables();await ensureReviews();const {slug}=await params;const p=await db`select id,published from paths where slug=${slug} limit 1`;if(!p.length)return NextResponse.json({error:'Path not found.'},{status:404});const [reviews,mine]=await Promise.all([db`select r.id,r.rating,r.review,r.created_at,u.name,u.username,u.avatar_url from path_reviews r join users u on u.id=r.user_id where r.path_id=${p[0].id} order by r.created_at desc limit 100`,db`select id,rating,review,created_at from path_reviews where path_id=${p[0].id} and user_id=${user.id} limit 1`]);return NextResponse.json({reviews,myReview:mine[0]||null,isAdmin:user.role==='admin'});}catch(e:any){return NextResponse.json({error:'Could not load path reviews.'},{status:401})}
+}
+export async function POST(request:Request,{params}:{params:Promise<{slug:string}>}){
+ try{const user=await requireUser();await ensurePathTables();await ensureReviews();const {slug}=await params;const p=await db`select id,is_free,published from paths where slug=${slug} limit 1`;if(!p.length||!p[0].published)return NextResponse.json({error:'Path not found.'},{status:404});const access=user.role==='admin'||await hasPathAccess(user.id,p[0].id);if(!access)return NextResponse.json({error:'Enroll in this path before reviewing it.'},{status:403});const body=await request.json();const rating=Number(body.rating),review=String(body.review||'').trim();if(!Number.isInteger(rating)||rating<1||rating>5||review.length<5||review.length>1000)return NextResponse.json({error:'Provide a 1–5 rating and a comment of 5–1000 characters.'},{status:400});const existing=await db`select id from path_reviews where path_id=${p[0].id} and user_id=${user.id} limit 1`;if(existing.length)return NextResponse.json({error:'Your path review has already been submitted and cannot be changed.'},{status:409});const rows=await db`insert into path_reviews(path_id,user_id,rating,review) values(${p[0].id},${user.id},${rating},${review}) returning id,rating,review,created_at`;return NextResponse.json({review:rows[0]},{status:201});}catch(e:any){return NextResponse.json({error:'Could not submit path review.'},{status:400})}
+}
