@@ -12,7 +12,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
   const path=rows[0] as any;
   const pathEnrolled=await hasPathAccess(user.id,path.id);
   if(!path.published&&user.role!=='admin'&&!pathEnrolled)return NextResponse.json({error:'Path unavailable.'},{status:404});
-  const enrolled=path.is_free||user.role==='admin'||pathEnrolled;
+  const enrolled=user.role==='admin'||pathEnrolled;
   const courses=await db`select pc.id as path_course_id,pc.course_id,pc.position,c.title,c.slug,c.description,c.category,c.level,c.duration_minutes,c.thumbnail_url,c.is_free,c.price,c.published
     from path_courses pc join courses c on c.id=pc.course_id where pc.path_id=${path.id} and c.published=true order by pc.position asc`;
   const resultCourses=await Promise.all(courses.map(async(c:any)=>{
@@ -25,4 +25,17 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
   const cert=allDone&&path.certificate_enabled?await db`select certificate_id,issued_at from path_certificates where user_id=${user.id} and path_id=${path.id} limit 1`:[];
   return NextResponse.json({path, enrolled, courses:resultCourses,complete:allDone,certificateEnabled:Boolean(path.certificate_enabled),certificate:cert[0]||null});
  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not load path.'},{status:e.message==='UNAUTHENTICATED'?401:500})}
+}
+
+export async function POST(_:Request,{params}:{params:Promise<{slug:string}>}){
+ try{
+  const user=await requireUser(); await ensurePathTables();
+  const {slug}=await params;
+  const rows=await db`select id,is_free,published from paths where slug=${slug} limit 1`;
+  const path=rows[0] as any;
+  if(!path||!path.published)return NextResponse.json({error:'Path not found.'},{status:404});
+  if(!path.is_free)return NextResponse.json({error:'Paid paths require admin-granted access.'},{status:403});
+  const enrollment=await db`insert into path_enrollments(user_id,path_id,granted_by,source) values(${user.id},${path.id},null,'free') on conflict(user_id,path_id) do update set revoked_at=null,source=case when path_enrollments.source='admin' and path_enrollments.revoked_at is null then 'admin' else 'free' end returning id`;
+  return NextResponse.json({ok:true,enrolled:Boolean(enrollment.length)});
+ }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not enroll in path.'},{status:e.message==='UNAUTHENTICATED'?401:400})}
 }

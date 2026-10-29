@@ -39,7 +39,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     const {slug}=await params;
     const result=await getEligible(user.id,slug);
     if(!result)return NextResponse.json({error:'Course not found.'},{status:404});
-    if(user.role!=='admin'&&!result.course.is_free){
+    if(user.role!=='admin'){
       await ensurePathTables();
       if(!(await hasStandaloneCourseAccess(user.id,result.course.id))){
         return NextResponse.json({eligible:false,blockedByPath:true,error:'A standalone course enrollment is required for this course certificate. Access through a learning path does not qualify.'},{status:403});

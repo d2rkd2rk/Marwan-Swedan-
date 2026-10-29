@@ -33,6 +33,8 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [reviewText,setReviewText]=useState('');
   const [reviewBusy,setReviewBusy]=useState(false);
   const [reviewMessage,setReviewMessage]=useState('');
+  const [enrollBusy,setEnrollBusy]=useState(false);
+  const [enrollMessage,setEnrollMessage]=useState('');
   const [isReviewAdmin,setIsReviewAdmin]=useState(false);
   const lastSaved=useRef<Record<string,number>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
@@ -211,7 +213,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
           {data.certificateBlockedByPath?<div className="certificateUnlock"><div><div className="eyebrow">Path certificate only</div><h3>Course certificate unavailable inside this path.</h3><p className="small muted">Complete the full learning path to receive its path certificate. Course certificates are reserved for courses taken independently.</p></div></div>:courseComplete&&certificate?<div className="certificateUnlock"><div><div className="eyebrow">Achievement unlocked</div><h3>🎓 Your certificate is ready.</h3><p className="small muted">You completed 100% of <b>{c.title}</b>. Your certificate uses your full name exactly as saved on your account.</p></div><div className="actions"><Link className="btn primary" href={`/certificate/${certificate.certificateId}`}>View certificate</Link><a className="btn" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${typeof window!=='undefined'?window.location.origin:'https://marwan-swedan.vercel.app'}/certificate/${certificate.certificateId}`)}`} target="_blank" rel="noreferrer">in&nbsp; Share on LinkedIn ↗</a></div></div>:<div style={{marginTop:16,padding:18,borderRadius:16,border:'1px solid rgba(255,255,255,.1)',background:'rgba(255,255,255,.03)',opacity:.72}}><div style={{fontSize:13,letterSpacing:'.08em',textTransform:'uppercase'}}>🔒 Certificate locked</div><h3 style={{margin:'8px 0 6px'}}>Complete the course to unlock your certificate.</h3><p className="small muted" style={{margin:0}}>Finish all {lessons.length} lessons. Once every lesson is marked <b>Completed</b>, your certificate will become available automatically.</p></div>}
         </div>}
         {!c.is_free&&!data.enrolled&&<div className="actions"><a className="btn primary" href={purchaseUrl} target="_blank" rel="noreferrer">Buy this course on WhatsApp</a></div>}
-        {c.is_free&&!data.enrolled&&<div className="actions"><Link className="btn primary" href="/register">Join for free</Link><Link className="btn" href="/login">Sign in</Link></div>}
+        {c.is_free&&!data.enrolled&&<div className="actions"><button className="btn primary" disabled={enrollBusy} onClick={async()=>{setEnrollBusy(true);setEnrollMessage('');try{const r=await fetch(`/api/courses/${slug}`,{method:'POST'});const j=await r.json();if(!r.ok)throw new Error(j.error||'Enrollment failed');const refreshed=await fetch(`/api/courses/${slug}`,{cache:'no-store'}).then(x=>x.json());setData(refreshed);if(Array.isArray(refreshed.progress)){const mapped:Record<string,Progress>={};for(const item of refreshed.progress)mapped[item.lesson_id]=item;setProgress(mapped)}}catch(e:any){setEnrollMessage(e.message||'Could not enroll.')}finally{setEnrollBusy(false)}}}>{enrollBusy?'Enrolling…':'Enroll for free'}</button><Link className="btn" href="/login">Sign in</Link>{enrollMessage&&<p className="small muted">{enrollMessage}</p>}</div>}
       </section>
 
       <section className="section" style={{paddingTop:25}}>
