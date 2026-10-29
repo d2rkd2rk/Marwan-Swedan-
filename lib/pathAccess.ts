@@ -35,7 +35,7 @@ export async function hasStandaloneCourseAccess(userId:string,courseId:string){
 }
 export async function hasCourseAccessViaPath(userId:string,courseId:string){
   await ensurePathTables();
-  const rows=await db`select 1 from path_courses pc join paths p on p.id=pc.path_id join path_enrollments pe on pe.path_id=p.id and pe.user_id=${userId} and pe.revoked_at is null where pc.course_id=${courseId} and p.published=true limit 1`;
+  const rows=await db`select 1 from path_courses pc join paths p on p.id=pc.path_id join path_enrollments pe on pe.path_id=p.id and pe.user_id=${userId} and pe.revoked_at is null where pc.course_id=${courseId} and p.published=true and (pe.source<>'free' or p.is_free=true) limit 1`;
   return rows.length>0;
 }
 export async function getPathCourseIds(pathId:string){
