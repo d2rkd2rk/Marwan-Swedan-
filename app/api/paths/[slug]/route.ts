@@ -35,7 +35,7 @@ export async function POST(_:Request,{params}:{params:Promise<{slug:string}>}){
   const path=rows[0] as any;
   if(!path||!path.published)return NextResponse.json({error:'Path not found.'},{status:404});
   if(!path.is_free)return NextResponse.json({error:'Paid paths require admin-granted access.'},{status:403});
-  const enrollment=await db`insert into path_enrollments(user_id,path_id,granted_by,source) values(${user.id},${path.id},null,'free') on conflict(user_id,path_id) do update set revoked_at=null,source=case when path_enrollments.source='admin' then 'admin' else 'free' end returning id`;
+  const enrollment=await db`insert into path_enrollments(user_id,path_id,granted_by,source) values(${user.id},${path.id},null,'free') on conflict(user_id,path_id) do update set revoked_at=null,source=case when path_enrollments.source='admin' and path_enrollments.revoked_at is null then 'admin' else 'free' end returning id`;
   return NextResponse.json({ok:true,enrolled:Boolean(enrollment.length)});
  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not enroll in path.'},{status:e.message==='UNAUTHENTICATED'?401:400})}
 }
