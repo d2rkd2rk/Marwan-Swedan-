@@ -21,7 +21,9 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     if(enrolled){
       await db`alter table lesson_progress add column if not exists progress_seconds integer not null default 0`;
       await db`alter table lesson_progress add column if not exists last_viewed_at timestamptz`;
-      progress=await db`select lp.lesson_id,lp.completed,lp.progress_seconds,lp.updated_at,lp.last_viewed_at from lesson_progress lp join lessons l on l.id=lp.lesson_id where lp.user_id=${user.id} and l.course_id=${course.id}`;
+      await db`create table if not exists lesson_watch_state(user_id uuid not null references users(id) on delete cascade,lesson_id uuid not null references lessons(id) on delete cascade,watch_ranges jsonb not null default '[]'::jsonb,duration_seconds integer not null default 0,last_position real,last_heartbeat_at timestamptz,session_id text,updated_at timestamptz not null default now(),primary key(user_id,lesson_id))`;
+      const rows=await db`select lp.lesson_id,lp.completed,lp.progress_seconds,lp.updated_at,lp.last_viewed_at,coalesce(ws.watch_ranges,'[]'::jsonb) as watch_ranges,coalesce(ws.duration_seconds,0) as duration_seconds from lesson_progress lp join lessons l on l.id=lp.lesson_id left join lesson_watch_state ws on ws.lesson_id=lp.lesson_id and ws.user_id=lp.user_id where lp.user_id=${user.id} and l.course_id=${course.id}`;
+      progress=rows.map((row:any)=>{const ranges=Array.isArray(row.watch_ranges)?row.watch_ranges:[];const watchedSeconds=ranges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);return {...row,watched_seconds:Math.floor(watchedSeconds),watch_percent:row.duration_seconds?Math.min(100,Math.floor(watchedSeconds/row.duration_seconds*100)):0,watch_ranges:undefined}});
     }
     const certificateBlockedByPath=!isAdmin&&!(await hasStandaloneCourseAccess(user.id,course.id))&&await hasCourseAccessViaPath(user.id,course.id);
     return NextResponse.json({course:{...course,ai_context:undefined},lessons:safeLessons,progress,enrolled,requiresPurchase:!course.is_free&&!enrolled,certificateBlockedByPath});
