@@ -25,6 +25,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [busy,setBusy]=useState(false);
   const [openVideos,setOpenVideos]=useState<Record<string,boolean>>({});
   const [progress,setProgress]=useState<Record<string,Progress>>({});
+  const [watchSyncError,setWatchSyncError]=useState<Record<string,string>>({});
   const [certificate,setCertificate]=useState<{certificateId:string;issuedAt:string}|null>(null);
   const [reviewModalOpen,setReviewModalOpen]=useState(false);
   const [reviews,setReviews]=useState<any[]>([]);
@@ -39,6 +40,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const lastSaved=useRef<Record<string,number>>({});
   const watchSessions=useRef<Record<string,string>>({});
   const watchHeartbeatInFlight=useRef<Record<string,boolean>>({});
+  const watchRetryAfter=useRef<Record<string,number>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
 
   useEffect(()=>{
@@ -109,32 +111,39 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   };
 
   const handleTimeUpdate=(lessonId:string,currentTime:number,duration:number,playbackRate:number)=>{
-    const firstUpdate=!(lessonId in lastSaved.current);
     const previous=lastSaved.current[lessonId]??0;
+    const firstUpdate=!(lessonId in lastSaved.current);
     const movedBack=currentTime<previous-2;
-    if(firstUpdate||currentTime-previous>=5||movedBack){
-      const sessionId=watchSessions.current[lessonId]||(watchSessions.current[lessonId]=typeof crypto!=='undefined'&&'randomUUID' in crypto?crypto.randomUUID():String(Date.now())+'-'+String(Math.random()));
-      if(!watchHeartbeatInFlight.current[lessonId]){
-        watchHeartbeatInFlight.current[lessonId]=true;
-        lastSaved.current[lessonId]=currentTime;
-        fetch(`/api/courses/${slug}/progress`,{
-          method:'PUT',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({eventType:'heartbeat',lessonId,currentTime,duration,playbackRate,sessionId}),
-          keepalive:true
-        }).then(async response=>{
-          if(!response.ok)return;
-          const result=await response.json();
-          if(result.watchProgress)setProgress(prev=>{
-            const current=prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()};
-            const watchedSeconds=Math.max(current.watched_seconds||0,Number(result.watchProgress.watchedSeconds)||0);
-            const watchPercent=Math.max(current.watch_percent||0,Number(result.watchProgress.percent)||0);
-            return {...prev,[lessonId]:{...current,watched_seconds:watchedSeconds,watch_percent:watchPercent}};
-          });
-        }).catch(()=>{}).finally(()=>{watchHeartbeatInFlight.current[lessonId]=false;});
-      }
-      saveProgress(lessonId,currentTime,false);
-    }
+    if(!(firstUpdate||currentTime-previous>=5||movedBack))return;
+    if(watchHeartbeatInFlight.current[lessonId]||Date.now()<(watchRetryAfter.current[lessonId]||0))return;
+
+    const sessionId=watchSessions.current[lessonId]||(watchSessions.current[lessonId]=typeof crypto!=='undefined'&&'randomUUID' in crypto?crypto.randomUUID():String(Date.now())+'-'+String(Math.random()));
+    watchHeartbeatInFlight.current[lessonId]=true;
+    fetch(`/api/courses/${slug}/progress`,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({eventType:'heartbeat',lessonId,currentTime,duration,playbackRate,sessionId}),
+      keepalive:true
+    }).then(async response=>{
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok)throw new Error(result.error||`Watch progress request failed (${response.status}).`);
+      if(!result.watchProgress)throw new Error('The server did not return verified watch progress.');
+      lastSaved.current[lessonId]=currentTime;
+      watchRetryAfter.current[lessonId]=0;
+      setWatchSyncError(prev=>({...prev,[lessonId]:''}));
+      setProgress(prev=>{
+        const current=prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()};
+        const watchedSeconds=Math.max(current.watched_seconds||0,Number(result.watchProgress.watchedSeconds)||0);
+        const watchPercent=Math.max(current.watch_percent||0,Number(result.watchProgress.percent)||0);
+        return {...prev,[lessonId]:{...current,watched_seconds:watchedSeconds,watch_percent:watchPercent}};
+      });
+    }).catch(error=>{
+      watchRetryAfter.current[lessonId]=Date.now()+1500;
+      setWatchSyncError(prev=>({...prev,[lessonId]:error instanceof Error?error.message:'Could not sync watch progress. Retrying…'}));
+    }).finally(()=>{
+      watchHeartbeatInFlight.current[lessonId]=false;
+    });
+    saveProgress(lessonId,currentTime,false);
   };
 
   const markComplete=async(lessonId:string)=>{
@@ -273,6 +282,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed||(Boolean(lessonVideoUrl)&&(p?.watch_percent||0)<70)}>
                       {p?.completed?'Lesson completed':Boolean(lessonVideoUrl)&&(p?.watch_percent||0)<70?'Watch 70% to unlock':'Mark as Completed'}
                     </button>
+                    {Boolean(lessonVideoUrl)&&watchSyncError[l.id]&&<div className="small" role="status" style={{color:'#fca5a5',marginTop:7}}>{watchSyncError[l.id]}</div>}
                     {Boolean(lessonVideoUrl)&&!p?.completed&&<div style={{width:'100%',maxWidth:420,marginTop:8}}>
                       <div className="small muted" style={{display:'flex',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}>
                         <span>Watched {p?.watch_percent||0}% of video</span>

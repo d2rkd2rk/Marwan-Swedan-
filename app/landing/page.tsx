@@ -8,6 +8,8 @@ import SiteNav from '@/app/components/SiteNav';
 import CourseThumbnail from '@/app/components/CourseThumbnail';
 import s from '../home.module.css';
 
+export const dynamic = 'force-dynamic';
+
 const siteUrl='https://marwanswedan.online';
 
 export const metadata:Metadata={

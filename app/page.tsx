@@ -5,6 +5,8 @@ import db from '@/lib/db';
 import LogoutButton from '@/app/components/LogoutButton';
 import CourseThumbnail from '@/app/components/CourseThumbnail';
 
+export const dynamic = 'force-dynamic';
+
 const roles=[['Jul 2026 — Present','Security Operations Center Analyst','Alignerr'],['Jul 2026 — Present','Information Security Intern','Commercial International Bank (CIB Egypt)'],['Jul 2026 — Present','Member','International Association of Engineers (IAENG)'],['Jun 2026 — Present','Network Engineer (Contract)','Internet Society'],['Feb 2026 — Present','CTF Player & Digital Forensics Analyst','Information Technology Institute'],['Apr 2026 — Present','Founder & Chairman','Sudo Academy'],['Apr 2026 — May 2026','Cyber Security Instructor','Pharos University in Alexandria (PUA)'],['Mar 2026 — May 2026','Back-End Developer & HR Specialist','IEEE PUA Student Branch']];
 const projects=[['Artifact Hunter','Digital Forensics','Python · FastAPI · Volatility · Wireshark'],['Smart Environmental Regulation & Embedded Robotic Platform','Embedded Systems','C++ · Embedded C · Arduino'],['Optimized Database Application Framework','Web Platform','JavaScript · SQL · HTML · CSS']];
 const featuredCerts=['LetsDefend — SOC Member','Netriders — System Operator Certification (SOC)','Netriders — Digital Forensics Fundamentals','Basel Institute on Governance — Open-Source Intelligence (OSINT)','ITI — Global Cyber Championship CTF','IBM — Incident Response & Digital Forensics','MaharaTech — Incident Handling & Response','MaharaTech — Digital Forensics and Investigations','Cisco — Network Basics Certificate','Cisco — Introduction to Cybersecurity']; const totalCerts=33;
