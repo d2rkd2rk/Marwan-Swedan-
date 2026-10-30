@@ -114,7 +114,8 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     const previous=lastSaved.current[lessonId]??0;
     const firstUpdate=!(lessonId in lastSaved.current);
     const movedBack=currentTime<previous-2;
-    if(!(firstUpdate||currentTime-previous>=5||movedBack))return;
+    const heartbeatInterval=Math.max(1,duration*0.01);
+    if(!(firstUpdate||currentTime-previous>=heartbeatInterval||movedBack))return;
     if(watchHeartbeatInFlight.current[lessonId]||Date.now()<(watchRetryAfter.current[lessonId]||0))return;
 
     const sessionId=watchSessions.current[lessonId]||(watchSessions.current[lessonId]=typeof crypto!=='undefined'&&'randomUUID' in crypto?crypto.randomUUID():String(Date.now())+'-'+String(Math.random()));
@@ -143,7 +144,13 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     }).finally(()=>{
       watchHeartbeatInFlight.current[lessonId]=false;
     });
-    saveProgress(lessonId,currentTime,false);
+    setProgress(prev=>({
+      ...prev,
+      [lessonId]:{
+        ...prev[lessonId],lesson_id:lessonId,completed:Boolean(prev[lessonId]?.completed),
+        progress_seconds:Math.floor(currentTime),updated_at:new Date().toISOString(),last_viewed_at:new Date().toISOString()
+      }
+    }));
   };
 
   const markComplete=async(lessonId:string)=>{
