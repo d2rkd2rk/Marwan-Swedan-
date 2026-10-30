@@ -5,7 +5,7 @@ import {useEffect,useRef,useState} from 'react';
 type Props={
   src:string;
   savedSeconds?:number;
-  onTimeUpdate?:(currentTime:number,duration:number)=>void;
+  onTimeUpdate?:(currentTime:number,duration:number,playbackRate:number)=>void;
   onPause?:(currentTime:number)=>void;
   onEnded?:(duration:number)=>void;
 };
@@ -42,7 +42,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
     const handlePause=()=>setPlaying(false);
     const handleTime=()=>{
       setCurrent(video.currentTime);
-      onTimeUpdate?.(video.currentTime,video.duration||0);
+      onTimeUpdate?.(video.currentTime,video.duration||0,video.playbackRate||1);
     };
     const handleEnd=()=>{setPlaying(false);onEnded?.(video.duration||0)};
     video.addEventListener('loadedmetadata',handleLoaded);
