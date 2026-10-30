@@ -65,7 +65,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
       let added=0;
       const previous=existing[0] as any;
       if(previous&&previous.session_id===sessionId&&previous.last_position!==null&&previous.last_heartbeat_at){
-        const elapsed=Math.max(0,Math.min(12,(Date.now()-new Date(previous.last_heartbeat_at).getTime())/1000));
+        const elapsed=Math.max(0,Math.min(60,(Date.now()-new Date(previous.last_heartbeat_at).getTime())/1000));
         const delta=position-Number(previous.last_position);
         if(delta>0&&delta<=elapsed*Math.min(2,playbackRate)*1.2+1){
           const nextStart=Math.max(0,Number(previous.last_position));
@@ -89,7 +89,11 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
         returning watch_ranges,duration_seconds`;
       const savedRanges=Array.isArray((watchRows[0] as any)?.watch_ranges)?(watchRows[0] as any).watch_ranges:[];
       const watchedSeconds=savedRanges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);
-      return NextResponse.json({watchProgress:{watchedSeconds:Math.floor(watchedSeconds),durationSeconds:Number((watchRows[0] as any)?.duration_seconds||duration),percent:Math.min(100,Math.floor(watchedSeconds/Math.max(1,duration)*100)),addedSeconds:Math.floor(added)}});
+      const progressRows=await db`insert into lesson_progress(user_id,lesson_id,completed,progress_seconds,last_viewed_at,updated_at)
+        values(${user.id},${lessonId},false,${Math.floor(position)},now(),now())
+        on conflict(user_id,lesson_id) do update set progress_seconds=greatest(lesson_progress.progress_seconds,excluded.progress_seconds),last_viewed_at=now(),updated_at=now()
+        returning lesson_id,completed,progress_seconds,updated_at,last_viewed_at`;
+      return NextResponse.json({progress:progressRows[0],watchProgress:{watchedSeconds:Math.floor(watchedSeconds),durationSeconds:Number((watchRows[0] as any)?.duration_seconds||duration),percent:Math.min(100,Math.floor(watchedSeconds/Math.max(1,duration)*100)),addedSeconds:Math.floor(added)}});
     }
     const isVideo=Boolean((lesson[0] as any).video_url)||/\.(mp4|webm|ogg|mov|m4v)(?:[?#]|$)/i.test(String((lesson[0] as any).file_url||''))||/\.(mp4|webm|ogg|mov|m4v)$/i.test(String((lesson[0] as any).file_name||''));
     if(body.completed&&isVideo){
