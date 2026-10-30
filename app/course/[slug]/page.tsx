@@ -15,7 +15,7 @@ const suggestedQuestions=[
   'ممكن تشرحلي ترتيب الدروس؟'
 ];
 
-type Progress={lesson_id:string;completed:boolean;progress_seconds:number;updated_at:string;last_viewed_at?:string|null};
+type Progress={lesson_id:string;completed:boolean;progress_seconds:number;updated_at:string;last_viewed_at?:string|null;watched_seconds?:number;watch_percent?:number};
 
 export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [slug,setSlug]=useState('');
@@ -37,6 +37,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [enrollMessage,setEnrollMessage]=useState('');
   const [isReviewAdmin,setIsReviewAdmin]=useState(false);
   const lastSaved=useRef<Record<string,number>>({});
+  const watchSessions=useRef<Record<string,string>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
 
   useEffect(()=>{
@@ -88,6 +89,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     setProgress(prev=>({
       ...prev,
       [lessonId]:{
+        ...prev[lessonId],
         lesson_id:lessonId,
         completed:Boolean(prev[lessonId]?.completed||completed),
         progress_seconds:safeSeconds,
@@ -105,12 +107,24 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     }catch{}
   };
 
-  const handleTimeUpdate=(lessonId:string,currentTime:number,duration:number)=>{
+  const handleTimeUpdate=(lessonId:string,currentTime:number,duration:number,playbackRate:number)=>{
+    const firstUpdate=!(lessonId in lastSaved.current);
     const previous=lastSaved.current[lessonId]??0;
-    const nearEnd=duration>0&&currentTime/duration>=0.9;
-    if(currentTime-previous>=5||nearEnd){
+    const movedBack=currentTime<previous-2;
+    if(firstUpdate||currentTime-previous>=5||movedBack){
       lastSaved.current[lessonId]=currentTime;
-      saveProgress(lessonId,currentTime,nearEnd);
+      const sessionId=watchSessions.current[lessonId]||(watchSessions.current[lessonId]=typeof crypto!=='undefined'&&'randomUUID' in crypto?crypto.randomUUID():String(Date.now())+'-'+String(Math.random()));
+      fetch(`/api/courses/${slug}/progress`,{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({eventType:'heartbeat',lessonId,currentTime,duration,playbackRate,sessionId}),
+        keepalive:true
+      }).then(async response=>{
+        if(!response.ok)return;
+        const result=await response.json();
+        if(result.watchProgress)setProgress(prev=>({...prev,[lessonId]:{...(prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()}),watched_seconds:result.watchProgress.watchedSeconds,watch_percent:result.watchProgress.percent}}));
+      }).catch(()=>{});
+      saveProgress(lessonId,currentTime,false);
     }
   };
 
@@ -237,9 +251,9 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     <VideoPlayer
                       src={lessonVideoUrl}
                       savedSeconds={progress[l.id]?.progress_seconds||0}
-                      onTimeUpdate={(currentTime,duration)=>handleTimeUpdate(l.id,currentTime,duration)}
+                      onTimeUpdate={(currentTime,duration,playbackRate)=>handleTimeUpdate(l.id,currentTime,duration,playbackRate)}
                       onPause={currentTime=>saveProgress(l.id,currentTime,Boolean(p?.completed))}
-                      onEnded={duration=>saveProgress(l.id,duration,true)}
+                      onEnded={duration=>saveProgress(l.id,duration,false)}
                     />
                     <div className="small muted" style={{marginTop:7}}>
                       {p?.completed?'✓ Video completed':'Mark the video as completed when you finish watching.'}
@@ -247,9 +261,10 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                   </div>}
                   {l.file_url&&<div className="actions"><a className="btn" href={isVideoFile(l.file_url,l.file_name||'')?('#lesson-video-'+l.id):l.file_url} target={isVideoFile(l.file_url,l.file_name||'')?undefined:'_blank'} rel={isVideoFile(l.file_url,l.file_name||'')?undefined:'noreferrer'} onClick={e=>{if(isVideoFile(l.file_url,l.file_name||'')){e.preventDefault();setOpenVideos(v=>({...v,[l.id]:true}));window.setTimeout(()=>document.getElementById('lesson-video-'+l.id)?.scrollIntoView({behavior:'smooth',block:'center'}),0);}}}>Open lesson file</a></div>}
                   <div className="actions">
-                    <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed}>
-                      {p?.completed?'Lesson completed':'Mark as Completed'}
+                    <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed||(Boolean(lessonVideoUrl)&&(p?.watch_percent||0)<70)}>
+                      {p?.completed?'Lesson completed':Boolean(lessonVideoUrl)&&(p?.watch_percent||0)<70?'Watch 70% to unlock':'Mark as Completed'}
                     </button>
+                    {Boolean(lessonVideoUrl)&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Watched: {p?.watch_percent||0}% / 70% required</span>}
                     {p?.progress_seconds>0&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Saved at {Math.floor(p.progress_seconds/60)}:{String(Math.floor(p.progress_seconds%60)).padStart(2,'0')}</span>}
                   </div>
                 </div>
