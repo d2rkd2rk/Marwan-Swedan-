@@ -89,6 +89,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     setProgress(prev=>({
       ...prev,
       [lessonId]:{
+        ...prev[lessonId],
         lesson_id:lessonId,
         completed:Boolean(prev[lessonId]?.completed||completed),
         progress_seconds:safeSeconds,
