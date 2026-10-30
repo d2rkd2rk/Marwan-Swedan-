@@ -122,7 +122,12 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
       }).then(async response=>{
         if(!response.ok)return;
         const result=await response.json();
-        if(result.watchProgress)setProgress(prev=>({...prev,[lessonId]:{...(prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()}),watched_seconds:result.watchProgress.watchedSeconds,watch_percent:result.watchProgress.percent}}));
+        if(result.watchProgress)setProgress(prev=>{
+          const current=prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()};
+          const watchedSeconds=Math.max(current.watched_seconds||0,Number(result.watchProgress.watchedSeconds)||0);
+          const watchPercent=Math.max(current.watch_percent||0,Number(result.watchProgress.percent)||0);
+          return {...prev,[lessonId]:{...current,watched_seconds:watchedSeconds,watch_percent:watchPercent}};
+        });
       }).catch(()=>{});
       saveProgress(lessonId,currentTime,false);
     }
@@ -264,7 +269,15 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     <button className={p?.completed?'btn':'btn primary'} onClick={()=>markComplete(l.id)} disabled={p?.completed||(Boolean(lessonVideoUrl)&&(p?.watch_percent||0)<70)}>
                       {p?.completed?'Lesson completed':Boolean(lessonVideoUrl)&&(p?.watch_percent||0)<70?'Watch 70% to unlock':'Mark as Completed'}
                     </button>
-                    {Boolean(lessonVideoUrl)&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Watched: {p?.watch_percent||0}% / 70% required</span>}
+                    {Boolean(lessonVideoUrl)&&!p?.completed&&<div style={{width:'100%',maxWidth:420,marginTop:8}}>
+                      <div className="small muted" style={{display:'flex',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}>
+                        <span>Watched {p?.watch_percent||0}% of video</span>
+                        <span>{Math.min(100,Math.floor((p?.watch_percent||0)/70*100))}% of 70% requirement</span>
+                      </div>
+                      <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginTop:7}}>
+                        <div style={{height:'100%',width:`${Math.min(100,((p?.watch_percent||0)/70)*100)}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .25s ease'}}/>
+                      </div>
+                    </div>}
                     {p?.progress_seconds>0&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Saved at {Math.floor(p.progress_seconds/60)}:{String(Math.floor(p.progress_seconds%60)).padStart(2,'0')}</span>}
                   </div>
                 </div>
