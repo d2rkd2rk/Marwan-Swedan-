@@ -25,7 +25,7 @@ export async function POST(request:Request){
   const admin=await requireAdmin(); await ensurePathTables();
   const b=await request.json(); const pathId=String(b.pathId||'');
   const rawIds=Array.isArray(b.userIds)?b.userIds:[b.userId];
-  const userIds=[...new Set(rawIds.filter((id:any)=>typeof id==='string'&&id.trim()).map((id:string)=>id.trim()))];
+  const userIds:string[]=Array.from(new Set<string>((rawIds as unknown[]).filter((id):id is string=>typeof id==='string'&&id.trim().length>0).map(id=>id.trim())));
   if(!userIds.length||!pathId)return NextResponse.json({error:'At least one account and a path are required.'},{status:400});
   if(userIds.length>500)return NextResponse.json({error:'Select no more than 500 accounts at once.'},{status:400});
   const rows=await db`insert into path_enrollments(user_id,path_id,granted_by,source) select selected.user_id,${pathId},${admin.id},'admin' from unnest(${userIds}::uuid[]) as selected(user_id) on conflict(user_id,path_id) do update set granted_by=${admin.id},revoked_at=null,source='admin' returning user_id`;
