@@ -122,7 +122,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
       }).then(async response=>{
         if(!response.ok)return;
         const result=await response.json();
-        if(result.watchProgress)setProgress(prev=>({...prev,[lessonId]:{lesson_id:lessonId,completed:Boolean(prev[lessonId]?.completed),progress_seconds:prev[lessonId]?.progress_seconds||0,updated_at:prev[lessonId]?.updated_at||new Date().toISOString(),...prev[lessonId],watched_seconds:result.watchProgress.watchedSeconds,watch_percent:result.watchProgress.percent}}));
+        if(result.watchProgress)setProgress(prev=>({...prev,[lessonId]:{...(prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()}),watched_seconds:result.watchProgress.watchedSeconds,watch_percent:result.watchProgress.percent}}));
       }).catch(()=>{});
       saveProgress(lessonId,currentTime,false);
     }
