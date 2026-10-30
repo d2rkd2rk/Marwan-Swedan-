@@ -90,7 +90,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
       const watchedSeconds=savedRanges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);
       return NextResponse.json({watchProgress:{watchedSeconds:Math.floor(watchedSeconds),durationSeconds:Number((watchRows[0] as any)?.duration_seconds||duration),percent:Math.min(100,Math.floor(watchedSeconds/Math.max(1,duration)*100)),addedSeconds:Math.floor(added)}});
     }
-    const isVideo=Boolean((lesson[0] as any).video_url)||/\\.(mp4|webm|ogg|mov|m4v)(?:[?#]|$)/i.test(String((lesson[0] as any).file_url||''))||/\\.(mp4|webm|ogg|mov|m4v)$/i.test(String((lesson[0] as any).file_name||''));
+    const isVideo=Boolean((lesson[0] as any).video_url)||/\.(mp4|webm|ogg|mov|m4v)(?:[?#]|$)/i.test(String((lesson[0] as any).file_url||''))||/\.(mp4|webm|ogg|mov|m4v)$/i.test(String((lesson[0] as any).file_name||''));
     if(body.completed&&isVideo){
       const watch=await db`select watch_ranges,duration_seconds from lesson_watch_state where user_id=${user.id} and lesson_id=${lessonId} limit 1`;
       const ranges=Array.isArray((watch[0] as any)?.watch_ranges)?(watch[0] as any).watch_ranges:[];
