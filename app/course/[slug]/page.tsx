@@ -38,6 +38,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [isReviewAdmin,setIsReviewAdmin]=useState(false);
   const lastSaved=useRef<Record<string,number>>({});
   const watchSessions=useRef<Record<string,string>>({});
+  const watchHeartbeatInFlight=useRef<Record<string,boolean>>({});
   const lessonRefs=useRef<Record<string,HTMLDivElement|null>>({});
 
   useEffect(()=>{
@@ -112,23 +113,26 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     const previous=lastSaved.current[lessonId]??0;
     const movedBack=currentTime<previous-2;
     if(firstUpdate||currentTime-previous>=5||movedBack){
-      lastSaved.current[lessonId]=currentTime;
       const sessionId=watchSessions.current[lessonId]||(watchSessions.current[lessonId]=typeof crypto!=='undefined'&&'randomUUID' in crypto?crypto.randomUUID():String(Date.now())+'-'+String(Math.random()));
-      fetch(`/api/courses/${slug}/progress`,{
-        method:'PUT',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({eventType:'heartbeat',lessonId,currentTime,duration,playbackRate,sessionId}),
-        keepalive:true
-      }).then(async response=>{
-        if(!response.ok)return;
-        const result=await response.json();
-        if(result.watchProgress)setProgress(prev=>{
-          const current=prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()};
-          const watchedSeconds=Math.max(current.watched_seconds||0,Number(result.watchProgress.watchedSeconds)||0);
-          const watchPercent=Math.max(current.watch_percent||0,Number(result.watchProgress.percent)||0);
-          return {...prev,[lessonId]:{...current,watched_seconds:watchedSeconds,watch_percent:watchPercent}};
-        });
-      }).catch(()=>{});
+      if(!watchHeartbeatInFlight.current[lessonId]){
+        watchHeartbeatInFlight.current[lessonId]=true;
+        lastSaved.current[lessonId]=currentTime;
+        fetch(`/api/courses/${slug}/progress`,{
+          method:'PUT',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({eventType:'heartbeat',lessonId,currentTime,duration,playbackRate,sessionId}),
+          keepalive:true
+        }).then(async response=>{
+          if(!response.ok)return;
+          const result=await response.json();
+          if(result.watchProgress)setProgress(prev=>{
+            const current=prev[lessonId]||{lesson_id:lessonId,completed:false,progress_seconds:0,updated_at:new Date().toISOString()};
+            const watchedSeconds=Math.max(current.watched_seconds||0,Number(result.watchProgress.watchedSeconds)||0);
+            const watchPercent=Math.max(current.watch_percent||0,Number(result.watchProgress.percent)||0);
+            return {...prev,[lessonId]:{...current,watched_seconds:watchedSeconds,watch_percent:watchPercent}};
+          });
+        }).catch(()=>{}).finally(()=>{watchHeartbeatInFlight.current[lessonId]=false;});
+      }
       saveProgress(lessonId,currentTime,false);
     }
   };
