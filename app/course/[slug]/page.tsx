@@ -251,7 +251,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                     <VideoPlayer
                       src={lessonVideoUrl}
                       savedSeconds={progress[l.id]?.progress_seconds||0}
-                      onTimeUpdate={(currentTime,duration)=>handleTimeUpdate(l.id,currentTime,duration)}
+                      onTimeUpdate={(currentTime,duration,playbackRate)=>handleTimeUpdate(l.id,currentTime,duration,playbackRate)}
                       onPause={currentTime=>saveProgress(l.id,currentTime,Boolean(p?.completed))}
                       onEnded={duration=>saveProgress(l.id,duration,false)}
                     />
