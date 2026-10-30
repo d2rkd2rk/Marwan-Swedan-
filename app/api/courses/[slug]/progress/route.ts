@@ -3,6 +3,14 @@ import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
 import {ensurePathTables,hasCourseAccess} from '@/lib/pathAccess';
 
+function parseWatchRanges(value:unknown):any[]{
+  if(Array.isArray(value))return value;
+  if(typeof value==='string'){
+    try{const parsed=JSON.parse(value);return Array.isArray(parsed)?parsed:[];}catch{return [];}
+  }
+  return [];
+}
+
 async function ensureProgressColumns(){
   await db`alter table lesson_progress add column if not exists progress_seconds integer not null default 0`;
   await db`alter table lesson_progress add column if not exists last_viewed_at timestamptz`;
@@ -32,7 +40,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
       left join lesson_watch_state ws on ws.lesson_id=lp.lesson_id and ws.user_id=lp.user_id
       where lp.user_id=${user.id} and l.course_id=${course.id}
       order by lp.updated_at desc`;
-    const progress=rows.map((row:any)=>{const ranges=Array.isArray(row.watch_ranges)?row.watch_ranges:[];const watchedSeconds=ranges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);return {...row,watched_seconds:Math.floor(watchedSeconds),watch_percent:row.duration_seconds?Math.min(100,Math.floor(watchedSeconds/row.duration_seconds*100)):0,watch_ranges:undefined}});
+    const progress=rows.map((row:any)=>{const ranges=parseWatchRanges(row.watch_ranges);const watchedSeconds=ranges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);return {...row,watched_seconds:Math.floor(watchedSeconds),watch_percent:row.duration_seconds?Math.min(100,Math.floor(watchedSeconds/row.duration_seconds*100)):0,watch_ranges:undefined}});
     return NextResponse.json({progress});
   }catch(e:any){
     return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Authentication required'},{status:e.message==='FORBIDDEN'?403:401});
@@ -61,7 +69,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
         return NextResponse.json({error:'Invalid playback heartbeat.'},{status:400});
       }
       const existing=await db`select watch_ranges,duration_seconds,last_position,last_heartbeat_at,session_id from lesson_watch_state where user_id=${user.id} and lesson_id=${lessonId} limit 1`;
-      let ranges:any[]=Array.isArray((existing[0] as any)?.watch_ranges)?(existing[0] as any).watch_ranges:[];
+      let ranges:any[]=parseWatchRanges((existing[0] as any)?.watch_ranges);
       let added=0;
       const previous=existing[0] as any;
       if(previous&&previous.session_id===sessionId&&previous.last_position!==null&&previous.last_heartbeat_at){
@@ -87,7 +95,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
         values(${user.id},${lessonId},${JSON.stringify(safeRanges)}::jsonb,${Math.round(duration)},${position},now(),${sessionId},now())
         on conflict(user_id,lesson_id) do update set watch_ranges=excluded.watch_ranges,duration_seconds=greatest(lesson_watch_state.duration_seconds,excluded.duration_seconds),last_position=excluded.last_position,last_heartbeat_at=now(),session_id=excluded.session_id,updated_at=now()
         returning watch_ranges,duration_seconds`;
-      const savedRanges=Array.isArray((watchRows[0] as any)?.watch_ranges)?(watchRows[0] as any).watch_ranges:[];
+      const savedRanges=parseWatchRanges((watchRows[0] as any)?.watch_ranges);
       const watchedSeconds=savedRanges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);
       const progressRows=await db`insert into lesson_progress(user_id,lesson_id,completed,progress_seconds,last_viewed_at,updated_at)
         values(${user.id},${lessonId},false,${Math.floor(position)},now(),now())
@@ -98,7 +106,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
     const isVideo=Boolean((lesson[0] as any).video_url)||/\.(mp4|webm|ogg|mov|m4v)(?:[?#]|$)/i.test(String((lesson[0] as any).file_url||''))||/\.(mp4|webm|ogg|mov|m4v)$/i.test(String((lesson[0] as any).file_name||''));
     if(body.completed&&isVideo){
       const watch=await db`select watch_ranges,duration_seconds from lesson_watch_state where user_id=${user.id} and lesson_id=${lessonId} limit 1`;
-      const ranges=Array.isArray((watch[0] as any)?.watch_ranges)?(watch[0] as any).watch_ranges:[];
+      const ranges=parseWatchRanges((watch[0] as any)?.watch_ranges);
       const duration=Number((watch[0] as any)?.duration_seconds||0);
       const watched=ranges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);
       if(!duration||watched<duration*0.7)return NextResponse.json({error:'Watch at least 70% of this video before marking it complete.',watchProgress:{watchedSeconds:Math.floor(watched),durationSeconds:duration,percent:duration?Math.floor(watched/duration*100):0},requiredPercent:70},{status:403});
