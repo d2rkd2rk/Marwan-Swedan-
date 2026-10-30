@@ -107,16 +107,17 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
     }catch{}
   };
 
-  const handleTimeUpdate=(lessonId:string,currentTime:number,duration:number)=>{
+  const handleTimeUpdate=(lessonId:string,currentTime:number,duration:number,playbackRate:number)=>{
+    const firstUpdate=!(lessonId in lastSaved.current);
     const previous=lastSaved.current[lessonId]??0;
     const movedBack=currentTime<previous-2;
-    if(currentTime-previous>=5||movedBack){
+    if(firstUpdate||currentTime-previous>=5||movedBack){
       lastSaved.current[lessonId]=currentTime;
-      const sessionId=watchSessions.current[lessonId]||(watchSessions.current[lessonId]=typeof crypto!=='undefined'&&'randomUUID' in crypto?crypto.randomUUID():`1793383691691-${Math.random()}`);
+      const sessionId=watchSessions.current[lessonId]||(watchSessions.current[lessonId]=typeof crypto!=='undefined'&&'randomUUID' in crypto?crypto.randomUUID():String(Date.now())+'-'+String(Math.random()));
       fetch(`/api/courses/${slug}/progress`,{
         method:'PUT',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({eventType:'heartbeat',lessonId,currentTime,duration,sessionId}),
+        body:JSON.stringify({eventType:'heartbeat',lessonId,currentTime,duration,playbackRate,sessionId}),
         keepalive:true
       }).then(async response=>{
         if(!response.ok)return;
