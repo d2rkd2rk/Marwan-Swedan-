@@ -56,7 +56,8 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
       const position=Number(body.currentTime);
       const duration=Number(body.duration);
       const sessionId=String(body.sessionId||'').slice(0,100);
-      if(!Number.isFinite(position)||!Number.isFinite(duration)||duration<=0||position<0||position>duration+1||!sessionId){
+      const playbackRate=Number(body.playbackRate||1);
+      if(!Number.isFinite(position)||!Number.isFinite(duration)||duration<=0||position<0||position>duration+1||!sessionId||!Number.isFinite(playbackRate)||playbackRate<0.25||playbackRate>2){
         return NextResponse.json({error:'Invalid playback heartbeat.'},{status:400});
       }
       const existing=await db`select watch_ranges,duration_seconds,last_position,last_heartbeat_at,session_id from lesson_watch_state where user_id=${user.id} and lesson_id=${lessonId} limit 1`;
@@ -66,7 +67,7 @@ export async function PUT(request:Request,{params}:{params:Promise<{slug:string}
       if(previous&&previous.session_id===sessionId&&previous.last_position!==null&&previous.last_heartbeat_at){
         const elapsed=Math.max(0,Math.min(12,(Date.now()-new Date(previous.last_heartbeat_at).getTime())/1000));
         const delta=position-Number(previous.last_position);
-        if(delta>0&&delta<=elapsed*1.75+1.5){
+        if(delta>0&&delta<=elapsed*Math.min(2,playbackRate)*1.2+1){
           const nextStart=Math.max(0,Number(previous.last_position));
           const nextEnd=Math.min(duration,position);
           if(nextEnd>nextStart){
