@@ -15,7 +15,7 @@ export async function GET(request:Request){
       order by pe.created_at desc`
    : await db`select pe.id,pe.user_id,pe.path_id,pe.created_at,u.name,u.email,u.username,u.whatsapp,p.title as path_title
       from path_enrollments pe join users u on u.id=pe.user_id join paths p on p.id=pe.path_id
-      where pe.revoked_at is null order by pe.created_at desc limit 5`;
+      where pe.revoked_at is null order by pe.created_at desc`;
   const total=await db`select count(*)::int as count from path_enrollments where revoked_at is null`;
   return NextResponse.json({enrollments:rows,total:Number(total[0]?.count||0)});
  }catch(e:any){return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Authentication required'},{status:e.message==='FORBIDDEN'?403:401})}
