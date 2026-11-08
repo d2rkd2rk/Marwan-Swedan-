@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {PutObjectCommand,S3Client} from '@aws-sdk/client-s3';
+import {PutBucketCorsCommand,PutObjectCommand,S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import {randomUUID} from 'crypto';
 import {requireUser} from '@/lib/auth';
@@ -12,6 +12,7 @@ export async function POST(request:Request){
   const accessKeyId=process.env.TIGRIS_STORAGE_ACCESS_KEY_ID,secretAccessKey=process.env.TIGRIS_STORAGE_SECRET_ACCESS_KEY,Bucket=process.env.TIGRIS_STORAGE_BUCKET;
   if(!accessKeyId||!secretAccessKey||!Bucket)return NextResponse.json({error:'Receipt storage is not configured.'},{status:503});
   const client=new S3Client({region:'auto',endpoint:'https://t3.storage.dev',credentials:{accessKeyId,secretAccessKey}});
+  try{await client.send(new PutBucketCorsCommand({Bucket,CORSConfiguration:{CORSRules:[{AllowedOrigins:['*'],AllowedMethods:['PUT','GET','HEAD'],AllowedHeaders:['*'],ExposeHeaders:['ETag'],MaxAgeSeconds:86400}]}}))}catch(error:any){console.warn('TIGRIS_RECEIPT_CORS_SETUP_FAILED',error?.message||error)}
   const key='payment-receipts/'+user.id+'/'+randomUUID()+'-'+name.replace(/[^a-zA-Z0-9._-]/g,'-');
   const uploadUrl=await getSignedUrl(client,new PutObjectCommand({Bucket,Key:key,ContentType:type}),{expiresIn:900});
   return NextResponse.json({uploadUrl,key});
