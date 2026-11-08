@@ -27,7 +27,7 @@ export function ensureCouponSchema(){
       await db`create index if not exists discount_coupons_active_idx on discount_coupons(is_active,starts_at,expires_at)`;
       await db`create table if not exists discount_coupon_redemptions(
         id uuid primary key default gen_random_uuid(),
-        coupon_id uuid not null references discount_coupons(id) on delete restrict,
+        coupon_id uuid not null references discount_coupons(id) on delete cascade,
         user_id uuid not null references users(id) on delete cascade,
         course_id uuid not null references courses(id) on delete cascade,
         original_price numeric(12,2) not null,
