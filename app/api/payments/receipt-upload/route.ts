@@ -14,7 +14,7 @@ export async function POST(request:Request){
   const client=new S3Client({region:'auto',endpoint:'https://t3.storage.dev',credentials:{accessKeyId,secretAccessKey}});
   try{await client.send(new PutBucketCorsCommand({Bucket,CORSConfiguration:{CORSRules:[{AllowedOrigins:['*'],AllowedMethods:['PUT','GET','HEAD'],AllowedHeaders:['*'],ExposeHeaders:['ETag'],MaxAgeSeconds:86400}]}}))}catch(error:any){console.warn('TIGRIS_RECEIPT_CORS_SETUP_FAILED',error?.message||error)}
   const key='payment-receipts/'+user.id+'/'+randomUUID()+'-'+name.replace(/[^a-zA-Z0-9._-]/g,'-');
-  const uploadUrl=await getSignedUrl(client,new PutObjectCommand({Bucket,Key:key,ContentType:type}),{expiresIn:900});
+  const uploadUrl=await getSignedUrl(client,new PutObjectCommand({Bucket,Key:key,ContentType:type,ContentLength:size}),{expiresIn:900});
   return NextResponse.json({uploadUrl,key});
  }catch(e:any){return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required':'Could not prepare receipt upload.'},{status:e.message==='UNAUTHENTICATED'?401:500})}
 }
