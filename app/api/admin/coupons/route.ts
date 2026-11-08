@@ -24,7 +24,7 @@ export async function GET(){
   try{
     await requireAdmin();await ensureCouponSchema();
     const coupons=await db`select dc.*,c.title as course_title from discount_coupons dc left join courses c on c.id=dc.course_id order by dc.created_at desc`;
-    const redemptions=await db`select r.id,r.coupon_id,r.user_id,r.course_id,r.original_price,r.discount_amount,r.final_price,r.created_at,u.name,u.username,u.email,c.title as course_title,dc.code from discount_coupon_redemptions r join users u on u.id=r.user_id join courses c on c.id=r.course_id join discount_coupons dc on dc.id=r.coupon_id order by r.created_at desc limit 200`;
+    const redemptions=await db`select r.id,r.coupon_id,r.user_id,r.course_id,r.path_id,r.original_price,r.discount_amount,r.final_price,r.created_at,u.name,u.username,u.email,coalesce(c.title,p.title) as course_title,case when r.path_id is null then 'course' else 'path' end as target_type,dc.code from discount_coupon_redemptions r join users u on u.id=r.user_id left join courses c on c.id=r.course_id left join paths p on p.id=r.path_id join discount_coupons dc on dc.id=r.coupon_id order by r.created_at desc limit 200`;
     return NextResponse.json({coupons,redemptions});
   }catch(e:any){return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Authentication required'},{status:e.message==='FORBIDDEN'?403:401})}
 }
