@@ -34,7 +34,7 @@ export async function POST(request:Request){
     const unavailable=couponAvailability(coupon,Number(used[0]?.count||0));if(unavailable)throw new Error(unavailable);
     const totals=couponDiscount(Number(course.price),coupon.discount_type,Number(coupon.discount_value));couponId=coupon.id;couponCode=coupon.code;discount=totals.discountAmount;amount=totals.finalPrice;
    }
-   const inserted=await tx.unsafe("insert into payment_requests(user_id,course_id,coupon_id,coupon_code,original_price,discount_amount,amount,sender_phone,sender_name,transaction_reference,receipt_key) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning id,title",( [user.id,course.id,couponId,couponCode,Number(course.price),discount,amount,senderPhone,senderName,reference||null,receiptKey] ));
+   const inserted=await tx.unsafe("insert into payment_requests(user_id,course_id,coupon_id,coupon_code,original_price,discount_amount,amount,sender_phone,sender_name,transaction_reference,receipt_key) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning id",[user.id,course.id,couponId,couponCode,Number(course.price),discount,amount,senderPhone,senderName,reference||null,receiptKey]);
    return {id:inserted[0].id,title:course.title};
   });
   try{await sendRoleNotification('admin','New InstaPay payment request',user.name+' submitted a payment request for '+result.title+'.','/admin/transactions','payment-'+result.id)}catch(error){console.error('PAYMENT_ADMIN_PUSH_FAILED',error)}
