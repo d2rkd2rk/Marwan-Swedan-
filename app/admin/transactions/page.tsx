@@ -22,7 +22,7 @@ export default function AdminTransactions(){
   try{const r=await fetch('/api/admin/payments',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,action,reason})});const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not review request.');setDeclineId('');setReason('');await load();setMessage(action==='approve'?'Payment approved and course access activated.':'Payment request declined.')}
   catch(e:any){setMessage(e.message)}finally{setBusy('')}
  }
- async function receipt(id:string){const r=await fetch('/api/admin/payments/receipt/'+id),j=await r.json();if(!r.ok){setMessage(j.error||'Could not open receipt.');return}window.open(j.url,'_blank','noopener,noreferrer')}
+ async function receipt(id:string){const tab=window.open('about:blank','_blank');try{const r=await fetch('/api/admin/payments/receipt/'+id),j=await r.json();if(!r.ok)throw new Error(j.error||'Could not open receipt.');if(tab)tab.location.href=j.url;else window.location.href=j.url}catch(e:any){tab?.close();setMessage(e.message||'Could not open receipt.')}}
  async function saveSettings(){
   setSaving(true);setMessage('');
   try{const r=await fetch('/api/admin/payments/settings',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not save settings.');setMessage('InstaPay settings saved.')}
@@ -30,7 +30,7 @@ export default function AdminTransactions(){
  }
  function exportCsv(){
   const headers=['Student','Username','Course','Amount EGP','Status','Sender phone','Sender name','Transaction reference','Coupon','Submitted at','Reviewed at','Decline reason'];
-  const q=(v:any)=>'"'+String(v??'').replace(/"/g,'""')+'"';
+  const q=(v:any)=>{let value=String(v??'');if(/^[=+@-]/.test(value))value="'"+value;return '"'+value.replace(/"/g,'""')+'"'};
   const csv=[headers.map(q).join(','),...rows.map(r=>[r.student_name,r.username,r.course_title,r.amount,r.status,r.sender_phone,r.sender_name,r.transaction_reference,r.coupon_code,r.created_at,r.reviewed_at,r.decline_reason].map(q).join(','))].join('\r\n');
   const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='academy-payment-transactions.csv';a.click();URL.revokeObjectURL(url);
  }
