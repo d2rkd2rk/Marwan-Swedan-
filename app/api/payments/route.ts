@@ -27,7 +27,7 @@ export async function POST(request:Request){
    if(!target||!target.published||target.is_free)throw new Error('This paid '+targetType+' is unavailable.');
    const access=targetType==='path'
     ?await tx.unsafe("select id from path_enrollments where user_id=$1 and path_id=$2 and revoked_at is null limit 1",[user.id,target.id])
-    :await tx.unsafe("select id from enrollments where user_id=$1 and course_id=$2 and revoked_at is null limit 1",[user.id,target.id]);
+    :await tx.unsafe("select id from enrollments where user_id=$1 and course_id=$2 and revoked_at is null union all select pe.id from path_courses pc join paths p on p.id=pc.path_id join path_enrollments pe on pe.path_id=p.id where pc.course_id=$2 and pe.user_id=$1 and pe.revoked_at is null and p.published=true and (pe.source<>'free' or p.is_free=true) limit 1",[user.id,target.id]);
    if(access.length)throw new Error('You already have access to this '+targetType+'.');
    const pending=targetType==='path'
     ?await tx.unsafe("select id from payment_requests where user_id=$1 and path_id=$2 and status='pending' limit 1",[user.id,target.id])
