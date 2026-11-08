@@ -25,4 +25,4 @@ export async function ensurePaymentSchema(){
  }
  return schemaPromise;
 }
-export function safeReceiptKey(key:string,userId:string){return key.startsWith('payment-receipts/'+userId+'/')&&!key.includes('..')&&!key.includes('\\\\')}
+export function safeReceiptKey(key:string,userId:string){return key.startsWith('payment-receipts/'+userId+'/')&&!key.includes('..')&&!key.includes('\\')}
