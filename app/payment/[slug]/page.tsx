@@ -9,7 +9,7 @@ export default function PaymentPage(){
  const [senderPhone,setSenderPhone]=useState(''),[senderName,setSenderName]=useState(''),[reference,setReference]=useState('');
  const [file,setFile]=useState<File|null>(null),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
  useEffect(()=>{if(!slug)return;fetch('/api/payments/checkout?slug='+encodeURIComponent(slug)+(coupon?'&coupon='+encodeURIComponent(coupon):''),{cache:'no-store'}).then(async r=>{const j=await r.json();if(!r.ok)throw new Error(j.error||'Could not load payment page.');setData(j)}).catch(e=>setError(e.message)).finally(()=>setLoading(false))},[slug,coupon]);
- const copy=async()=>{try{await navigator.clipboard.writeText(data?.settings?.instapay_address||'');setMessage('InstaPay details copied.')}catch{setMessage('Copy was not available on this browser.')}};
+ const copy=async()=>{try{await navigator.clipboard.writeText('Account holder: '+(data?.settings?.account_name||'')+'\nInstaPay: '+(data?.settings?.instapay_address||''));setMessage('InstaPay details copied.')}catch{setMessage('Copy was not available on this browser.')}};
  const submit=async()=>{
   if(busy)return;setMessage('');
   if(!senderPhone.trim()||!senderName.trim()||!file){setMessage('Enter the sender details and upload the payment receipt.');return}
