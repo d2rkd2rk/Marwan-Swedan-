@@ -1,8 +1,10 @@
 import db from '@/lib/db';
+import {ensurePathTables} from '@/lib/pathAccess';
 let schemaPromise:Promise<void>|null=null;
 export function ensureCouponSchema(){
   if(!schemaPromise){
     schemaPromise=(async()=>{
+      await ensurePathTables();
       await db`create table if not exists discount_coupons(
         id uuid primary key default gen_random_uuid(),
         code text not null unique,
