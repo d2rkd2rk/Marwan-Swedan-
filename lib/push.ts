@@ -93,3 +93,29 @@ export async function sendBroadcastAnnouncement(title:string,body:string){
  }));
  return {sent,failed,expired,total:rows.length};
 }
+
+
+async function deliverUserPush(rows:any[],title:string,body:string,url:string,tag:string){
+ if(!configured())throw new Error('PUSH_NOT_CONFIGURED');
+ let sent=0,failed=0,expired=0;
+ await Promise.all(rows.map(async(row:any)=>{
+  try{
+   await webpush.sendNotification({endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}},JSON.stringify({title,body,url,tag}),{TTL:3600,headers:{Urgency:'high'}});
+   await db.unsafe("update push_subscriptions set last_used_at=now(),disabled_at=null where id=$1",[row.id]);sent++;
+  }catch(error:any){
+   if(error?.statusCode===404||error?.statusCode===410){await db.unsafe("update push_subscriptions set disabled_at=now() where id=$1",[row.id]);expired++}
+   else{failed++;console.error('PUSH_DELIVERY_FAILED',{statusCode:error?.statusCode,body:error?.body})}
+  }
+ }));
+ return {sent,failed,expired,total:rows.length};
+}
+export async function sendUserNotification(userId:string,title:string,body:string,url:string,tag:string){
+ await ensurePushTable();
+ const rows=await db.unsafe("select id,endpoint,p256dh,auth from push_subscriptions where user_id=$1 and disabled_at is null",[userId]);
+ return deliverUserPush(rows,title,body,url,tag);
+}
+export async function sendRoleNotification(role:string,title:string,body:string,url:string,tag:string){
+ await ensurePushTable();
+ const rows=await db.unsafe("select ps.id,ps.endpoint,ps.p256dh,ps.auth from push_subscriptions ps join users u on u.id=ps.user_id where u.role=$1 and ps.disabled_at is null",[role]);
+ return deliverUserPush(rows,title,body,url,tag);
+}
