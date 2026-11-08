@@ -50,7 +50,7 @@ export default function AdminTransactions(){
    <button className="btn primary" onClick={saveSettings} disabled={saving}>{saving?'Saving…':'Save InstaPay details'}</button>
   </div>
   <div className="card" style={{marginTop:16}}><div className="eyebrow">Reports</div><h3>Monthly approved revenue</h3>
-   {monthly.length?monthly.map(m=><div key={m.month} style={{display:'flex',justifyContent:'space-between',padding:'9px 0',borderBottom:'1px solid var(--line)'}}><span>{m.month}</span><span>{egp(m.revenue)} · {m.approved_count} approved</span></div>):<p className="muted">No approved revenue in the last 12 months.</p>}
+   {monthly.length?monthly.map(m=><div key={m.month} style={{display:'flex',justifyContent:'space-between',padding:'9px 0',borderBottom:'1px solid var(--line)'}}><span>{m.month}</span><span>{egp(m.revenue)} · {m.approved_count} approved · {m.declined_count} declined · {m.pending_count} pending</span></div>):<p className="muted">No approved revenue in the last 12 months.</p>}
   </div>
   <div className="card" style={{marginTop:16}}><div className="cardHead"><div><div className="eyebrow">Payment queue</div><h3>Student requests</h3></div><button className="btn" onClick={exportCsv}>Export CSV</button></div>
    <div className="grid" style={{gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))'}}>
