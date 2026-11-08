@@ -5,7 +5,6 @@ import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
 import VideoPlayer from '@/app/components/VideoPlayer';
 
-const defaultWhatsAppNumber='201515227612';
 const suggestedQuestions=[
   'الكورس ده مناسب للمبتدئين؟',
   'هتعلم إيه من الكورس ده؟',

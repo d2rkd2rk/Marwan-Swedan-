@@ -3,12 +3,6 @@ import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
 
-const defaultWhatsAppNumber='201515227612';
-function requestUrl(path:any){
- const n=path.whatsapp_number||defaultWhatsAppNumber;
- const message=`السلام عليكم، أريد شراء مسار ${path.title}.\nالسعر الحالي: ${path.price} EGP\nUsername/Email: `;
- return `https://wa.me/${n}?text=${encodeURIComponent(message)}`;
-}
 export default function Paths(){
  const [paths,setPaths]=useState<any[]>([]),[loading,setLoading]=useState(true);
  useEffect(()=>{
@@ -26,7 +20,7 @@ export default function Paths(){
    <span className="tag" style={{color:'#d8b4fe'}}>{p.category}</span><h3 style={{fontFamily:'Space Grotesk',fontSize:24}}>{p.title}</h3>
    <p className="muted" style={{lineHeight:1.7}}>{p.description||'A structured learning path.'}</p>
    <p className="small muted">{p.level} · {Number(p.course_count||0)} courses · {Math.round(Number(p.duration_minutes||0)/60*10)/10} hours · {p.is_free?'Free':`${p.price} EGP`}</p>
-   <div className="actions"><Link className="btn" href={`/paths/${p.slug}`}>{p.enrolled?'Open path':'View path'}</Link>{!p.is_free&&!p.enrolled&&<a className="btn primary pathAccentBtn" href={requestUrl(p)} target="_blank" rel="noreferrer">Request access</a>}</div>
+   <div className="actions"><Link className="btn" href={`/paths/${p.slug}`}>{p.enrolled?'Open path':'View path'}</Link></div>
   </article>)}</div>}
  </section></div></main>;
 }

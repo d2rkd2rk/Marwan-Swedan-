@@ -1,15 +1,22 @@
 import db from '@/lib/db';
 import {ensureCouponSchema} from '@/lib/coupons';
+import {ensurePathTables} from '@/lib/pathAccess';
 let schemaPromise:Promise<void>|null=null;
 export async function ensurePaymentSchema(){
  if(!schemaPromise){
   schemaPromise=(async()=>{
+   await ensurePathTables();
    await ensureCouponSchema();
    await db.unsafe("create table if not exists payment_settings(id smallint primary key default 1 check(id=1),instapay_address text not null default '',account_name text not null default '',instructions text not null default 'حوّل المبلغ إلى حساب InstaPay الموضح، ثم ارفع صورة الإيصال وأرسل البيانات للمراجعة.',updated_by uuid references users(id) on delete set null,updated_at timestamptz not null default now())");
    await db.unsafe("alter table payment_settings alter column instructions set default 'حوّل المبلغ إلى حساب InstaPay الموضح، ثم ارفع صورة الإيصال وأرسل البيانات للمراجعة.'");
    await db.unsafe("insert into payment_settings(id) values(1) on conflict(id) do nothing");
-   await db.unsafe("create table if not exists payment_requests(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,course_id uuid not null references courses(id) on delete cascade,coupon_id uuid references discount_coupons(id) on delete set null,coupon_code text,original_price numeric(12,2) not null,discount_amount numeric(12,2) not null default 0,amount numeric(12,2) not null,sender_phone text not null,sender_name text not null,transaction_reference text,receipt_key text not null,status text not null default 'pending' check(status in ('pending','approved','declined')),decline_reason text,reviewed_by uuid references users(id) on delete set null,reviewed_at timestamptz,created_at timestamptz not null default now(),updated_at timestamptz not null default now())");
-   await db.unsafe("create unique index if not exists payment_requests_one_pending_idx on payment_requests(user_id,course_id) where status='pending'");
+   await db.unsafe("create table if not exists payment_requests(id uuid primary key default gen_random_uuid(),user_id uuid not null references users(id) on delete cascade,course_id uuid references courses(id) on delete cascade,path_id uuid references paths(id) on delete cascade,coupon_id uuid references discount_coupons(id) on delete set null,coupon_code text,original_price numeric(12,2) not null,discount_amount numeric(12,2) not null default 0,amount numeric(12,2) not null,sender_phone text not null,sender_name text not null,transaction_reference text,receipt_key text not null,status text not null default 'pending' check(status in ('pending','approved','declined')),decline_reason text,reviewed_by uuid references users(id) on delete set null,reviewed_at timestamptz,created_at timestamptz not null default now(),updated_at timestamptz not null default now(),check((course_id is not null)::int+(path_id is not null)::int=1))");
+   await db.unsafe("alter table payment_requests alter column course_id drop not null");
+   await db.unsafe("alter table payment_requests add column if not exists path_id uuid references paths(id) on delete cascade");
+   await db.unsafe("do $$ begin if not exists(select 1 from pg_constraint where conname='payment_requests_one_target_check') then alter table payment_requests add constraint payment_requests_one_target_check check((course_id is not null)::int+(path_id is not null)::int=1); end if; end $$");
+   await db.unsafe("drop index if exists payment_requests_one_pending_idx");
+   await db.unsafe("create unique index if not exists payment_requests_one_pending_course_idx on payment_requests(user_id,course_id) where status='pending' and course_id is not null");
+   await db.unsafe("create unique index if not exists payment_requests_one_pending_path_idx on payment_requests(user_id,path_id) where status='pending' and path_id is not null");
    await db.unsafe("create index if not exists payment_requests_status_created_idx on payment_requests(status,created_at desc)");
    await db.unsafe("create index if not exists payment_requests_approved_at_idx on payment_requests(reviewed_at desc) where status='approved'");
    await db.unsafe("create index if not exists payment_requests_user_idx on payment_requests(user_id,created_at desc)");
