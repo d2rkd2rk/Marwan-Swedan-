@@ -5,7 +5,7 @@ import {couponAvailability,couponDiscount,ensureCouponSchema} from '@/lib/coupon
 import {ensurePathTables} from '@/lib/pathAccess';
 export async function POST(request:Request){
  try{
-  const user=await requireUser();await ensureCouponSchema();
+  const user=await requireUser();await ensurePathTables();await ensureCouponSchema();
   const body=await request.json(),code=String(body.code||'').trim().toUpperCase(),slug=String(body.slug||''),targetType=body.targetType==='path'?'path':'course';
   if(!code||!slug)return NextResponse.json({error:'Enter a coupon code.'},{status:400});
   let target:any;
