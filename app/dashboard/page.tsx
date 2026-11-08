@@ -14,7 +14,7 @@ export default function StudentDashboard(){
  const courses=data.courses||[], certificates=data.certificates||[], paths=data.paths||[], pathCertificates=data.pathCertificates||[];
  return <main><div className="shell"><SiteNav/><section className="section">
   <div className="eyebrow">Student Dashboard</div>
-  <h1 style={{fontFamily:'Space Grotesk',fontSize:'clamp(46px,7vw,72px)',letterSpacing:'-.055em',margin:'14px 0 45px'}}>My academy.</h1>
+  <h1 style={{fontFamily:'Space Grotesk',fontSize:'clamp(46px,7vw,72px)',letterSpacing:'-.055em',margin:'14px 0 20px'}}>My academy.</h1><div className="actions" style={{marginBottom:28}}><Link className="btn" href="/dashboard/payments">Track payment requests</Link></div>
   <section>
    <div className="sectionhead"><div><div className="eyebrow">Your learning</div><h2>Enrolled courses</h2></div></div>
    {courses.length===0?<div className="emptyAcademy"><div><h3>No enrolled courses yet.</h3><p className="muted">Your courses will appear here after access is granted.</p><Link className="btn primary" href="/courses">Browse courses</Link></div></div>:<div className="grid">{courses.map((c:any)=><article className="card" key={c.id}>
