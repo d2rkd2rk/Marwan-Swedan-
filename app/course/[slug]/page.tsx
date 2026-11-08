@@ -84,13 +84,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   },[params]);
 
 
-  const purchaseUrl=useMemo(()=>{
-    if(!data?.course||data.course.is_free)return '';
-    const c=data.course;
-    const message=`السلام عليكم، أريد شراء كورس ${c.title}.\\nالسعر الحالي: ${c.price} EGP\\nUsername/Email: `;
-    const whatsappNumber=c.whatsapp_number||defaultWhatsAppNumber;
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-  },[data]);
+  const purchaseUrl=useMemo(()=>data?.course&&!data.course.is_free?'/payment/'+data.course.slug:'',[data]);
 
   const applyCoupon=async()=>{
     if(!couponCode.trim()||couponBusy)return;
@@ -105,13 +99,8 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   };
   const requestWithCoupon=async()=>{
     if(!couponInfo||couponRequestBusy)return;
-    setCouponRequestBusy(true);setCouponMessage('');
-    try{
-      const response=await fetch('/api/coupons/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug,code:couponInfo.code})});
-      const result=await response.json();
-      if(!response.ok)throw new Error(result.error||'Could not create WhatsApp request.');
-      window.location.assign(result.whatsappUrl);
-    }catch(error:any){setCouponMessage(error.message||'Could not create WhatsApp request.');setCouponRequestBusy(false);}
+    setCouponRequestBusy(true);
+    window.location.assign('/payment/'+slug+'?coupon='+encodeURIComponent(couponInfo.code));
   };
 
   const saveProgress=async(lessonId:string,seconds:number,completed=false)=>{
@@ -280,9 +269,9 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
         </div>}
         {!c.is_free&&!data.enrolled&&<div style={{maxWidth:520,marginTop:20}}>
           <div className="field"><label htmlFor="course-coupon">Have a discount code?</label><div className="actions" style={{alignItems:'stretch'}}><input id="course-coupon" value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setCouponInfo(null);setCouponMessage('')}} placeholder="Enter coupon code" maxLength={40} style={{flex:1,minWidth:180}}/><button className="btn" type="button" disabled={!couponCode.trim()||couponBusy} onClick={applyCoupon}>{couponBusy?'Checking…':'Apply code'}</button></div></div>
-          {couponInfo&&<div className="card" style={{marginTop:12,padding:16}}><div className="eyebrow">Discount applied · {couponInfo.code}</div><div className="small muted" style={{textDecoration:'line-through'}}>Original price: {Number(couponInfo.originalPrice).toFixed(2)} EGP</div><p style={{margin:'6px 0'}}>Discount: <b>{Number(couponInfo.discountAmount).toFixed(2)} EGP</b></p><h3 style={{margin:'6px 0 14px'}}>Final price: {Number(couponInfo.finalPrice).toFixed(2)} EGP</h3><button className="btn primary" disabled={couponRequestBusy} onClick={requestWithCoupon}>{couponRequestBusy?'Preparing WhatsApp…':'Request access with discount on WhatsApp'}</button></div>}
+          {couponInfo&&<div className="card" style={{marginTop:12,padding:16}}><div className="eyebrow">Discount applied · {couponInfo.code}</div><div className="small muted" style={{textDecoration:'line-through'}}>Original price: {Number(couponInfo.originalPrice).toFixed(2)} EGP</div><p style={{margin:'6px 0'}}>Discount: <b>{Number(couponInfo.discountAmount).toFixed(2)} EGP</b></p><h3 style={{margin:'6px 0 14px'}}>Final price: {Number(couponInfo.finalPrice).toFixed(2)} EGP</h3><button className="btn primary" disabled={couponRequestBusy} onClick={requestWithCoupon}>{couponRequestBusy?'Opening checkout…':'Continue to InstaPay payment'}</button></div>}
           {couponMessage&&<p className="small muted" role="status">{couponMessage}</p>}
-          {!couponInfo&&<div className="actions"><a className="btn primary" href={purchaseUrl} target="_blank" rel="noreferrer">Buy this course on WhatsApp</a></div>}
+          {!couponInfo&&<div className="actions"><a className="btn primary" href={purchaseUrl}>Continue to InstaPay payment</a></div>}
         </div>}
         {c.is_free&&!data.enrolled&&<div className="actions"><button className="btn primary" disabled={enrollBusy} onClick={async()=>{setEnrollBusy(true);setEnrollMessage('');try{const r=await fetch(`/api/courses/${slug}`,{method:'POST'});const j=await r.json();if(!r.ok)throw new Error(j.error||'Enrollment failed');const refreshed=await fetch(`/api/courses/${slug}`,{cache:'no-store'}).then(x=>x.json());setData(refreshed);if(Array.isArray(refreshed.progress)){const mapped:Record<string,Progress>={};for(const item of refreshed.progress)mapped[item.lesson_id]=item;setProgress(mapped)}}catch(e:any){setEnrollMessage(e.message||'Could not enroll.')}finally{setEnrollBusy(false)}}}>{enrollBusy?'Enrolling…':'Enroll for free'}</button><Link className="btn" href="/login">Sign in</Link>{enrollMessage&&<p className="small muted">{enrollMessage}</p>}</div>}
       </section>
@@ -347,9 +336,9 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
             {answer&&<p style={{lineHeight:1.8,whiteSpace:'pre-wrap',marginTop:16}}>{answer}</p>}
           </div>
         </>:<div className="card">
-          <h3>{c.is_free?'Free playlist — sign in to start.':'Ready to buy? Contact me on WhatsApp.'}</h3>
-          <p className="muted">{c.is_free?'Create an account or sign in and the lessons will become available.':'The current price is shown above. Tap the WhatsApp button to send a ready-made purchase message. Payment is arranged with the instructor directly.'}</p>
-          <div className="actions">{c.is_free?<><Link className="btn primary" href="/register">Register</Link><Link className="btn" href="/login">Sign in</Link></>:<a className="btn primary" href={purchaseUrl} target="_blank" rel="noreferrer">Buy this course</a>}</div>
+          <h3>{c.is_free?'Free playlist — sign in to start.':'Ready to enroll? Pay securely with InstaPay.'}</h3>
+          <p className="muted">{c.is_free?'Create an account or sign in and the lessons will become available.':'The current price is shown above. Continue to the InstaPay payment page, upload your receipt, and track the review from your dashboard.'}</p>
+          <div className="actions">{c.is_free?<><Link className="btn primary" href="/register">Register</Link><Link className="btn" href="/login">Sign in</Link></>:<a className="btn primary" href={purchaseUrl}>Continue to InstaPay payment</a>}</div>
         </div>}
       </section>
 
