@@ -3,10 +3,10 @@ import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
 import {ensurePaymentSchema} from '@/lib/payments';
 import {ensurePathTables,hasCourseAccess,hasPathAccess} from '@/lib/pathAccess';
-import {couponAvailability,couponDiscount} from '@/lib/coupons';
+import {couponAvailability,couponDiscount,ensureCouponSchema} from '@/lib/coupons';
 export async function GET(request:Request){
  try{
-  const user=await requireUser();await ensurePaymentSchema();await ensurePathTables();
+  const user=await requireUser();await ensurePaymentSchema();await ensurePathTables();await ensureCouponSchema();
   const url=new URL(request.url),slug=url.searchParams.get('slug')||'',targetType=url.searchParams.get('type')==='path'?'path':'course';
   const targetRows=targetType==='path'
    ?await db.unsafe("select id,title,slug,price,is_free,published from paths where slug=$1 limit 1",[slug])
@@ -22,6 +22,8 @@ export async function GET(request:Request){
    const found=await db.unsafe("select * from discount_coupons where code=$1 limit 1",[code]);coupon=found[0] as any;
    if(!coupon)return NextResponse.json({error:'Invalid coupon code.'},{status:400});
    if(targetType==='path'&&coupon.course_id)return NextResponse.json({error:'This coupon is restricted to a specific course and cannot be used for a path.'},{status:400});
+   if(targetType==='path'&&coupon.path_id&&coupon.path_id!==target.id)return NextResponse.json({error:'This coupon is not valid for this path.'},{status:400});
+   if(targetType==='course'&&coupon.path_id)return NextResponse.json({error:'This coupon is restricted to a specific path and cannot be used for a course.'},{status:400});
    if(targetType==='course'&&coupon.course_id&&coupon.course_id!==target.id)return NextResponse.json({error:'This coupon is not valid for this course.'},{status:400});
    const used=await db.unsafe("select count(*)::int as count from discount_coupon_redemptions where coupon_id=$1 and user_id=$2",[coupon.id,user.id]);
    const unavailable=couponAvailability(coupon,Number(used[0]?.count||0));if(unavailable)return NextResponse.json({error:unavailable},{status:400});
