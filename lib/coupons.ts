@@ -26,7 +26,7 @@ export function ensureCouponSchema(){
         check(per_user_limit>0)
       )`;
       await db`alter table discount_coupons add column if not exists path_id uuid references paths(id) on delete cascade`;
-      await db.unsafe("do $ begin if not exists(select 1 from pg_constraint where conname='discount_coupons_one_target_check') then alter table discount_coupons add constraint discount_coupons_one_target_check check(not (course_id is not null and path_id is not null)); end if; end $");
+      await db.unsafe("do $coupon$ begin if not exists(select 1 from pg_constraint where conname='discount_coupons_one_target_check') then alter table discount_coupons add constraint discount_coupons_one_target_check check(not (course_id is not null and path_id is not null)); end if; end $coupon$");
       await db`create index if not exists discount_coupons_active_idx on discount_coupons(is_active,starts_at,expires_at)`;
       await db`create table if not exists discount_coupon_redemptions(
         id uuid primary key default gen_random_uuid(),
