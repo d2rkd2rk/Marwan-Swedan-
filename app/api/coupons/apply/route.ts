@@ -19,6 +19,8 @@ export async function POST(request:Request){
   const rows=await db`select * from discount_coupons where code=${code} limit 1`,coupon=rows[0] as any;
   if(!coupon)return NextResponse.json({error:'Invalid coupon code.'},{status:404});
   if(targetType==='path'&&coupon.course_id)return NextResponse.json({error:'This coupon is restricted to a specific course and cannot be used for a path.'},{status:400});
+  if(targetType==='path'&&coupon.path_id&&coupon.path_id!==target.id)return NextResponse.json({error:'This coupon is not valid for this path.'},{status:400});
+  if(targetType==='course'&&coupon.path_id)return NextResponse.json({error:'This coupon is restricted to a specific path and cannot be used for a course.'},{status:400});
   if(targetType==='course'&&coupon.course_id&&coupon.course_id!==target.id)return NextResponse.json({error:'This coupon is not valid for this course.'},{status:400});
   const used=await db`select count(*)::int as count from discount_coupon_redemptions where coupon_id=${coupon.id} and user_id=${user.id}`;
   const unavailable=couponAvailability(coupon,Number(used[0]?.count||0));if(unavailable)return NextResponse.json({error:unavailable},{status:400});
