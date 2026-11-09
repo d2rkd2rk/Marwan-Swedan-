@@ -3,7 +3,7 @@ import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
 import {ensurePaymentSchema,safeReceiptKey} from '@/lib/payments';
 import {ensurePathTables} from '@/lib/pathAccess';
-import {couponAvailability,couponDiscount} from '@/lib/coupons';
+import {couponAvailability,couponDiscount,ensureCouponSchema} from '@/lib/coupons';
 import {sendRoleNotification} from '@/lib/push';
 export async function GET(){
  try{
@@ -15,7 +15,7 @@ export async function GET(){
 }
 export async function POST(request:Request){
  try{
-  const user=await requireUser();await ensurePaymentSchema();await ensurePathTables();
+  const user=await requireUser();await ensurePaymentSchema();await ensurePathTables();await ensureCouponSchema();
   if(user.role==='admin')return NextResponse.json({error:'Admins cannot submit student payment requests.'},{status:403});
   const b=await request.json(),slug=String(b.slug||'').trim(),targetType=b.targetType==='path'?'path':'course',senderPhone=String(b.senderPhone||'').replace(/\D/g,'').slice(0,20),senderName=String(b.senderName||'').trim().slice(0,120),reference=String(b.transactionReference||'').trim().slice(0,120),receiptKey=String(b.receiptKey||'');
   if(!slug||senderPhone.length<8||senderName.length<2||!safeReceiptKey(receiptKey,user.id))return NextResponse.json({error:'Complete the sender details and upload a valid receipt.'},{status:400});
@@ -39,6 +39,8 @@ export async function POST(request:Request){
     const coupons=await tx.unsafe("select * from discount_coupons where code=$1 for update",[code]);const coupon=coupons[0] as any;
     if(!coupon)throw new Error('Invalid coupon code.');
     if(targetType==='path'&&coupon.course_id)throw new Error('This coupon is restricted to a specific course and cannot be used for a path.');
+    if(targetType==='path'&&coupon.path_id&&coupon.path_id!==target.id)throw new Error('This coupon is not valid for this path.');
+    if(targetType==='course'&&coupon.path_id)throw new Error('This coupon is restricted to a specific path and cannot be used for a course.');
     if(targetType==='course'&&coupon.course_id&&coupon.course_id!==target.id)throw new Error('This coupon is not valid for this course.');
     const used=await tx.unsafe("select count(*)::int as count from discount_coupon_redemptions where coupon_id=$1 and user_id=$2",[coupon.id,user.id]);
     const unavailable=couponAvailability(coupon,Number(used[0]?.count||0));if(unavailable)throw new Error(unavailable);
