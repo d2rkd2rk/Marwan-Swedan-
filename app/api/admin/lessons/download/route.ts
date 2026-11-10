@@ -40,7 +40,7 @@ export async function GET(request:NextRequest){
     if(!key.startsWith(`courses/${lesson.course_id}/`)||key.split('/').length<3)return new NextResponse('Invalid lesson file reference.',{status:404});
 
     const fileName=String(lesson.file_name||lesson.title||'lesson-video').trim()||'lesson-video';
-    const fallbackName=fileName.replace(/[\\r\\n"]/g,'').replace(/[^\\x20-\\x7E]/g,'_')||'lesson-video';
+    const fallbackName=fileName.replace(/[\r\n"]/g,'')||'lesson-video';
     const disposition=`attachment; filename="${fallbackName}"; filename*=UTF-8''${encodeURIComponent(fileName)}`;
     const {Bucket,client}=storage();
     const signedUrl=await getSignedUrl(
