@@ -30,11 +30,12 @@ export async function GET(request:NextRequest){
     const lessonId=request.nextUrl.searchParams.get('lessonId');
     if(!lessonId)return new NextResponse('Lesson id is required.',{status:400});
 
-    const rows=await db`select id,course_id,title,file_url,file_name from lessons where id=${lessonId} limit 1`;
+    const rows=await db`select id,course_id,title,file_url,video_url,file_name from lessons where id=${lessonId} limit 1`;
     const lesson=rows[0] as any;
-    if(!lesson?.file_url)return new NextResponse('Stored lesson file not found.',{status:404});
+    const storedFileUrl=lesson?.file_url||lesson?.video_url;
+    if(!storedFileUrl)return new NextResponse('Stored lesson file not found.',{status:404});
 
-    const fileUrl=new URL(String(lesson.file_url),request.url);
+    const fileUrl=new URL(String(storedFileUrl),request.url);
     if(fileUrl.origin!==new URL(request.url).origin||fileUrl.pathname!=='/api/file')return new NextResponse('Invalid lesson file reference.',{status:404});
     const key=fileUrl.searchParams.get('key')||'';
     if(!key.startsWith(`courses/${lesson.course_id}/`)||key.split('/').length<3)return new NextResponse('Invalid lesson file reference.',{status:404});
