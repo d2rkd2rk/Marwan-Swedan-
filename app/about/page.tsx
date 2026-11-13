@@ -24,6 +24,8 @@ const experience=[
 ];
 
 const projects=[
+ {name:'ZeroTrace',area:'Cybersecurity · Network Analysis',stack:'Open-source network traffic monitoring and suspicious-activity detection tool. Its public project post reports 98.2% model accuracy using a Random Forest classifier trained on a CICIDS2017-like dataset.'},
+ {name:'PASSCHK',area:'Cybersecurity · Password Security',stack:'Open-source password-strength assessment tool for Windows and Linux, designed to help users identify weak passwords and reduce brute-force risk.'},
  {name:'Artifact Hunter',area:'Digital Forensics',stack:'Python · FastAPI · Volatility · Wireshark'},
  {name:'Smart Environmental Regulation & Embedded Robotic Platform',area:'Embedded Systems',stack:'C++ · Embedded C · Arduino'},
  {name:'Optimized Database Application Framework',area:'Web Platform',stack:'JavaScript · SQL · HTML · CSS'},
@@ -40,6 +42,25 @@ const credentials=[
  'MaharaTech — Digital Forensics and Investigations',
  'Cisco — Network Basics Certificate',
  'Cisco — Introduction to Cybersecurity',
+];
+
+const linkedinCredentials=[
+ {name:'Cloud and Virtualization Concepts',issuer:'MaharaTech — ITIMooca',date:'November 2025',id:'0qr8VbhY4q'},
+ {name:'Cybersecurity ITI',issuer:'MaharaTech — ITIMooca',date:'November 2025',id:'ajv5UEcgyB'},
+ {name:'Introduction to Network Security',issuer:'MaharaTech — ITIMooca',date:'November 2025',id:'pZnimaqJr0'},
+ {name:'Network Virtualization Concepts',issuer:'MaharaTech — ITIMooca',date:'November 2025',id:'Spgmab5CdL'},
+ {name:'Red Hat System Administration I',issuer:'MaharaTech — ITIMooca',date:'November 2025',id:'HUOVZY54HW'},
+ {name:'Cisco Python Essentials 1',issuer:'Cisco',date:'August 2025'},
+ {name:'Ethical Hacking',issuer:'Great Learning',date:'August 2025'},
+ {name:'Introduction to Cybersecurity',issuer:'Cisco',date:'August 2025'},
+ {name:'EF SET English Certificate',issuer:'EF SET',date:'December 2024'},
+ {name:'EF SET English Certificate — 62/100 (C1 Advanced)',issuer:'EF SET',date:'Date not displayed'},
+];
+
+const additionalTraining=[
+ 'Advanced Digital Forensics: File Systems, Mobile Devices, and OSINT — MaharaTech / ITI MOOC',
+ 'Digital Forensics: Analyzing Memory and Network Traffic — MaharaTech / ITI MOOC',
+ 'Generative AI program — CIB Egypt Summer Training Program',
 ];
 
 const person={
@@ -68,14 +89,14 @@ const person={
   'Incident Response','Threat Hunting','Digital Forensics','Memory Forensics','Digital Evidence','Open-Source Intelligence (OSINT)',
   'Network Security','PCAP Analysis','Python','C++','JavaScript','SQL','Cybersecurity Education'
  ],
- hasCredential:credentials.map(name=>({
+ hasCredential:[...credentials,...linkedinCredentials.map(item=>item.name)].map(name=>({
   '@type':'EducationalOccupationalCredential',
   name,
   credentialCategory:'certificate'
  })),
  award:[
-  'Ranked among the Top 27 Digital Forensics Investigators and CTF Players across Egypt by ITI in 2026',
-  'Ideal Student recognition, academic year 2025/2026'
+  'Ranked 27th across Egypt with his team in the Global Cyber Champion digital forensics competition, and among the Top 500 competitors worldwide',
+  'Ideal Student recognition, Faculty of Computer Science and Artificial Intelligence, Pharos University in Alexandria, academic year 2025/2026'
  ],
 };
 
@@ -165,7 +186,7 @@ export default function AboutPage(){
    <section className="section compact">
     <div className="eyebrow">Recognition · الإنجازات</div><h2>Highlights</h2>
     <div className="projectGrid">
-     <article className="projectCard"><span>Digital forensics · 2026</span><h3>Top 27 in Egypt</h3><p>Ranked among the Top 27 Digital Forensics Investigators and CTF Players across Egypt by the Information Technology Institute (ITI) in 2026.</p></article>
+     <article className="projectCard"><span>Digital forensics · 2026</span><h3>Top 27 in Egypt · Top 500 worldwide</h3><p>Competed in the Global Cyber Champion competition in the digital forensics track, solving all challenges. His team ranked 27th across Egypt, and he reported an individual placement among the Top 500 competitors worldwide.</p></article>
      <article className="projectCard"><span>Leadership · Sudo Academy</span><h3>Founder & Chairman</h3><p>Founded Sudo Academy and developed cybersecurity, networking, and programming curricula and practical assessment paths, mentoring more than 150 students.</p></article>
      <article className="projectCard"><span>University recognition</span><h3>Ideal Student 2025/2026</h3><p>Recognized as an Ideal Student for the 2025/2026 academic year.</p></article>
     </div>
@@ -186,6 +207,17 @@ export default function AboutPage(){
     <div className="eyebrow">Selected credentials · الشهادات والاعتمادات</div><h2>Selected certifications</h2>
     <p className="muted">The public portfolio currently lists 33 certifications and credentials. The following ten are highlighted here; the landing page intentionally keeps this short selection.</p>
     <div className="certRow">{credentials.map(item=><div className="cert" key={item}>{item}</div>)}</div>
+   </section>
+
+   <section className="section compact">
+    <div className="eyebrow">LinkedIn credentials · شهادات لينكدإن</div><h2>Licenses and certifications</h2>
+    <div className="projectGrid">{linkedinCredentials.map(item=><article className="projectCard" key={item.name}><span>{item.issuer}</span><h3>{item.name}</h3><p>{item.date}{item.id?' · Credential ID: '+item.id:''}</p></article>)}</div>
+   </section>
+
+   <section className="section compact">
+    <div className="eyebrow">Additional training · برامج ودورات إضافية</div><h2>Professional development</h2>
+    <div className="certRow">{additionalTraining.map(item=><div className="cert" key={item}>{item}</div>)}</div>
+    <p className="muted" style={{marginTop:18}}>English proficiency: EF SET 62/100 — C1 Advanced, as displayed on the public LinkedIn profile.</p>
    </section>
 
    <section className="section compact">
