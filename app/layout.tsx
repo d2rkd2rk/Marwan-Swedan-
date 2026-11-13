@@ -23,7 +23,7 @@ export const metadata:Metadata={
  keywords:[
   'PROVENRA','PROVENRA Academy','Cybersecurity Academy','Cybersecurity Courses',
   'Digital Forensics','SOC Analyst','Incident Response','Threat Intelligence',
-  'Security Operations Center','Marwan Swedan'
+  'Security Operations Center','Marwan Swedan','مروان سويدان','Marwan Swaidan','مروان سويدان PROVENRA','Marwan Swedan Cybersecurity'
  ],
  robots:{
   index:true,
@@ -67,8 +67,21 @@ const structuredData=[
   alternateName:'PROVENRA Cybersecurity Academy',
   url:siteUrl,
   description:'A cybersecurity education platform focused on cybersecurity, digital forensics, SOC operations, incident response, and threat intelligence.',
-  founder:{'@type':'Person',name:'Marwan Swedan'},
-  sameAs:['https://www.linkedin.com/in/marwan-swedan'],
+  founder:{'@id':siteUrl+'/#person'},
+ },
+ {
+  '@context':'https://schema.org',
+  '@type':'Person',
+  '@id':siteUrl+'/#person',
+  name:'Marwan Swedan',
+  alternateName:['مروان سويدان','Marwan Swaidan'],
+  url:siteUrl,
+  image:siteUrl+'/images/profile.jpg',
+  jobTitle:'Cybersecurity Analyst and Digital Forensics Practitioner',
+  description:'Marwan Swedan (مروان سويدان) is an Egyptian cybersecurity learner and practitioner focused on digital forensics, SOC operations, incident response, and cybersecurity education. Founder of PROVENRA.',
+  worksFor:{'@type':'Organization','name':'PROVENRA','url':siteUrl},
+  sameAs:['https://eg.linkedin.com/in/marwan-swedan'],
+  knowsAbout:['Cybersecurity','Digital Forensics','Security Operations Center','Incident Response','Threat Intelligence','Cybersecurity Education'],
  },
  {
   '@context':'https://schema.org',
