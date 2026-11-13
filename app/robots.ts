@@ -6,7 +6,7 @@ export default function robots():MetadataRoute.Robots{
  return {
   rules:{
    userAgent:'*',
-   allow:'/',
+   allow:['/','/courses'],
    disallow:[
     '/api/',
     '/admin',
@@ -16,7 +16,6 @@ export default function robots():MetadataRoute.Robots{
     '/register',
     '/forgot-password',
     '/auth',
-    '/courses',
     '/paths',
     '/course',
    ],
