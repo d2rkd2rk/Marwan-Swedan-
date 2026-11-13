@@ -1,5 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
-<title>PROVENRA</title><defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5efdf"/><stop offset="1" stop-color="#bca779"/></linearGradient></defs>
-<rect width="512" height="512" rx="112" fill="#06111a" stroke="#29333a" stroke-width="4"/>
-<path d="M145 92h93c111 0 166 53 166 146S343 390 231 390h-38v72h-48V92Zm48 44v210h38c81 0 124-34 124-108S315 136 234 136h-41Z" fill="url(#gold)"/>
-</svg>
+<title>PROVENRA fingerprint shield</title>
+<defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5efdf"/><stop offset="1" stop-color="#b18d51"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="#0a1016" stroke="#34332c" stroke-width="4"/>
+<path d="M256 54 420 116v126c0 112-65 194-164 246C157 436 92 354 92 242V116L256 54Z" fill="#111a22" stroke="url(#gold)" stroke-width="12" stroke-linejoin="round"/>
+<g fill="none" stroke="url(#gold)" stroke-width="13" stroke-linecap="round">
+<path d="M164 235c0-57 39-98 92-98s92 41 92 98"/>
+<path d="M190 248c0-43 26-70 66-70s66 27 66 70c0 57-18 100-51 138"/>
+<path d="M215 248c0-25 15-43 41-43s41 18 41 43c0 64-12 99-37 134"/>
+<path d="M245 248c0-12 4-19 11-19s11 7 11 19c0 57-4 91-18 119"/>
+<path d="M142 262c0 68 18 122 54 164"/>
+<path d="M370 262c0 48-11 91-32 125"/>
+</g></svg>
