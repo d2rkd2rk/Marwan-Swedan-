@@ -53,7 +53,7 @@ export const metadata:Metadata={
  },
  twitter:{
   card:'summary_large_image',
-  title:'PROVENRA | Cybersecurity & Digital Forensics Academy',
+  title:'PROVENRA',
   description:'Practical cybersecurity and digital forensics education by PROVENRA.',
   images:[{url:'/images/profile.jpg',alt:'PROVENRA — Cybersecurity & Digital Forensics Academy'}],
  },
