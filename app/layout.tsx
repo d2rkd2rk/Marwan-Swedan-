@@ -67,6 +67,7 @@ const structuredData=[
   alternateName:'PROVENRA Cybersecurity Academy',
   url:siteUrl,
   description:'A cybersecurity education platform focused on cybersecurity, digital forensics, SOC operations, incident response, and threat intelligence.',
+  logo:siteUrl+'/images/provenra-app-icon-v2.svg',
   founder:{'@id':siteUrl+'/#person'},
  },
  {
@@ -92,9 +93,9 @@ const structuredData=[
   '@context':'https://schema.org',
   '@type':'WebSite',
   name:'PROVENRA',
-  alternateName:'PROVENRA Academy',
+  alternateName:['PROVENRA Academy','PROVENRA Cybersecurity'],
   url:siteUrl,
-  description:'Cybersecurity and digital forensics education.',
+  description:'PROVENRA is a cybersecurity and digital forensics academy founded by Marwan Swedan.',
  },
 ];
 
