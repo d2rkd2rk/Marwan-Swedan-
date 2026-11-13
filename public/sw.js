@@ -1,4 +1,4 @@
-const SW_VERSION='provenra-push-v3';
+const SW_VERSION='provenra-push-v4';
 
 self.addEventListener('install',event=>{
  event.waitUntil(self.skipWaiting());
