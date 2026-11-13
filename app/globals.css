@@ -138,3 +138,76 @@
 .coursePriceHighlight{display:inline-flex;align-items:center;justify-content:center;position:relative;width:max-content;max-width:100%;margin-top:16px;padding:8px 13px;border:1px solid rgba(198,166,106,.45);border-radius:10px;background:linear-gradient(120deg,rgba(157,126,73,.16),rgba(198,166,106,.07));color:#d5bd86;font-family:'Space Grotesk',sans-serif;font-size:clamp(17px,2vw,21px);font-weight:800;letter-spacing:-.025em;text-shadow:0 0 16px rgba(198,166,106,.45);box-shadow:0 0 0 1px rgba(198,166,106,.04),0 0 20px rgba(157,126,73,.13);animation:coursePriceGlow 3.4s ease-in-out infinite}
 @keyframes coursePriceGlow{0%,100%{box-shadow:0 0 0 1px rgba(198,166,106,.04),0 0 14px rgba(157,126,73,.10);text-shadow:0 0 12px rgba(198,166,106,.32)}50%{box-shadow:0 0 0 1px rgba(198,166,106,.10),0 0 24px rgba(157,126,73,.23);text-shadow:0 0 18px rgba(198,166,106,.58)}}
 @media(prefers-reduced-motion:reduce){.coursePriceHighlight{animation:none}}
+
+
+/* PROVENRA fingerprint identity + consistent landscape certificates */
+.certificateCard{aspect-ratio:297/210!important;background:#f5f0e4!important;border-color:#d2b477!important}
+.certificateInner{padding:4.2% 6.4% 4.2%!important}
+.certificateAcademy{color:#18232b!important;letter-spacing:.32em!important}
+.certificateHeading{color:#18232b!important}
+.certificateName,.certificateCourse{color:#18232b!important}
+.certificateGoldLine,.certificateFooterLine{background:#b18d51!important}
+.certificateEmblem{display:none!important}
+.certificateFingerprintSeal{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.certificateFingerprintSeal svg{width:clamp(58px,6vw,88px);height:clamp(68px,7vw,102px);filter:drop-shadow(0 5px 12px rgba(177,141,81,.18))}
+.certificateFingerprintSeal span{font:700 clamp(7px,.62vw,10px) 'Space Grotesk',sans-serif;letter-spacing:.22em;color:#18232b}
+.pathCertificateCard{aspect-ratio:297/210!important;min-height:0!important;height:auto!important;grid-template-columns:62% 38%!important;border:1px solid #b18d51!important;border-radius:0!important;background:#f5f0e4!important;box-shadow:0 22px 65px rgba(0,0,0,.28)!important}
+.pathCertificateLeft{padding:5% 6% 4%!important;background:#f5f0e4!important;color:#18232b!important;clip-path:polygon(0 0,91% 0,100% 50%,91% 100%,0 100%)!important;display:flex;flex-direction:column;justify-content:center}
+.pathCertificateTitle{font-size:clamp(30px,3.4vw,52px)!important;color:#18232b!important;letter-spacing:.02em!important}
+.pathCertificateTitle span{display:inline!important;font-size:.48em!important;color:#b18d51!important;margin-left:8px!important}
+.pathCertificatePathTitle{color:#8f713e!important;font-size:clamp(18px,2vw,29px)!important;margin-top:8px!important}
+.pathCertificateIntro{margin-top:3%!important;color:#716b5f!important;font-size:clamp(12px,1.15vw,16px)!important}
+.pathCertificateName{font-size:clamp(27px,3.2vw,48px)!important;color:#18232b!important}
+.pathCertificateBody{margin-top:3%!important;font-size:clamp(11px,1vw,14px)!important;color:#34332c!important}
+.pathCertificateBody strong{font-size:clamp(17px,1.7vw,24px)!important;color:#8f713e!important}
+.pathCertificateBody p{font-size:clamp(10px,.85vw,12px)!important;color:#716b5f!important}
+.pathCertificateMeta{margin-top:auto!important;padding-top:3%!important;gap:8%!important}
+.pathCertificateMeta span,.pathCertificateMeta b,.pathCertificateSignature em,.pathCertificateSignature span{color:#34332c!important}
+.pathCertificateSignature i{border-color:#b18d51!important}
+.pathCertificateArt{background:radial-gradient(circle at 50% 45%,rgba(210,180,119,.18),transparent 38%),linear-gradient(145deg,#18232b,#0a1016 76%)!important}
+.pathCertificateArt:before{background:linear-gradient(135deg,transparent 0 48%,rgba(177,141,81,.12) 48.1% 100%)!important;opacity:1!important}
+.pathCertificateBrandMark{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.pathCertificateBrandMark svg{width:min(42%,190px);height:auto;filter:drop-shadow(0 0 30px rgba(210,180,119,.2))}
+.pathCertificateBrandMark b{font:600 clamp(17px,2.2vw,30px) 'Space Grotesk',sans-serif;letter-spacing:.28em;color:#f5f0e4}
+.pathCertificateBrandMark span{font-size:clamp(6px,.6vw,9px);letter-spacing:.2em;color:#d2b477;text-align:center}
+@media(max-width:760px){
+ .pathCertificateCard{grid-template-columns:62% 38%!important;min-height:0!important}
+ .pathCertificateLeft{padding:5% 6%!important}
+ .pathCertificateArt{min-height:0!important}
+ .pathCertificateMeta{gap:4%!important}
+ .pathCertificateSignature{min-width:100px!important}
+ .pathCertificateSignature i{width:100px!important}
+ .pathCertificateTitle{font-size:clamp(16px,3.8vw,28px)!important}
+ .pathCertificatePathTitle{font-size:clamp(11px,2.5vw,18px)!important}
+ .pathCertificateIntro{font-size:clamp(8px,1.8vw,12px)!important}
+ .pathCertificateName{font-size:clamp(15px,3.3vw,25px)!important}
+ .pathCertificateBody{font-size:clamp(7px,1.5vw,11px)!important}
+ .pathCertificateBody strong{font-size:clamp(9px,1.9vw,15px)!important}
+ .pathCertificateBody p{font-size:clamp(6px,1.25vw,9px)!important}
+ .pathCertificateSignature em{font-size:clamp(15px,2.6vw,23px)!important}
+ .pathCertificateSignature span,.pathCertificateMeta span{font-size:clamp(6px,1.2vw,9px)!important}
+}
+@media print{
+ .certificateCard,.pathCertificateCard{width:297mm!important;height:210mm!important;aspect-ratio:auto!important}
+ .pathCertificateCard{grid-template-columns:62% 38%!important}
+ .pathCertificateLeft{padding:15mm 17mm 12mm!important}
+}
+
+@media(max-width:700px){
+ .certificateCard{min-height:0!important}
+ .certificateInner{padding:4.2% 6.4%!important}
+ .certificateContent{padding-top:4.8%!important}
+ .certificateHeading{font-size:clamp(12px,3.2vw,20px)!important}
+ .certificatePresented{font-size:clamp(6px,1.5vw,9px)!important;margin-top:3%!important}
+ .certificateName{font-size:clamp(15px,4.2vw,27px)!important}
+ .certificateCompleted{font-size:clamp(7px,1.8vw,11px)!important;margin-top:2.8%!important}
+ .certificateCourse{font-size:clamp(11px,2.8vw,18px)!important}
+ .certificateDescription{font-size:clamp(6px,1.5vw,9px)!important;margin-top:2%!important}
+ .certificateFooter{min-height:18%!important}
+ .certificateDate{font-size:clamp(6px,1.6vw,10px)!important}
+ .certificateFooterLabel{font-size:clamp(5px,1.1vw,7px)!important}
+ .certificateFingerprintSeal svg{width:clamp(24px,6vw,42px)!important;height:clamp(28px,7vw,50px)!important}
+ .certificateFingerprintSeal span{font-size:clamp(4px,.9vw,6px)!important}
+ .certificateSignature{font-size:clamp(12px,2.8vw,20px)!important}
+ .certificateRole,.certificateId{font-size:clamp(4px,.8vw,6px)!important}
+}

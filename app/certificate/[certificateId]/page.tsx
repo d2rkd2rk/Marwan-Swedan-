@@ -21,6 +21,21 @@ export async function generateMetadata({params}:{params:Promise<{certificateId:s
   };
 }
 
+function ProvenraFingerprintMark({className=''}:{className?:string}){
+  return <svg className={className} viewBox="0 0 120 140" role="img" aria-label="PROVENRA fingerprint shield">
+    <defs><linearGradient id="provenraGold" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#f0dfb4"/><stop offset="1" stopColor="#b18d51"/></linearGradient></defs>
+    <path d="M60 5 108 23v38c0 33-19 57-48 73C31 118 12 94 12 61V23L60 5Z" fill="#0a1016" stroke="url(#provenraGold)" strokeWidth="3"/>
+    <g fill="none" stroke="url(#provenraGold)" strokeWidth="3.2" strokeLinecap="round">
+      <path d="M35 61c0-16 11-28 25-28s25 12 25 28"/>
+      <path d="M42 65c0-12 7-20 18-20s18 8 18 20c0 16-5 28-14 39"/>
+      <path d="M49 65c0-7 4-12 11-12s11 5 11 12c0 18-3 28-10 38"/>
+      <path d="M57 65c0-3 1-5 3-5s3 2 3 5c0 16-1 25-5 33"/>
+      <path d="M29 69c0 19 5 34 15 45"/>
+      <path d="M91 69c0 13-3 25-9 34"/>
+    </g>
+  </svg>;
+}
+
 function CourseEmblem({title}:{title:string}){
   const t=title.toLowerCase();
   let mark='COURSE';
@@ -102,7 +117,7 @@ export default async function CertificatePage({params}:{params:Promise<{certific
               </div>
 
               <div className="certificateLogoBlock">
-                <CourseEmblem title={cert.title}/>
+                <div className="certificateFingerprintSeal"><ProvenraFingerprintMark/><span>PROVENRA</span></div>
               </div>
 
               <div className="certificateFooterBlock certificateSignatureBlock">
