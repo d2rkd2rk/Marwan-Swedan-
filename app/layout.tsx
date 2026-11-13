@@ -21,7 +21,7 @@ export const metadata:Metadata={
  creator:'Marwan Swedan',
  publisher:'PROVENRA',
  manifest:'/manifest.json',
- themeColor:'#06111a',
+ themeColor:'#0a1016',
  appleWebApp:{
   capable:true,
   statusBarStyle:'black-translucent',
