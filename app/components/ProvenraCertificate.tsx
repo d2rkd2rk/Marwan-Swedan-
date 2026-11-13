@@ -20,6 +20,7 @@ export default function ProvenraCertificate({name,title,date,kind}:Props) {
         sizes="(max-width: 900px) 100vw, 1180px"
         className={styles.artwork}
       />
+      <div className={styles.nameplate} aria-hidden="true" />
       <div className={styles.recipient}>{name}</div>
       <div className={styles.completion}>
         <span>has successfully completed {kind === 'course' ? 'the course' : 'the learning path'}</span>
