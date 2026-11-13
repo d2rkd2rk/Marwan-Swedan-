@@ -268,3 +268,25 @@
  .certificateSection,.pathCertificateSection{padding:0!important}
  .provenraCertificate{width:297mm!important;height:210mm!important;aspect-ratio:auto!important;border-radius:0!important;box-shadow:none!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
+
+/* Use the exact approved certificate artwork as the shared course/path template. */
+.provenraCertificate{position:relative!important;isolation:isolate;width:100%!important;aspect-ratio:1672/941!important;height:auto!important;min-height:0!important;overflow:hidden!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:#030b18!important;color:#f5f0df!important}
+.provenraCertificate:before,.provenraCertificate:after{display:none!important}
+.provenraCertificateArtwork{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:fill!important;display:block!important;z-index:0!important}
+.provenraCertificateStudent{position:absolute!important;z-index:2!important;left:15%!important;right:15%!important;top:43.5%!important;height:8.5%!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;font-family:'Great Vibes',cursive!important;font-size:clamp(30px,5.2vw,76px)!important;line-height:1!important;color:#e9c76c!important;text-shadow:0 2px 8px rgba(0,0,0,.7),0 0 15px rgba(225,178,74,.25)!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+.provenraCertificateCompletion{position:absolute!important;z-index:2!important;left:18%!important;right:18%!important;top:59.5%!important;text-align:center!important;font-size:clamp(9px,1.25vw,17px)!important;font-weight:500!important;letter-spacing:.04em!important;color:#e9edf4!important;text-shadow:0 2px 5px #000!important}
+.provenraCertificateTitle{position:absolute!important;z-index:2!important;left:15%!important;right:15%!important;top:63%!important;text-align:center!important;font-size:clamp(11px,1.75vw,24px)!important;font-weight:700!important;line-height:1.2!important;color:#f4d889!important;text-shadow:0 2px 7px #000!important;max-height:6%!important;overflow:hidden!important}
+.provenraCertificateDate{position:absolute!important;z-index:2!important;left:35%!important;right:35%!important;top:68%!important;text-align:center!important;font-size:clamp(8px,1vw,13px)!important;color:#e7d9b5!important;text-shadow:0 2px 5px #000!important}
+@media(max-width:650px){
+ .provenraCertificateStudent{font-size:clamp(18px,5.2vw,34px)!important}
+ .provenraCertificateCompletion{font-size:clamp(6px,1.4vw,9px)!important}
+ .provenraCertificateTitle{font-size:clamp(7px,1.8vw,12px)!important}
+ .provenraCertificateDate{font-size:clamp(5px,1vw,7px)!important}
+}
+@media print{
+ @page{size:landscape;margin:0}
+ .shell{width:100%!important;margin:0!important}
+ .nav,.certificateActionsBar{display:none!important}
+ .certificateSection,.pathCertificateSection{padding:0!important}
+ .provenraCertificate{width:100vw!important;height:56.46vw!important;max-height:100vh!important;aspect-ratio:1672/941!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+}
