@@ -20,10 +20,10 @@
 .cursorGlow{position:fixed;left:0;top:0;width:280px;height:280px;border-radius:50%;pointer-events:none;z-index:2;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(192,132,252,.09),transparent 65%);filter:blur(4px)}
 .heroCinematic{min-height:calc(100vh - 74px);height:780px;grid-template-columns:1.04fr .96fr;overflow:visible}
 .heroCinematic:before{background:radial-gradient(circle at 78% 44%,rgba(192,132,252,.18),transparent 28%),linear-gradient(90deg,#090611 0%,rgba(9,6,17,.9) 44%,rgba(9,6,17,.2) 100%)}
-.heroCinematic:after{content:'MS';position:absolute;right:-4%;bottom:-7%;font-family:'Space Grotesk';font-size:clamp(180px,31vw,480px);font-weight:700;letter-spacing:-.13em;line-height:.75;color:rgba(216,180,254,.025);pointer-events:none}
+.heroCinematic:after{content:'PR';position:absolute;right:-4%;bottom:-7%;font-family:'Space Grotesk';font-size:clamp(180px,31vw,480px);font-weight:700;letter-spacing:-.13em;line-height:.75;color:rgba(216,180,254,.025);pointer-events:none}
 .heroKicker{position:absolute;top:38px;left:0;z-index:4;font-size:9px;letter-spacing:.2em;color:#cbb9dd;border-left:2px solid #c084fc;padding-left:10px}
 .heroIndex{font-size:9px;color:#786b86;letter-spacing:.16em;margin-bottom:18px}
-.heroTitle{font-family:'Space Grotesk',sans-serif!important;font-size:clamp(72px,9vw,142px)!important;line-height:.78!important;letter-spacing:-.09em!important;margin:0 0 30px!important;display:flex;flex-direction:column;text-transform:uppercase!important;max-width:none!important}
+.heroTitle{font-family:'Space Grotesk',sans-serif!important;font-size:clamp(58px,8.4vw,128px)!important;line-height:1!important;letter-spacing:-.075em!important;margin:0 0 30px!important;display:block;white-space:nowrap;text-transform:uppercase!important;max-width:none!important}
 .heroTitle span{color:#f8f5ff!important;background:none!important;-webkit-text-fill-color:initial}
 .heroTitle em{font-style:normal;color:#c084fc}
 .heroLead{max-width:510px!important;font-size:14px!important;line-height:1.8!important;color:#aaa0b8!important}

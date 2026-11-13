@@ -80,7 +80,7 @@ export default async function Landing(){
     <div className={s.heroKicker}><span className={s.dot}/>CYBERSECURITY · BUILDER · EDUCATOR</div>
     <div className={s.copy}>
       <div className={s.heroIndex}>01 / INTRO</div>
-      <h1 className={s.heroTitle}><span>PROVEN</span><em>RA</em></h1>
+      <h1 className={s.heroTitle}>PROVENRA</h1>
       <p className={s.heroLead}>Cybersecurity analyst building practical skills, digital-forensics experience and an academy for the next generation of tech learners.</p>
       <div className={s.actions}><Link className={s.primary+' '+s.btn} href="/courses">Enter Academy <span>↗</span></Link><Link className={s.btn} href="/paths">Explore Paths <span>↗</span></Link><a className={s.btn} href="#experience">Explore Portfolio <span>↓</span></a></div>
     </div>
