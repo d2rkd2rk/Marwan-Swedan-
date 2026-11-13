@@ -1,4 +1,4 @@
-const SW_VERSION='provenra-push-v4';
+const SW_VERSION='provenra-push-v5';
 
 self.addEventListener('install',event=>{
  event.waitUntil(self.skipWaiting());
@@ -20,8 +20,8 @@ self.addEventListener('push',event=>{
   try{
    await self.registration.showNotification(data.title,{
     body:data.body,
-    icon:'/images/marwan-app-icon.svg',
-    badge:'/images/marwan-app-icon.svg',
+    icon:'/images/provenra-app-icon-v2.svg',
+    badge:'/images/provenra-app-icon-v2.svg',
     data:{url:data.url||'/'},
     tag:data.tag||'provenra',
     requireInteraction:false
