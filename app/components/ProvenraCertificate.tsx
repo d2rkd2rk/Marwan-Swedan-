@@ -8,6 +8,10 @@ type Props = {
   kind: 'course' | 'path';
 };
 
+function formatRecipientName(value:string){
+  return value.replace(/(^|[\\s-])([a-z])/g,(_match,separator,letter)=>separator+letter.toUpperCase());
+}
+
 export default function ProvenraCertificate({name,title,date,kind}:Props) {
   return (
     <article className={styles.certificate}>
@@ -21,7 +25,7 @@ export default function ProvenraCertificate({name,title,date,kind}:Props) {
         className={styles.artwork}
       />
       <div className={styles.nameplate} aria-hidden="true" />
-      <div className={styles.recipient}>{name}</div>
+      <div className={styles.recipient}>{formatRecipientName(name)}</div>
       <div className={styles.completion}>
         <span>has successfully completed {kind === 'course' ? 'the course' : 'the learning path'}</span>
         <strong>{title}</strong>
