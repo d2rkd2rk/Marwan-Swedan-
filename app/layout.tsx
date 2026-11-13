@@ -28,9 +28,9 @@ export const metadata:Metadata={
   title:'PROVENRA',
  },
  icons:{
-  icon:'/images/marwan-app-icon.svg',
-  shortcut:'/images/marwan-app-icon.svg',
-  apple:{url:'/images/marwan-app-icon.svg',sizes:'512x512',type:'image/svg+xml'},
+  icon:'/images/provenra-app-icon-v2.svg',
+  shortcut:'/images/provenra-app-icon-v2.svg',
+  apple:{url:'/images/provenra-app-icon-v2.svg',sizes:'512x512',type:'image/svg+xml'},
  },
  openGraph:{
   type:'website',
@@ -43,7 +43,7 @@ export const metadata:Metadata={
  },
  twitter:{
   card:'summary_large_image',
-  title:'Marwan Swedan | Cybersecurity & Digital Forensics',
+  title:'PROVENRA | Cybersecurity & Digital Forensics',
   description:'Cybersecurity, digital forensics, SOC operations, threat intelligence, and practical security education.',
   images:[{url:'/images/profile.jpg',alt:'Marwan Swedan'}],
  },
