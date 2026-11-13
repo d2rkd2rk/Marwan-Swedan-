@@ -192,7 +192,7 @@ export default function PWAInstallPrompt(){
  return <div className="pwaInstallOverlay">
   <div className="pwaInstallCard" role="dialog" aria-modal="true" aria-label="PROVENRA install and notification prompt">
    {closeAllowed&&<button className="pwaInstallClose" type="button" aria-label="Close" onClick={complete}>×</button>}
-   <div className="pwaInstallIcon"><img src="/images/marwan-app-icon.svg" alt="" width="56" height="56"/></div>
+   <div className="pwaInstallIcon"><img src="/images/provenra-app-icon-v2.svg" alt="" width="56" height="56"/></div>
    <div className="pwaInstallCopy">
     <div className="eyebrow">PROVENRA</div>
     <h3>{iosInstallMode?'Install the Academy':unsupportedMode?'Update iOS to Enable Notifications':loggedIn?'Enable Academy Notifications':'Install the Academy'}</h3>
