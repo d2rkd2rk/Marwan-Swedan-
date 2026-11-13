@@ -192,3 +192,22 @@
  .pathCertificateCard{grid-template-columns:62% 38%!important}
  .pathCertificateLeft{padding:15mm 17mm 12mm!important}
 }
+
+@media(max-width:700px){
+ .certificateCard{min-height:0!important}
+ .certificateInner{padding:4.2% 6.4%!important}
+ .certificateContent{padding-top:4.8%!important}
+ .certificateHeading{font-size:clamp(12px,3.2vw,20px)!important}
+ .certificatePresented{font-size:clamp(6px,1.5vw,9px)!important;margin-top:3%!important}
+ .certificateName{font-size:clamp(15px,4.2vw,27px)!important}
+ .certificateCompleted{font-size:clamp(7px,1.8vw,11px)!important;margin-top:2.8%!important}
+ .certificateCourse{font-size:clamp(11px,2.8vw,18px)!important}
+ .certificateDescription{font-size:clamp(6px,1.5vw,9px)!important;margin-top:2%!important}
+ .certificateFooter{min-height:18%!important}
+ .certificateDate{font-size:clamp(6px,1.6vw,10px)!important}
+ .certificateFooterLabel{font-size:clamp(5px,1.1vw,7px)!important}
+ .certificateFingerprintSeal svg{width:clamp(24px,6vw,42px)!important;height:clamp(28px,7vw,50px)!important}
+ .certificateFingerprintSeal span{font-size:clamp(4px,.9vw,6px)!important}
+ .certificateSignature{font-size:clamp(12px,2.8vw,20px)!important}
+ .certificateRole,.certificateId{font-size:clamp(4px,.8vw,6px)!important}
+}
