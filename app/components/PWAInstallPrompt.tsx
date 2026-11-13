@@ -57,7 +57,24 @@ export default function PWAInstallPrompt(){
     setIosPushSupported(iosPushOK);
 
     if('serviceWorker' in navigator){
-     await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});
+     const hadController=Boolean(navigator.serviceWorker.controller);
+     sessionStorage.removeItem('provenra_sw_reload_pending_v1');
+     const onControllerChange=()=>{
+      if(!hadController||sessionStorage.getItem('provenra_sw_reload_pending_v1')==='1')return;
+      sessionStorage.setItem('provenra_sw_reload_pending_v1','1');
+      window.location.reload();
+     };
+     if(hadController)navigator.serviceWorker.addEventListener('controllerchange',onControllerChange);
+     const registration=await navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'});
+     void registration.update().catch(()=>{});
+     const checkForUpdate=()=>{
+      if(document.visibilityState==='visible')void registration.update().catch(()=>{});
+     };
+     document.addEventListener('visibilitychange',checkForUpdate);
+     cleanupListeners=()=>{
+      document.removeEventListener('visibilitychange',checkForUpdate);
+      navigator.serviceWorker.removeEventListener('controllerchange',onControllerChange);
+     };
     }
 
     if(userLoggedIn){
