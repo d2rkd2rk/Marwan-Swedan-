@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Marwan Swedan Academy",
-  "short_name": "Marwan Academy",
-  "description": "Cybersecurity courses and learning platform by Marwan Swedan.",
+  "name": "PROVENRA",
+  "short_name": "PROVENRA",
+  "description": "Cybersecurity, digital forensics, and threat intelligence education.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -204,7 +204,7 @@ export default function VideoPlayer({src,savedSeconds=0,onTimeUpdate,onPause,onE
       onDoubleClick={handleVideoDoubleTap}
       onPause={()=>{if(videoRef.current)onPause?.(videoRef.current.currentTime)}}
     />
-    <div className="videoWatermark" aria-hidden="true"><div>PROTECTED CONTENT • MARWAN SWEDAN ACADEMY</div><div className="videoWatermarkUser">{typeof window !== "undefined" ? (document.body.dataset.username || "") : ""}</div></div>
+    <div className="videoWatermark" aria-hidden="true"><div>PROTECTED CONTENT • PROVENRA</div><div className="videoWatermarkUser">{typeof window !== "undefined" ? (document.body.dataset.username || "") : ""}</div></div>
     {seekFeedback&&<div className={`videoSeekFeedback ${seekFeedback}`} aria-hidden="true">{seekFeedback==='forward'?'⏩ +5':'⏪ -5'}</div>}
     {captureWarning&&<div className="captureShield" role="status" aria-live="polite">Screenshot / screen capture is disabled here.</div>}
     {downloadMessage&&<div className="downloadNotice" role="status" aria-live="polite">ممنوع الداونلوود يا سكر انا بتاع سكيوريتي مش بتاع كفتة😍</div>}

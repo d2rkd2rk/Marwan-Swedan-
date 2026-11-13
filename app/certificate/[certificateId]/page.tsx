@@ -13,10 +13,10 @@ export async function generateMetadata({params}:{params:Promise<{certificateId:s
   const {certificateId}=await params;
   await ensureCertificateFlag();
   const rows=await db`select u.name,c.title from course_certificates cc join users u on u.id=cc.user_id join courses c on c.id=cc.course_id where cc.certificate_id=${certificateId} and c.published=true and c.certificate_enabled=true limit 1`;
-  if(!rows.length)return {title:'Certificate | Marwan Swedan'};
+  if(!rows.length)return {title:'Certificate | PROVENRA'};
   const cert=rows[0] as any;
   return {
-    title:`Certificate — ${cert.name} | Marwan Swedan`,
+    title:`Certificate — ${cert.name} | PROVENRA`,
     description:`Verified certificate of completion for ${cert.title}.`
   };
 }
@@ -75,7 +75,7 @@ export default async function CertificatePage({params}:{params:Promise<{certific
 
           <div className="certificateInner">
             <header className="certificateHeader">
-              <div className="certificateAcademy">MARWAN SWEDAN ACADEMY</div>
+              <div className="certificateAcademy">PROVENRA</div>
               <div className="certificateTagline">LEARN <span>•</span> BUILD <span>•</span> GROW</div>
             </header>
 

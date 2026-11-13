@@ -47,7 +47,7 @@ export function AuthForm({mode}:{mode:'login'|'register'}){
  ];
 
  return <div className="form">
-  <Link className="brand" href="/">Marwan <span>Swedan</span></Link>
+  <Link className="brand" href="/">PROVENRA</Link>
   <div className="eyebrow" style={{marginTop:30}}>Private Academy</div>
   <h1>{verificationEmail?'Check your email':mode==='login'?'Welcome back.':'Create your account.'}</h1>
   <p className="muted">{verificationEmail?'Verify your email address to activate your academy account.':mode==='login'?'Sign in with your email or username and password.':'Create one account for the academy, courses and your profile.'}</p>

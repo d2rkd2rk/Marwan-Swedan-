@@ -1,4 +1,4 @@
-const SW_VERSION='msa-push-v2';
+const SW_VERSION='provenra-push-v3';
 
 self.addEventListener('install',event=>{
  event.waitUntil(self.skipWaiting());
@@ -9,7 +9,7 @@ self.addEventListener('activate',event=>{
 });
 
 self.addEventListener('push',event=>{
- const fallback={title:'Marwan Swedan Academy',body:'You have a new update.',url:'/'};
+ const fallback={title:'PROVENRA',body:'You have a new update.',url:'/'};
  let data=fallback;
  try{
   if(event.data)data={...fallback,...event.data.json()};
@@ -23,7 +23,7 @@ self.addEventListener('push',event=>{
     icon:'/images/marwan-app-icon.svg',
     badge:'/images/marwan-app-icon.svg',
     data:{url:data.url||'/'},
-    tag:data.tag||'marwan-academy',
+    tag:data.tag||'provenra',
     requireInteraction:false
    });
   }catch(error){

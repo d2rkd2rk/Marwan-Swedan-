@@ -13,15 +13,15 @@ export const dynamic = 'force-dynamic';
 const siteUrl='https://marwanswedan.online';
 
 export const metadata:Metadata={
- title:{absolute:'Marwan Swedan | Cybersecurity & Digital Forensics'},
- description:'Meet Marwan Swedan (مروان سويدان), a cybersecurity analyst in Egypt focused on SOC operations, digital forensics, incident response, networking, and practical technology education.',
+ title:{absolute:'PROVENRA | Cybersecurity & Digital Forensics'},
+ description:'PROVENRA is a cybersecurity learning platform focused on digital forensics, threat intelligence, SOC operations, and practical security education.',
  alternates:{canonical:'/'},
  robots:{index:true,follow:true},
  openGraph:{
   type:'website',
-  siteName:'Marwan Swedan Academy',
-  title:'Marwan Swedan | Cybersecurity & Digital Forensics',
-  description:'Cybersecurity, digital forensics, SOC operations, and practical technology education by Marwan Swedan in Egypt.',
+  siteName:'PROVENRA',
+  title:'PROVENRA | Cybersecurity & Digital Forensics',
+  description:'Cybersecurity, digital forensics, SOC operations, threat intelligence, and practical security education.',
   url:siteUrl,
   locale:'en_US',
   images:[{url:'/images/profile.jpg',alt:'Marwan Swedan'}],
@@ -29,7 +29,7 @@ export const metadata:Metadata={
  twitter:{
   card:'summary_large_image',
   title:'Marwan Swedan | Cybersecurity & Digital Forensics',
-  description:'Cybersecurity, digital forensics, SOC operations, and practical technology education by Marwan Swedan.',
+  description:'Cybersecurity, digital forensics, SOC operations, threat intelligence, and practical security education.',
   images:[{url:'/images/profile.jpg',alt:'Marwan Swedan'}],
  },
 };
@@ -54,8 +54,8 @@ const structuredData={
   {
    '@type':'WebSite',
    '@id':siteUrl+'/#website',
-   name:'Marwan Swedan Academy',
-   alternateName:'Marwan Swedan',
+   name:'PROVENRA',
+   alternateName:'PROVENRA',
    url:siteUrl,
    inLanguage:'en',
    publisher:{'@id':siteUrl+'/#person'},
@@ -80,7 +80,7 @@ export default async function Landing(){
     <div className={s.heroKicker}><span className={s.dot}/>CYBERSECURITY · BUILDER · EDUCATOR</div>
     <div className={s.copy}>
       <div className={s.heroIndex}>01 / INTRO</div>
-      <h1 className={s.heroTitle}><span>MARWAN</span><em>SWEDAN</em></h1>
+      <h1 className={s.heroTitle}><span>PROVEN</span><em>RA</em></h1>
       <p className={s.heroLead}>Cybersecurity analyst building practical skills, digital-forensics experience and an academy for the next generation of tech learners.</p>
       <div className={s.actions}><Link className={s.primary+' '+s.btn} href="/courses">Enter Academy <span>↗</span></Link><Link className={s.btn} href="/paths">Explore Paths <span>↗</span></Link><a className={s.btn} href="#experience">Explore Portfolio <span>↓</span></a></div>
     </div>
@@ -98,7 +98,7 @@ export default async function Landing(){
 
    {courses.length>0&&<section className={s.section+' '+s.courseStage}>
     <div className={s.sectionHead}><div><div className={s.label}>03 / ACADEMY</div><h2>Latest courses<span>.</span></h2></div><Link className={s.view} href="/courses">View all ↗</Link></div>
-    <div className={s.courses}>{courses.map((c:any,i:number)=>{const content=<><div className={s.courseNo}>0{i+1}</div><div className={s.courseImg}><CourseThumbnail src={c.thumbnail_url} alt={c.title} category={c.category}/><span className={s.badge}>{c.level||'Beginner'}</span>{user&&<span className={s.courseArrow}>↗</span>}</div><div className={s.courseBody}><h3>{c.title}</h3>{user&&<p>{c.description||'Practical training from Marwan Swedan Academy.'}</p>}<div className={s.meta}>{user&&<span>{c.lesson_count} LESSONS</span>}<span>{c.duration_minutes?(Math.floor(c.duration_minutes/60)+'H '+(c.duration_minutes%60)+'M'):'SELF-PACED'}</span></div><strong className={s.coursePriceHighlight}>{c.is_free?'Free':Number(c.price||0).toLocaleString()+' EGP'}</strong></div></>;return user?<Link href={'/courses/'+c.slug} className={s.course+' '+s.courseCard} key={c.id}>{content}</Link>:<article className={s.course+' '+s.courseCard} key={c.id}>{content}<div className={s.coursePublicAction}><Link className={s.btn} href="/login">LOG IN TO ACCESS ↗</Link></div></article>})}</div>
+    <div className={s.courses}>{courses.map((c:any,i:number)=>{const content=<><div className={s.courseNo}>0{i+1}</div><div className={s.courseImg}><CourseThumbnail src={c.thumbnail_url} alt={c.title} category={c.category}/><span className={s.badge}>{c.level||'Beginner'}</span>{user&&<span className={s.courseArrow}>↗</span>}</div><div className={s.courseBody}><h3>{c.title}</h3>{user&&<p>{c.description||'Practical training from PROVENRA.'}</p>}<div className={s.meta}>{user&&<span>{c.lesson_count} LESSONS</span>}<span>{c.duration_minutes?(Math.floor(c.duration_minutes/60)+'H '+(c.duration_minutes%60)+'M'):'SELF-PACED'}</span></div><strong className={s.coursePriceHighlight}>{c.is_free?'Free':Number(c.price||0).toLocaleString()+' EGP'}</strong></div></>;return user?<Link href={'/courses/'+c.slug} className={s.course+' '+s.courseCard} key={c.id}>{content}</Link>:<article className={s.course+' '+s.courseCard} key={c.id}>{content}<div className={s.coursePublicAction}><Link className={s.btn} href="/login">LOG IN TO ACCESS ↗</Link></div></article>})}</div>
    </section>}
 
    <section id="experience" className={s.section+' '+s.experienceStage}>
@@ -111,9 +111,9 @@ export default async function Landing(){
     <div className={s.certGrid}>{featuredCerts.map((c,i)=><div className={s.certItem+' '+s.certInteractive} key={c}><span>0{i+1}</span><b>{c}</b><i>↗</i></div>)}</div>
    </section>
 
-   <section className={s.journey+' '+s.finalStage}><div className={s.finalNoise}/><div className={s.journeyInner}><div><div className={s.label}>06 / NEXT</div><h2>Let’s build<br/><span>something useful.</span></h2><p>Explore the academy, connect with me, or follow the work as it grows.</p><div className={s.actions}><Link className={s.primary+' '+s.btn} href="/courses">Enter Academy ↗</Link><a className={s.btn} href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noreferrer">LinkedIn ↗</a></div></div><div className={s.finalMark}>MS<span>×</span></div></div></section>
+   <section className={s.journey+' '+s.finalStage}><div className={s.finalNoise}/><div className={s.journeyInner}><div><div className={s.label}>06 / NEXT</div><h2>Let’s build<br/><span>something useful.</span></h2><p>Explore the academy, connect with me, or follow the work as it grows.</p><div className={s.actions}><Link className={s.primary+' '+s.btn} href="/courses">Enter Academy ↗</Link><a className={s.btn} href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noreferrer">LinkedIn ↗</a></div></div><div className={s.finalMark}>PR<span>×</span></div></div></section>
 
-   <footer className={s.footer}><div><div className={s.footerBrand}>MARWAN SWEDAN</div><p>Cybersecurity · Academy · Portfolio</p></div><div><h4>EXPLORE</h4><Link href="/">Home</Link><Link href="/courses">Academy</Link><a href="#about">About</a><a href="#experience">Experience</a><a href="#certifications">Credentials</a></div><div><h4>CONNECT</h4><a href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/201515227612" target="_blank" rel="noreferrer">WhatsApp</a></div><div><h4>STATUS</h4><p><span className={s.statusDot}/> Open to collaboration</p><p>© 2026 Marwan Swedan</p></div></footer>
+   <footer className={s.footer}><div><div className={s.footerBrand}>PROVENRA</div><p>Cybersecurity · Academy · Portfolio</p></div><div><h4>EXPLORE</h4><Link href="/">Home</Link><Link href="/courses">Academy</Link><a href="#about">About</a><a href="#experience">Experience</a><a href="#certifications">Credentials</a></div><div><h4>CONNECT</h4><a href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://wa.me/201515227612" target="_blank" rel="noreferrer">WhatsApp</a></div><div><h4>STATUS</h4><p><span className={s.statusDot}/> Open to collaboration</p><p>© 2026 PROVENRA</p></div></footer>
   </div><Animations/>
  </main>;
 }

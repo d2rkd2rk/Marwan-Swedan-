@@ -12,8 +12,8 @@ export async function sendVerificationEmail(user: {id:string; email:string; name
   const url = `${baseUrl.replace(/\/$/, '')}/api/auth/verify-email?token=${raw}`;
   await sendEmail(
     user.email,
-    'Verify your Marwan Swedan Academy email',
-    `Hi ${user.name},\n\nPlease verify your email address to activate your Marwan Swedan Academy account. This link expires in 24 hours and can only be used once:\n\n${url}\n\nIf you did not create this account, you can ignore this email.\n\nMarwan Swedan Academy`
+    'Verify your PROVENRA email',
+    `Hi ${user.name},\n\nPlease verify your email address to activate your PROVENRA account. This link expires in 24 hours and can only be used once:\n\n${url}\n\nIf you did not create this account, you can ignore this email.\n\nPROVENRA`
   );
 }
 

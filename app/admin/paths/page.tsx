@@ -62,7 +62,7 @@ export default function PathsAdmin(){
  const current=paths.find(p=>p.id===selectedPath);
  const available=courses.filter(c=>!pathCourses.some(pc=>pc.course_id===c.id));
  return <main className={styles.page}><div className={styles.shell}>
-  <nav className={styles.nav}><Link href="/" className={styles.brand}>MARWAN<span>.SWEDAN</span></Link><div className={styles.navlinks}><Link href="/admin">Courses Dashboard</Link><Link href="/paths">View paths</Link></div><button className={styles.btn} onClick={async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/'}}>Sign out</button></nav>
+  <nav className={styles.nav}><Link href="/" className={styles.brand}>PROVENRA</Link><div className={styles.navlinks}><Link href="/admin">Courses Dashboard</Link><Link href="/paths">View paths</Link></div><button className={styles.btn} onClick={async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/'}}>Sign out</button></nav>
   <header className={styles.header}><div><div className={styles.eyebrow}>Paths Console</div><h1>Build learning journeys.</h1><p>Manage paths independently from the existing Courses Dashboard.</p></div><Link className={styles.btn} href="/admin">Open Courses Dashboard ↗</Link></header>
   {msg&&<div className={styles.notice}>{msg}</div>}
   <div className={styles.layout}>

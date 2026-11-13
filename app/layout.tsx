@@ -12,20 +12,20 @@ const siteUrl = 'https://marwanswedan.online';
 export const metadata:Metadata={
  metadataBase:new URL(siteUrl),
  title:{
-  default:'Marwan Swedan | Cybersecurity & Digital Forensics',
-  template:'%s | Marwan Swedan',
+  default:'PROVENRA | Cybersecurity & Digital Forensics',
+  template:'%s | PROVENRA',
  },
- description:'Marwan Swedan is a cybersecurity analyst focused on SOC operations, digital forensics, incident response, networking, and practical technology education through Marwan Swedan Academy.',
- applicationName:'Marwan Swedan Academy',
+ description:'PROVENRA is a cybersecurity learning platform focused on digital forensics, threat intelligence, SOC operations, and practical security education.',
+ applicationName:'PROVENRA',
  authors:[{name:'Marwan Swedan',url:siteUrl}],
  creator:'Marwan Swedan',
- publisher:'Marwan Swedan Academy',
+ publisher:'PROVENRA',
  manifest:'/manifest.json',
  themeColor:'#06111a',
  appleWebApp:{
   capable:true,
   statusBarStyle:'black-translucent',
-  title:'Marwan Academy',
+  title:'PROVENRA',
  },
  icons:{
   icon:'/images/marwan-app-icon.svg',
@@ -34,9 +34,9 @@ export const metadata:Metadata={
  },
  openGraph:{
   type:'website',
-  siteName:'Marwan Swedan Academy',
-  title:'Marwan Swedan | Cybersecurity & Digital Forensics',
-  description:'Cybersecurity, digital forensics, SOC operations, and practical technology education by Marwan Swedan in Egypt.',
+  siteName:'PROVENRA',
+  title:'PROVENRA | Cybersecurity & Digital Forensics',
+  description:'Cybersecurity, digital forensics, SOC operations, threat intelligence, and practical security education.',
   url:siteUrl,
   locale:'en_US',
   images:[{url:'/images/profile.jpg',alt:'Marwan Swedan'}],
@@ -44,7 +44,7 @@ export const metadata:Metadata={
  twitter:{
   card:'summary_large_image',
   title:'Marwan Swedan | Cybersecurity & Digital Forensics',
-  description:'Cybersecurity, digital forensics, SOC operations, and practical technology education by Marwan Swedan.',
+  description:'Cybersecurity, digital forensics, SOC operations, threat intelligence, and practical security education.',
   images:[{url:'/images/profile.jpg',alt:'Marwan Swedan'}],
  },
 };
