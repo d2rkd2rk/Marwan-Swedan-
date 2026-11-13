@@ -56,7 +56,7 @@
 .courseCard:hover{transform:translateY(-12px)!important}
 .courseNo{position:absolute;z-index:4;top:15px;left:15px;font-size:9px;color:#e0c98f}
 .courseImg{height:260px!important}
-.courseArrow{position:absolute;z-index:3;right:14px;top:14px;width:34px;height:34px;border:1px solid rgba(255,255,255,.16);border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(9,6,17,.5);transition:transform .3s,background .3s}
+.courseArrow{position:absolute;z-index:3;right:14px;top:14px;width:34px;height:34px;border:1px solid rgba(255,255,255,.16);border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(10,16,22,.72);transition:transform .3s,background .3s}
 .courseCard:hover .courseArrow{transform:rotate(45deg) scale(1.12);background:#b18d51}
 .courseBody{padding:22px!important}.courseBody h3{font-family:'Space Grotesk';font-size:17px!important}.courseBody p{font-size:10px!important;min-height:45px!important}
 .experienceStage{background:linear-gradient(110deg,#0a1016,#0a1016 45%,#0a1016);background-size:180% 180%}
