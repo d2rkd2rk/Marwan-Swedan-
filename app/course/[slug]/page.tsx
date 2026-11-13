@@ -261,7 +261,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
             <span className="small muted">Your progress</span><b>{percent}%</b>
           </div>
           <div style={{height:8,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden'}}>
-            <div style={{height:'100%',width:`${percent}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .25s ease'}}/>
+            <div style={{height:'100%',width:`${percent}%`,background:'linear-gradient(90deg,#c6a66a,#e0c98f)',transition:'width .25s ease'}}/>
           </div>
           <p className="small muted" style={{marginTop:7}}>{completedCount} of {lessons.length} lessons completed. {courseComplete?'Course complete.':'Finish every video to complete the course.'} Your progress is saved to your account.</p>
           {data.certificateBlockedByPath?<div className="certificateUnlock"><div><div className="eyebrow">Path certificate only</div><h3>Course certificate unavailable inside this path.</h3><p className="small muted">Complete the full learning path to receive its path certificate. Course certificates are reserved for courses taken independently.</p></div></div>:courseComplete&&certificate?<div className="certificateUnlock"><div><div className="eyebrow">Achievement unlocked</div><h3>🎓 Your certificate is ready.</h3><p className="small muted">You completed 100% of <b>{c.title}</b>. Your certificate uses your full name exactly as saved on your account.</p></div><div className="actions"><Link className="btn primary" href={`/certificate/${certificate.certificateId}`}>View certificate</Link><a className="btn" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${typeof window!=='undefined'?window.location.origin:'https://marwan-swedan.vercel.app'}/certificate/${certificate.certificateId}`)}`} target="_blank" rel="noreferrer">in&nbsp; Share on LinkedIn ↗</a></div></div>:<div style={{marginTop:16,padding:18,borderRadius:16,border:'1px solid rgba(255,255,255,.1)',background:'rgba(255,255,255,.03)',opacity:.72}}><div style={{fontSize:13,letterSpacing:'.08em',textTransform:'uppercase'}}>🔒 Certificate locked</div><h3 style={{margin:'8px 0 6px'}}>Complete the course to unlock your certificate.</h3><p className="small muted" style={{margin:0}}>Finish all {lessons.length} lessons. Once every lesson is marked <b>Completed</b>, your certificate will become available automatically.</p></div>}
@@ -291,7 +291,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                   <div className="small muted">{l.duration_minutes} minutes {l.file_name?'· '+l.file_name:''}</div>
                   {lessonVideoUrl&&openVideos[l.id]&&<div id={`lesson-video-${l.id}`} style={{marginTop:14}}>
                     <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginBottom:10}} aria-label="Video progress">
-                      <div style={{height:'100%',width:`${Math.min(100,Math.max(0,((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .15s ease'}}/>
+                      <div style={{height:'100%',width:`${Math.min(100,Math.max(0,((p?.progress_seconds||0)/Math.max(1,(l.duration_minutes||0)*60))*100))}%`,background:'linear-gradient(90deg,#c6a66a,#e0c98f)',transition:'width .15s ease'}}/>
                     </div>
                     <VideoPlayer
                       src={lessonVideoUrl}
@@ -316,7 +316,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
                         <span>{Math.min(100,Math.floor((p?.watch_percent||0)/70*100))}% of 70% requirement</span>
                       </div>
                       <div style={{height:6,borderRadius:99,background:'rgba(255,255,255,.08)',overflow:'hidden',marginTop:7}}>
-                        <div style={{height:'100%',width:`${Math.min(100,((p?.watch_percent||0)/70)*100)}%`,background:'linear-gradient(90deg,#6ee7ff,#7c3aed)',transition:'width .25s ease'}}/>
+                        <div style={{height:'100%',width:`${Math.min(100,((p?.watch_percent||0)/70)*100)}%`,background:'linear-gradient(90deg,#c6a66a,#e0c98f)',transition:'width .25s ease'}}/>
                       </div>
                     </div>}
                     {p?.progress_seconds>0&&!p?.completed&&<span className="small muted" style={{alignSelf:'center'}}>Saved at {Math.floor(p.progress_seconds/60)}:{String(Math.floor(p.progress_seconds%60)).padStart(2,'0')}</span>}
