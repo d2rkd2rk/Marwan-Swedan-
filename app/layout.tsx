@@ -38,9 +38,9 @@ export const metadata:Metadata={
   title:'PROVENRA',
  },
  icons:{
-  icon:'/images/provenra-app-icon-v2.svg',
-  shortcut:'/images/provenra-app-icon-v2.svg',
-  apple:{url:'/images/provenra-app-icon-v2.svg',sizes:'512x512',type:'image/svg+xml'},
+  icon:[{url:'/images/provenra-favicon-96.png',sizes:'96x96',type:'image/png'}],
+  shortcut:[{url:'/images/provenra-favicon-96.png',sizes:'96x96',type:'image/png'}],
+  apple:{url:'/images/provenra-favicon-96.png',sizes:'96x96',type:'image/png'},
  },
  openGraph:{
   type:'website',
