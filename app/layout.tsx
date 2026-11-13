@@ -12,7 +12,7 @@ const siteUrl = 'https://marwanswedan.online';
 export const metadata:Metadata={
  metadataBase:new URL(siteUrl),
  title:{
-  default:'PROVENRA | Cybersecurity & Digital Forensics Academy',
+  default:'PROVENRA',
   template:'%s | PROVENRA',
  },
  description:'PROVENRA is a cybersecurity education platform founded by Marwan Swedan, offering practical learning in cybersecurity, digital forensics, SOC operations, incident response, and threat intelligence.',
@@ -45,11 +45,11 @@ export const metadata:Metadata={
  openGraph:{
   type:'website',
   siteName:'PROVENRA',
-  title:'PROVENRA | Cybersecurity & Digital Forensics Academy',
+  title:'PROVENRA',
   description:'Learn cybersecurity, digital forensics, SOC operations, incident response, and threat intelligence through practical education.',
   url:siteUrl,
   locale:'en_US',
-  images:[{url:'/images/profile.jpg',alt:'PROVENRA — Cybersecurity & Digital Forensics Academy'}],
+  images:[{url:'/images/profile.jpg',alt:'PROVENRA'}],
  },
  twitter:{
   card:'summary_large_image',
@@ -95,7 +95,7 @@ const structuredData=[
   name:'PROVENRA',
   alternateName:['PROVENRA Academy','PROVENRA Cybersecurity'],
   url:siteUrl,
-  description:'PROVENRA is a cybersecurity and digital forensics academy founded by Marwan Swedan.',
+  description:'PROVENRA',
  },
 ];
 
