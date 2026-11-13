@@ -9,7 +9,7 @@ type Props = {
 };
 
 function formatRecipientName(value:string){
-  return value.replace(/(^|[\\s-])([a-z])/g,(_match,separator,letter)=>separator+letter.toUpperCase());
+  return value.replace(/(^|[\s-])([a-z])/g,(_match,separator,letter)=>separator+letter.toUpperCase());
 }
 
 export default function ProvenraCertificate({name,title,date,kind}:Props) {
