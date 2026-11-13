@@ -9,7 +9,7 @@ export async function issueOtp(userId:string,email:string,purpose:'login'|'passw
   const codeHash=hashToken(code);
   const rows=await db`insert into otp_challenges(user_id,purpose,code_hash,expires_at) values(${userId},${purpose},${codeHash},now()+interval '10 minutes') returning id`;
   try{
-    await sendEmail(email,'Your Marwan Swedan verification code',`Your verification code is ${code}. It expires in 10 minutes. If you did not request this code, ignore this email.`);
+    await sendEmail(email,'Your PROVENRA verification code',`Your verification code is ${code}. It expires in 10 minutes. If you did not request this code, ignore this email.`);
   }catch(error){await db`delete from otp_challenges where id=${rows[0].id}`;throw error}
   return String(rows[0].id);
 }

@@ -173,13 +173,13 @@ export default function PWAInstallPrompt(){
  const closeAllowed=!loggedIn||iosInstallMode||unsupportedMode;
 
  return <div className="pwaInstallOverlay">
-  <div className="pwaInstallCard" role="dialog" aria-modal="true" aria-label="Marwan Swedan Academy install and notification prompt">
+  <div className="pwaInstallCard" role="dialog" aria-modal="true" aria-label="PROVENRA install and notification prompt">
    {closeAllowed&&<button className="pwaInstallClose" type="button" aria-label="Close" onClick={complete}>×</button>}
    <div className="pwaInstallIcon"><img src="/images/marwan-app-icon.svg" alt="" width="56" height="56"/></div>
    <div className="pwaInstallCopy">
-    <div className="eyebrow">Marwan Swedan Academy</div>
+    <div className="eyebrow">PROVENRA</div>
     <h3>{iosInstallMode?'Install the Academy':unsupportedMode?'Update iOS to Enable Notifications':loggedIn?'Enable Academy Notifications':'Install the Academy'}</h3>
-    <p>{iosInstallMode?'To receive notifications on iPhone/iPad, install the Academy first. In Safari, tap Share, choose Add to Home Screen, then open the new app icon and sign in.':unsupportedMode?'Push notifications on iPhone require iOS 16.4 or later and the website opened from your Home Screen.':loggedIn?'Allow notifications to receive new lessons and course announcements on your device.':'Install Marwan Swedan Academy on your device for quick access. You can enable notifications after signing in.'}</p>
+    <p>{iosInstallMode?'To receive notifications on iPhone/iPad, install the Academy first. In Safari, tap Share, choose Add to Home Screen, then open the new app icon and sign in.':unsupportedMode?'Push notifications on iPhone require iOS 16.4 or later and the website opened from your Home Screen.':loggedIn?'Allow notifications to receive new lessons and course announcements on your device.':'Install PROVENRA on your device for quick access. You can enable notifications after signing in.'}</p>
     {iosInstallMode&&<p className="pwaInstallHint">Safari: <b>Share → Add to Home Screen → Add</b>. If you do not see this option, open the site in Safari rather than an in-app browser.</p>}
     {message&&<p className="pwaInstallHint">{message}</p>}
    </div>

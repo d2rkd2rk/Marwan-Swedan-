@@ -17,7 +17,7 @@ export default async function PathCertificatePage({params}:{params:Promise<{cert
  const totalHours=Math.round(Number(hours[0]?.minutes||0)/60*10)/10;
  return <main><div className="shell"><SiteNav/><section className="pathCertificateSection">
   <article className="pathCertificateCard">
-   <div className="pathCertificateLeft"><div className="pathCertificateTitle">CERTIFICATE <span>IN</span></div><div className="pathCertificatePathTitle">{cert.title}</div>
+   <div className="pathCertificateLeft"><div className="pathCertificateTitle">PROVENRA <span>CERTIFICATE</span></div><div className="pathCertificatePathTitle">{cert.title}</div>
     <div className="pathCertificateIntro">This is to certify that</div><div className="pathCertificateName">{cert.name}</div>
     <div className="pathCertificateBody"><b>has successfully completed the {totalHours} hour learning path</b><strong>{cert.title}</strong><p>{cert.description||'A structured learning path completed through dedication, consistency, and successful completion of all required courses.'}</p></div>
     <div className="pathCertificateMeta"><div><span>Date of issue:</span><b>{date}</b></div><div className="pathCertificateSignature"><em>M. Swedan</em><i></i><span>MARWAN SWEDAN</span></div></div>

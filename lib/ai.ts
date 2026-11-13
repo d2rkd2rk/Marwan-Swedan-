@@ -2,7 +2,7 @@ import { generateText } from 'ai';
 import { groq } from '@ai-sdk/groq';
 
 export async function askCourseAI(question:string,context:string){
-  const prompt=`You are the friendly AI assistant for Marwan Swedan Academy.
+  const prompt=`You are the friendly AI assistant for PROVENRA.
 
 LANGUAGE:
 - Understand Arabic, Egyptian Arabic, and English.

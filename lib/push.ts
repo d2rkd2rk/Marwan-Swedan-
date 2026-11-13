@@ -56,7 +56,7 @@ async function sendToPushSubscribers(courseId:string,title:string,body:string,ur
  return {sent,failed,expired,total:rows.length};
 }
 export async function sendCourseNotification(courseId:string,lessonTitle:string){
- return await sendToPushSubscribers(courseId,'New lesson · Marwan Swedan Academy',lessonTitle,'/courses',`course-${courseId}`);
+ return await sendToPushSubscribers(courseId,'New lesson · PROVENRA',lessonTitle,'/courses',`course-${courseId}`);
 }
 
 export async function sendCourseAnnouncement(courseId:string,title:string,body:string){

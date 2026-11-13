@@ -21,6 +21,6 @@ export default function AuthGate({children}:{children:React.ReactNode}){
     return()=>{cancelled=true};
   },[pathname,router]);
 
-  if(!ready)return <main className="authGate"><div className="gateCard"><div className="brand">MARWAN<span>.SWEDAN</span></div><div className="gatePulse"/><p>Checking your secure session…</p></div></main>;
+  if(!ready)return <main className="authGate"><div className="gateCard"><div className="brand">PROVENRA</div><div className="gatePulse"/><p>Checking your secure session…</p></div></main>;
   return <>{children}</>;
 }
