@@ -226,7 +226,7 @@ export default function AboutPage(){
     <div className="projectGrid">{profiles.map(profile=><a className="projectCard" href={profile.url} key={profile.name} target="_blank" rel="me noopener noreferrer" style={{minHeight:130}}><span>Official profile</span><h3 style={{marginTop:24}}>{profile.name} ↗</h3><p>Marwan Swedan · مروان سويدان</p></a>)}</div>
    </section>
 
-   <footer className="footer"><div><div className="brand">PROVENRA</div><p>Official profile of Marwan Swedan.</p><p>Cybersecurity · Digital Forensics · Education</p></div><div><h4>Explore</h4><Link href="/">Home</Link><Link href="/courses">Academy</Link></div><div><h4>Connect</h4>{profiles.map(profile=><a href={profile.url} key={profile.name} target="_blank" rel="me noopener noreferrer">{profile.name} ↗</a>)}</div><div><h4>Official website</h4><a href={siteUrl}>marwanswedan.online ↗</a></div></footer>
+   <footer className="footer"><div><div className="brand">PROVENRA</div><p>Official profile of Marwan Swedan.</p><p>Cybersecurity · Digital Forensics · Education</p></div><div><h4>Explore</h4><Link href="/">Home</Link><Link href="/courses">Academy</Link><Link href="/about-us">About PROVENRA</Link></div><div><h4>Connect</h4>{profiles.map(profile=><a href={profile.url} key={profile.name} target="_blank" rel="me noopener noreferrer">{profile.name} ↗</a>)}</div><div><h4>Official website</h4><a href={siteUrl}>marwanswedan.online ↗</a></div></footer>
   </div>
  </main>;
 }
