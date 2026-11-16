@@ -67,7 +67,8 @@ export default function AboutProvenraPage(){
      <a className={s.course} href="https://wa.me/201515227612" target="_blank" rel="noopener noreferrer" style={{padding:24,display:'block'}}>
       <div className={s.label}>OFFICIAL SUPPORT CHANNEL</div><h3 style={{marginTop:14}}>WhatsApp Support ↗</h3><p style={{color:'#b6b1a5',lineHeight:1.7}}>Send a message to the PROVENRA team.</p>
      </a>
-     <a className={s.course} href="mailto:202501259@pua.edu.eg" style={{padding:24,display:'block'}}><div className={s.label}>OFFICIAL EMAIL</div><h3 style={{marginTop:14}}>202501259@pua.edu.eg ↗</h3><p style={{color:'#b6b1a5',lineHeight:1.7}}>Email PROVENRA for support, privacy requests, and inquiries.</p></a>\n     <a className={s.course} href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noopener noreferrer" style={{padding:24,display:'block'}}>
+     <a className={s.course} href="mailto:202501259@pua.edu.eg" style={{padding:24,display:'block'}}><div className={s.label}>OFFICIAL EMAIL</div><h3 style={{marginTop:14}}>202501259@pua.edu.eg ↗</h3><p style={{color:'#b6b1a5',lineHeight:1.7}}>Email PROVENRA for support, privacy requests, and inquiries.</p></a>
+     <a className={s.course} href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noopener noreferrer" style={{padding:24,display:'block'}}>
       <div className={s.label}>PROFESSIONAL CONTACT</div><h3 style={{marginTop:14}}>LinkedIn ↗</h3><p style={{color:'#b6b1a5',lineHeight:1.7}}>Connect for professional and educational inquiries.</p>
      </a>
     </div>
