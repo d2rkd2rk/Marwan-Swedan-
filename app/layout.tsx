@@ -2,6 +2,7 @@ import './globals.css';
 import './mobile.css';
 import './premium.css';
 import type {Metadata} from 'next';
+import Script from 'next/script';
 import GlobalMotion from './components/GlobalMotion';
 import CourseImageManager from './components/CourseImageManager';
 import AdminEnhancements from './components/AdminEnhancements';
@@ -100,5 +101,5 @@ const structuredData=[
 ];
 
 export default function RootLayout({children}:{children:React.ReactNode}){
- return <html lang="en"><body><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData)}}/><GlobalMotion/><CourseImageManager/><AdminEnhancements/><PWAInstallPrompt/>{children}</body></html>
+ return <html lang="en"><body><Script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5071824712430151" crossOrigin="anonymous" strategy="afterInteractive"/><script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(structuredData)}}/><GlobalMotion/><CourseImageManager/><AdminEnhancements/><PWAInstallPrompt/>{children}</body></html>
 }
