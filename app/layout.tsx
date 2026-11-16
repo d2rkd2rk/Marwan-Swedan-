@@ -64,6 +64,7 @@ const structuredData=[
  {
   '@context':'https://schema.org',
   '@type':'Organization',
+  '@id':siteUrl+'/#organization',
   name:'PROVENRA',
   alternateName:'PROVENRA Cybersecurity Academy',
   url:siteUrl,
@@ -81,7 +82,7 @@ const structuredData=[
   image:siteUrl+'/images/profile.jpg',
   jobTitle:'Cybersecurity Analyst and Digital Forensics Practitioner',
   description:'Marwan Swedan (مروان سويدان) is an Egyptian cybersecurity learner and practitioner focused on digital forensics, SOC operations, incident response, and cybersecurity education. Founder of PROVENRA.',
-  worksFor:{'@type':'Organization','name':'PROVENRA','url':siteUrl},
+  worksFor:{'@id':siteUrl+'/#organization'},
   sameAs:[
    'https://eg.linkedin.com/in/marwan-swedan',
    'https://www.facebook.com/share/19efBQt717/',
@@ -96,6 +97,7 @@ const structuredData=[
   name:'PROVENRA',
   alternateName:['PROVENRA Academy','PROVENRA Cybersecurity'],
   url:siteUrl,
+  publisher:{'@id':siteUrl+'/#organization'},
   description:'PROVENRA',
  },
 ];
