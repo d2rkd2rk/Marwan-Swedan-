@@ -30,6 +30,7 @@ const organization={
  contactPoint:{
   '@type':'ContactPoint',
   contactType:'customer support',
+  email:'202501259@pua.edu.eg',
   url:'https://wa.me/201515227612',
   availableLanguage:['English','Arabic'],
  },
@@ -66,11 +67,12 @@ export default function AboutProvenraPage(){
      <a className={s.course} href="https://wa.me/201515227612" target="_blank" rel="noopener noreferrer" style={{padding:24,display:'block'}}>
       <div className={s.label}>OFFICIAL SUPPORT CHANNEL</div><h3 style={{marginTop:14}}>WhatsApp Support ↗</h3><p style={{color:'#b6b1a5',lineHeight:1.7}}>Send a message to the PROVENRA team.</p>
      </a>
+     <a className={s.course} href="mailto:202501259@pua.edu.eg" style={{padding:24,display:'block'}}><div className={s.label}>OFFICIAL EMAIL</div><h3 style={{marginTop:14}}>202501259@pua.edu.eg ↗</h3><p style={{color:'#b6b1a5',lineHeight:1.7}}>Email PROVENRA for support, privacy requests, and inquiries.</p></a>
      <a className={s.course} href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noopener noreferrer" style={{padding:24,display:'block'}}>
       <div className={s.label}>PROFESSIONAL CONTACT</div><h3 style={{marginTop:14}}>LinkedIn ↗</h3><p style={{color:'#b6b1a5',lineHeight:1.7}}>Connect for professional and educational inquiries.</p>
      </a>
     </div>
-    <p style={{color:'#827e74',fontSize:12,lineHeight:1.7,marginTop:20}}>The address no-reply@marwanswedan.online may be used for automated outgoing messages. It is not listed here as a monitored support inbox.</p>
+    
    </section>
 
    <section id="terms" className={s.section} style={{paddingTop:64,paddingBottom:64}}>
@@ -128,7 +130,7 @@ export default function AboutProvenraPage(){
      <h3>11. International users and policy updates</h3>
      <p>Your information may be processed in countries where our service providers operate, subject to applicable safeguards and laws. We may update this Policy when our practices or legal requirements change. The latest version and effective date will appear on this page.</p>
      <h3>12. Contact about privacy</h3>
-     <p>For privacy questions or requests, contact PROVENRA using the official WhatsApp support channel listed above. Please do not send passwords or sensitive account credentials in a support message.</p>
+     <p>For privacy questions or requests, email PROVENRA at 202501259@pua.edu.eg. Please do not send passwords or sensitive account credentials in an email.</p>
     </div>
    </section>
 
@@ -136,7 +138,7 @@ export default function AboutProvenraPage(){
     <div><div className={s.footerBrand}>PROVENRA</div><p>Cybersecurity · Digital Forensics · Practical Education</p><p>© 2026 PROVENRA. All rights reserved.</p></div>
     <div><h4>EXPLORE</h4><Link href="/">Home</Link><Link href="/courses">Academy</Link><Link href="/paths">Learning Paths</Link><Link href="/about">Marwan Swedan</Link></div>
     <div><h4>ON THIS PAGE</h4><a href="#about-platform">About the Platform</a><a href="#contact">Contact</a><a href="#terms">Terms of Service</a><a href="#privacy">Privacy Policy</a></div>
-    <div><h4>SUPPORT</h4><a href="https://wa.me/201515227612" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a><a href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></div>
+    <div><h4>SUPPORT</h4><a href="mailto:202501259@pua.edu.eg">Email PROVENRA ↗</a><a href="https://wa.me/201515227612" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a><a href="https://www.linkedin.com/in/marwan-swedan" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></div>
    </footer>
   </div>
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(organization)}}/>
