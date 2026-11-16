@@ -23,10 +23,11 @@ export const metadata:Metadata={
 const organization={
  '@context':'https://schema.org',
  '@type':'Organization',
+ '@id':siteUrl+'/#organization',
  name:'PROVENRA',
  url:siteUrl,
  description:'An online learning platform focused on cybersecurity, digital forensics, SOC operations, incident response, and practical security education.',
- founder:{'@type':'Person',name:'Marwan Swedan'},
+ founder:{'@id':siteUrl+'/#person'},
  contactPoint:{
   '@type':'ContactPoint',
   contactType:'customer support',
