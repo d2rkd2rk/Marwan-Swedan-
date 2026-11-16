@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
+import AdUnit from '@/app/components/AdUnit';
 
 export default function StudentDashboard(){
  const [data,setData]=useState<any>(null);
@@ -23,6 +24,7 @@ export default function StudentDashboard(){
     <div className="actions"><Link className="btn primary" href={`/courses/${c.slug}`}>Open course</Link></div>
    </article>)}</div>}
   </section>
+  <AdUnit slot="6741499639" />
   <section className="section compact" style={{paddingBottom:0}}>
    <div className="sectionhead"><div><div className="eyebrow">Your achievements</div><h2>Certificates</h2></div></div>
    {certificates.length===0?<div className="emptyAcademy"><div><h3>No certificates yet.</h3><p className="muted">Certificates you receive will appear here.</p></div></div>:<div className="grid">{certificates.map((c:any)=><article className="card" key={c.certificate_id}><span className="tag">Certificate</span><h3 style={{fontFamily:'Space Grotesk',fontSize:23}}>{c.course_title}</h3><p className="muted">Issued {new Date(c.issued_at).toLocaleDateString()}</p><div className="actions"><Link className="btn primary" href={`/certificate/${c.certificate_id}`}>View certificate</Link></div></article>)}</div>}

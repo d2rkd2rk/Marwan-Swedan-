@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
+import AdUnit from '@/app/components/AdUnit';
 
 export default function Paths(){
  const [paths,setPaths]=useState<any[]>([]),[loading,setLoading]=useState(true);
@@ -22,5 +23,6 @@ export default function Paths(){
    <p className="small muted">{p.level} · {Number(p.course_count||0)} courses · {Math.round(Number(p.duration_minutes||0)/60*10)/10} hours · {p.is_free?'Free':`${p.price} EGP`}</p>
    <div className="actions"><Link className="btn" href={`/paths/${p.slug}`}>{p.enrolled?'Open path':'View path'}</Link></div>
   </article>)}</div>}
+  <AdUnit slot="3708142184" />
  </section></div></main>;
 }

@@ -3,6 +3,7 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import Link from 'next/link';
 import SiteNav from '@/app/components/SiteNav';
+import AdUnit from '@/app/components/AdUnit';
 import VideoPlayer from '@/app/components/VideoPlayer';
 
 const suggestedQuestions=[
@@ -340,6 +341,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
           <div className="actions">{c.is_free?<><Link className="btn primary" href="/register">Register</Link><Link className="btn" href="/login">Sign in</Link></>:<a className="btn primary" href={purchaseUrl}>Continue to InstaPay payment</a>}</div>
         </div>}
       </section>
+      <AdUnit slot="8990444362" />
 
       <section className="section courseReviews" style={{paddingTop:25}}>
         <div className="sectionhead"><div><div className="eyebrow">Student feedback</div><h2>Reviews & Ratings</h2></div><span className="small muted">{reviews.length} review{reviews.length===1?'':'s'}</span></div>

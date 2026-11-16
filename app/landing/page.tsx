@@ -5,6 +5,7 @@ import {session} from '@/lib/auth';
 import db from '@/lib/db';
 import Animations from './Animations';
 import SiteNav from '@/app/components/SiteNav';
+import AdUnit from '@/app/components/AdUnit';
 import CourseThumbnail from '@/app/components/CourseThumbnail';
 import s from '../home.module.css';
 
@@ -89,6 +90,8 @@ export default async function Landing(){
    </section>
 
    <section className={s.marquee} aria-label="Areas of focus"><div className={s.marqueeTrack}>{['CYBERSECURITY','DIGITAL FORENSICS','SOC','NETWORKING','PROGRAMMING','ACADEMY','CYBERSECURITY','DIGITAL FORENSICS','SOC','NETWORKING','PROGRAMMING','ACADEMY'].map((x,i)=><span key={i}>{x}<b>✦</b></span>)}</div></section>
+
+   <AdUnit slot="9152040555" />
 
    <section id="about" className={s.aboutStage+' '+s.section}>
     <div className={s.sectionNumber}>02</div>
