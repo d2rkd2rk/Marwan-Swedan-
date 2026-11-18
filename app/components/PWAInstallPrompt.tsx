@@ -78,11 +78,9 @@ export default function PWAInstallPrompt(){
     }
 
     if(userLoggedIn){
-     if(onIOS&&!installed){
-      setMode('ios-install');
-      setShow(true);
-      return;
-     }
+     // Browser sessions never ask for notification permission or register push subscriptions.
+     // Push notifications are enabled only from the installed PWA.
+     if(!installed)return;
      if(onIOS&&!iosPushOK){
       setMode('ios-unsupported');
       setShow(true);
@@ -92,7 +90,7 @@ export default function PWAInstallPrompt(){
       const reg=await navigator.serviceWorker.ready;
       const sub=await reg.pushManager.getSubscription();
       if(sub){
-       const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
+       const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...sub.toJSON(),isStandalone:true})});
        if(response.ok)return;
       }
      }
@@ -149,9 +147,8 @@ export default function PWAInstallPrompt(){
   setBusy(true);
   setMessage('');
   try{
-   if(ios&&!standalone){
-    setMode('ios-install');
-    setMessage('First add this website to your Home Screen, then open the installed app and enable notifications there.');
+   if(!standalone){
+    complete();
     return;
    }
    if(ios&&!iosPushSupported){
@@ -160,12 +157,12 @@ export default function PWAInstallPrompt(){
     return;
    }
    if(!('Notification' in window)||!('PushManager' in window)||!('serviceWorker' in navigator)){
-    setMessage('Notifications are not supported by this browser. Try an up-to-date browser or install the app.');
+    setMessage('Notifications are not supported by this installed app on this device.');
     return;
    }
    const permission=Notification.permission==='granted'?'granted':await Notification.requestPermission();
    if(permission!=='granted'){
-    setMessage('Notifications were not allowed. Enable them in your device settings, then try again.');
+    setMessage('Notifications were not allowed. You can continue using PROVENRA without them.');
     return;
    }
    const reg=await navigator.serviceWorker.ready;
@@ -176,8 +173,8 @@ export default function PWAInstallPrompt(){
    if(!config.publicKey)throw new Error('Notifications are not configured on the server yet.');
    let sub=await reg.pushManager.getSubscription();
    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:applicationServerKey(config.publicKey)});
-   const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(sub.toJSON())});
-   if(!response.ok)throw new Error('The device could not be registered for notifications. Please try again.');
+   const response=await fetch('/api/push/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...sub.toJSON(),isStandalone:true})});
+   if(!response.ok)throw new Error('The installed app could not be registered for notifications. Please try again.');
    complete();
   }catch(error){
    setMessage(error instanceof Error?error.message:'Could not enable notifications.');
