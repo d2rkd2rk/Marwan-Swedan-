@@ -79,6 +79,7 @@ export function AuthForm({mode}:{mode:'login'|'register'}){
        </div>}
    </div>
    {mode==='login'&&<div className="field"><label>Password</label><div style={{display:'flex',gap:8}}><input style={{flex:1}} required name="password" autoComplete="current-password" type={showPassword?'text':'password'}/><button className="btn" type="button" onClick={()=>setShowPassword(!showPassword)}>{showPassword?'Hide':'Show'}</button></div></div>}
+   {mode==='register'&&<p className="small muted" style={{lineHeight:1.6,marginTop:14}}>We collect your name, email, username and WhatsApp number only to create, secure and operate your PROVENRA account. This is not marketing consent. See our <Link href="/cookie-policy">Cookie Policy</Link> and <Link href="/about-us#privacy">Privacy Policy</Link>.</p>}
    <button className="btn primary" style={{width:'100%',marginTop:10}} disabled={busy}>{busy?'Please wait…':mode==='login'?'Sign in':'Create account'}</button>
   </form>}
   {!verificationEmail&&<p className="small muted">{mode==='login'?<>No account? <Link className="registerCta" href="/register">Register</Link> · <Link href="/forgot-password">Forgot password?</Link></>:<>Already registered? <Link href="/login">Sign in</Link></>}</p>}
