@@ -22,15 +22,22 @@ export default function SiteNav({initialUser=null}:{initialUser?:NavUser}){
  return <nav className={s.nav}>
   <Link href="/" className={s.logo} onClick={closeMenu}><span className={s.logoMark} aria-hidden="true" style={{clipPath:'none',borderRadius:'10px',backgroundImage:"url('/images/marwan-app-icon.svg')",backgroundSize:'cover',backgroundPosition:'center',fontSize:0}}/><span className={s.logoText}>PROVENRA<small>Cybersecurity · Digital Forensics</small></span></Link>
   <div className={s.links}>
-   <Link href="/">Home</Link><Link href="/courses">Academy</Link><Link href="/courses">Courses</Link><Link href="/paths">Paths</Link><Link href="/#portfolio">Portfolio</Link>
+   <Link href="/">Home</Link><Link href="/courses">Courses</Link><Link href="/paths">Learning Paths</Link>
+   <details className="siteNavMore"><summary>Explore +</summary><div className="siteNavDropdown">
+    <b>Main</b><Link href="/#portfolio">Portfolio</Link><Link href="/about">About Marwan</Link><Link href="/about-us">About PROVENRA</Link>
+    <b>Information</b><Link href="/about-us#terms">Terms of Service</Link><Link href="/about-us#privacy">Privacy Policy</Link><Link href="/cookie-policy">Cookie Policy</Link>
+    <b>Support</b><Link href="/about-us#contact">Contact & Support</Link>
+   </div></details>
   </div>
   <div className={s.mobileMenu}>
    <button type="button" className={s.mobileMenuToggle} aria-label={menuOpen?'Close navigation menu':'Open navigation menu'} aria-expanded={menuOpen} onClick={()=>setMenuOpen(v=>!v)}>
     <span></span><span></span><span></span>
    </button>
    {menuOpen&&<div className={s.mobileMenuPanel}>
-    <Link href="/" onClick={closeMenu}>Home</Link><Link href="/courses" onClick={closeMenu}>Academy</Link><Link href="/courses" onClick={closeMenu}>Courses</Link><Link href="/paths" onClick={closeMenu}>Paths</Link><Link href="/#portfolio" onClick={closeMenu}>Portfolio</Link>
-    {user&&<><Link href="/dashboard" onClick={closeMenu}>Dashboard</Link><Link href="/account" onClick={closeMenu}>@{user.username}</Link>{user.role==='admin'&&<Link href="/admin" onClick={closeMenu}>Admin Dashboard</Link>}</>}
+    <div className="mobileNavGroup"><b>Main</b><Link href="/" onClick={closeMenu}>Home</Link><Link href="/#portfolio" onClick={closeMenu}>Portfolio</Link><Link href="/about" onClick={closeMenu}>About Marwan</Link><Link href="/about-us" onClick={closeMenu}>About PROVENRA</Link></div>
+    <div className="mobileNavGroup"><b>Academy</b><Link href="/courses" onClick={closeMenu}>Courses</Link><Link href="/paths" onClick={closeMenu}>Learning Paths</Link></div>
+    <div className="mobileNavGroup"><b>Information & Support</b><Link href="/about-us#terms" onClick={closeMenu}>Terms of Service</Link><Link href="/about-us#privacy" onClick={closeMenu}>Privacy Policy</Link><Link href="/cookie-policy" onClick={closeMenu}>Cookie Policy</Link><Link href="/about-us#contact" onClick={closeMenu}>Contact & Support</Link></div>
+    {user&&<div className="mobileNavGroup"><b>My Account</b><Link href="/dashboard" onClick={closeMenu}>Dashboard</Link><Link href="/dashboard/payments" onClick={closeMenu}>Payment History</Link><Link href="/account" onClick={closeMenu}>@{user.username}</Link>{user.role==='admin'&&<><Link href="/admin" onClick={closeMenu}>Admin Dashboard</Link><Link href="/admin/transactions" onClick={closeMenu}>Transactions</Link><Link href="/admin/coupons" onClick={closeMenu}>Coupons</Link><Link href="/admin/paths" onClick={closeMenu}>Manage Paths</Link></>}</div>}
     {!user&&<><Link href="/login" onClick={closeMenu}>Login</Link><Link href="/register" onClick={closeMenu}>Get Started</Link></>}
     {user&&<button type="button" className={s.mobileSignOut} onClick={logout} disabled={busy}>{busy?'Signing out…':'Sign out'}</button>}
    </div>}
