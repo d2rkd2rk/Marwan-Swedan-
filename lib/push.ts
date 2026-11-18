@@ -20,9 +20,11 @@ export async function ensurePushTable(){
   auth text not null,
   created_at timestamptz not null default now(),
   last_used_at timestamptz not null default now(),
-  disabled_at timestamptz
+  disabled_at timestamptz,
+  is_standalone boolean not null default false
  )`;
  await db`alter table push_subscriptions add column if not exists disabled_at timestamptz`;
+ await db`alter table push_subscriptions add column if not exists is_standalone boolean not null default false`;
  await db`create index if not exists push_subscriptions_user_idx on push_subscriptions(user_id,last_used_at desc)`;
 }
 
@@ -31,7 +33,7 @@ async function sendToPushSubscribers(courseId:string,title:string,body:string,ur
  await ensurePushTable();
  const rows=await db`select ps.id,ps.endpoint,ps.p256dh,ps.auth
   from push_subscriptions ps
-  where ps.disabled_at is null
+  where ps.disabled_at is null and ps.is_standalone=true
     and exists(
       select 1 from enrollments e
       where e.user_id=ps.user_id and e.course_id=${courseId} and e.revoked_at is null
@@ -72,7 +74,7 @@ export async function sendBroadcastAnnouncement(title:string,body:string){
  await ensurePushTable();
  const rows=await db`select ps.id,ps.endpoint,ps.p256dh,ps.auth
   from push_subscriptions ps
-  where ps.disabled_at is null`;
+  where ps.disabled_at is null and ps.is_standalone=true`;
  const tag=`broadcast-${Date.now()}`;
  let sent=0,failed=0,expired=0;
  await Promise.all(rows.map(async(row:any)=>{
@@ -111,11 +113,11 @@ async function deliverUserPush(rows:any[],title:string,body:string,url:string,ta
 }
 export async function sendUserNotification(userId:string,title:string,body:string,url:string,tag:string){
  await ensurePushTable();
- const rows=await db.unsafe("select id,endpoint,p256dh,auth from push_subscriptions where user_id=$1 and disabled_at is null",[userId]);
+ const rows=await db.unsafe("select id,endpoint,p256dh,auth from push_subscriptions where user_id=$1 and disabled_at is null and is_standalone=true",[userId]);
  return deliverUserPush(rows,title,body,url,tag);
 }
 export async function sendRoleNotification(role:string,title:string,body:string,url:string,tag:string){
  await ensurePushTable();
- const rows=await db.unsafe("select ps.id,ps.endpoint,ps.p256dh,ps.auth from push_subscriptions ps join users u on u.id=ps.user_id where u.role=$1 and ps.disabled_at is null",[role]);
+ const rows=await db.unsafe("select ps.id,ps.endpoint,ps.p256dh,ps.auth from push_subscriptions ps join users u on u.id=ps.user_id where u.role=$1 and ps.disabled_at is null and ps.is_standalone=true",[role]);
  return deliverUserPush(rows,title,body,url,tag);
 }
