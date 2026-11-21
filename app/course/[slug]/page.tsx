@@ -27,13 +27,13 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [progress,setProgress]=useState<Record<string,Progress>>({});
   const [watchSyncError,setWatchSyncError]=useState<Record<string,string>>({});
   const [certificate,setCertificate]=useState<{certificateId:string;issuedAt:string}|null>(null);
-  const [reviewModalOpen,setReviewModalOpen]=useState(false);
   const [reviews,setReviews]=useState<any[]>([]);
   const [myReview,setMyReview]=useState<any>(null);
-  const [reviewRating,setReviewRating]=useState(5);
+  const [reviewRating,setReviewRating]=useState(0);
   const [reviewText,setReviewText]=useState('');
   const [reviewBusy,setReviewBusy]=useState(false);
   const [reviewMessage,setReviewMessage]=useState('');
+  const [reviewModalOpen,setReviewModalOpen]=useState(false);
   const [enrollBusy,setEnrollBusy]=useState(false);
   const [enrollMessage,setEnrollMessage]=useState('');
   const [couponCode,setCouponCode]=useState('');
@@ -56,16 +56,6 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
       if(j.myReview){setMyReview(j.myReview);setReviewRating(j.myReview.rating);setReviewText(j.myReview.review||'');}
     }).catch(()=>{});
   },[slug]);
-
-  useEffect(()=>{
-    if(!data?.course?.slug||!data?.lessons?.length)return;
-    const done=data.lessons.every((l:any)=>progress[l.id]?.completed);
-    if(!done||data.certificateBlockedByPath)return;
-    fetch(`/api/courses/${data.course.slug}/certificate`,{cache:'no-store'}).then(r=>r.json()).then(j=>{
-      if(j.certificateId){setCertificate({certificateId:j.certificateId,issuedAt:j.issuedAt});setReviewModalOpen(false);}
-      else if(j.needsReview)setReviewModalOpen(true);
-    }).catch(()=>{});
-  },[data,progress]);
 
   useEffect(()=>{
     params.then(p=>{
@@ -188,8 +178,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   };
 
   const submitReview=async()=>{
-    if(reviewBusy||reviewText.trim().length<5)return;
-    const wasReviewGate=reviewModalOpen;
+    if(reviewBusy||reviewRating<1||reviewRating>5||reviewText.trim().length<5)return;
     setReviewBusy(true);setReviewMessage('');
     try{
       const r=await fetch(`/api/courses/${slug}/reviews`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rating:reviewRating,review:reviewText})});
@@ -198,18 +187,35 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
       setMyReview(j.review);setReviewMessage('Review saved.');
       const refreshed=await fetch(`/api/courses/${slug}/reviews`,{cache:'no-store'}).then(x=>x.json());
       setReviews(refreshed.reviews||[]);
-      if(wasReviewGate){
+      if(courseComplete&&!data.certificateBlockedByPath){
         const certificateResponse=await fetch(`/api/courses/${slug}/certificate`,{cache:'no-store'});
         const certificateResult=await certificateResponse.json();
         if(certificateResponse.ok&&certificateResult.certificateId){
           setCertificate({certificateId:certificateResult.certificateId,issuedAt:certificateResult.issuedAt});
           setReviewModalOpen(false);
-          setReviewMessage('Review saved. Your certificate is ready.');
-        }else if(certificateResult.needsReview){
-          setReviewMessage('Please write a review with at least 5 characters to unlock your certificate.');
+          window.location.assign(`/certificate/${certificateResult.certificateId}`);
+        }else{
+          setReviewMessage(certificateResult.error||'Review saved, but the certificate could not be issued yet.');
         }
       }
     }catch(e:any){setReviewMessage(e.message||'Could not save review.');}
+    finally{setReviewBusy(false);}
+  };
+  const openCourseReviewModal=()=>{
+    setReviewMessage('');
+    if(myReview){claimCourseCertificate();return;}
+    setReviewModalOpen(true);
+  };
+  const claimCourseCertificate=async()=>{
+    if(!courseComplete||data.certificateBlockedByPath)return;
+    setReviewBusy(true);setReviewMessage('');
+    try{
+      const response=await fetch(`/api/courses/${slug}/certificate`,{cache:'no-store'});
+      const result=await response.json();
+      if(!response.ok||!result.certificateId)throw new Error(result.error|| (result.needsReview?'Submit your review first.':'The certificate could not be issued.'));
+      setCertificate({certificateId:result.certificateId,issuedAt:result.issuedAt});
+      window.location.assign(`/certificate/${result.certificateId}`);
+    }catch(e:any){setReviewMessage(e.message||'Could not issue certificate.');}
     finally{setReviewBusy(false);}
   };
   const deleteReview=async(id:string)=>{
@@ -265,7 +271,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
             <div style={{height:'100%',width:`${percent}%`,background:'linear-gradient(90deg,#c6a66a,#e0c98f)',transition:'width .25s ease'}}/>
           </div>
           <p className="small muted" style={{marginTop:7}}>{completedCount} of {lessons.length} lessons completed. {courseComplete?'Course complete.':'Finish every video to complete the course.'} Your progress is saved to your account.</p>
-          {data.certificateBlockedByPath?<div className="certificateUnlock"><div><div className="eyebrow">Path certificate only</div><h3>Course certificate unavailable inside this path.</h3><p className="small muted">Complete the full learning path to receive its path certificate. Course certificates are reserved for courses taken independently.</p></div></div>:courseComplete&&certificate?<div className="certificateUnlock"><div><div className="eyebrow">Achievement unlocked</div><h3>🎓 Your certificate is ready.</h3><p className="small muted">You completed 100% of <b>{c.title}</b>. Your certificate uses your full name exactly as saved on your account.</p></div><div className="actions"><Link className="btn primary" href={`/certificate/${certificate.certificateId}`}>View certificate</Link><a className="btn" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${typeof window!=='undefined'?window.location.origin:'https://marwan-swedan.vercel.app'}/certificate/${certificate.certificateId}`)}`} target="_blank" rel="noreferrer">in&nbsp; Share on LinkedIn ↗</a></div></div>:<div style={{marginTop:16,padding:18,borderRadius:16,border:'1px solid rgba(255,255,255,.1)',background:'rgba(255,255,255,.03)',opacity:.72}}><div style={{fontSize:13,letterSpacing:'.08em',textTransform:'uppercase'}}>🔒 Certificate locked</div><h3 style={{margin:'8px 0 6px'}}>Complete the course to unlock your certificate.</h3><p className="small muted" style={{margin:0}}>Finish all {lessons.length} lessons. Once every lesson is marked <b>Completed</b>, your certificate will become available automatically.</p></div>}
+          {data.certificateBlockedByPath?<div className="certificateUnlock"><div><div className="eyebrow">Path certificate only</div><h3>Course certificate unavailable inside this path.</h3><p className="small muted">Complete the full learning path to receive its path certificate. Course certificates are reserved for courses taken independently.</p></div></div>:courseComplete&&certificate?<div className="certificateUnlock"><div><div className="eyebrow">Achievement unlocked</div><h3>🎓 Your certificate is ready.</h3><p className="small muted">You completed 100% of <b>{c.title}</b>. Your certificate uses your full name exactly as saved on your account.</p></div><div className="actions"><Link className="btn primary" href={`/certificate/${certificate.certificateId}`}>View certificate</Link><a className="btn" href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${typeof window!=='undefined'?window.location.origin:'https://marwan-swedan.vercel.app'}/certificate/${certificate.certificateId}`)}`} target="_blank" rel="noreferrer">in&nbsp; Share on LinkedIn ↗</a></div></div>:courseComplete?<div style={{marginTop:16,padding:18,borderRadius:16,border:'1px solid rgba(198,166,106,.28)',background:'rgba(255,255,255,.03)'}}><div style={{fontSize:13,letterSpacing:'.08em',textTransform:'uppercase'}}>🎓 Certificate</div><h3 style={{margin:'8px 0 6px'}}>Your certificate is ready to claim.</h3><p className="small muted" style={{margin:0}}>To receive it, submit a rating and a review of at least 5 characters. We’ll take you to the review section.</p><button type="button" className="btn primary" style={{marginTop:14}} onClick={openCourseReviewModal}>Claim certificate</button></div>:<div style={{marginTop:16,padding:18,borderRadius:16,border:'1px solid rgba(255,255,255,.1)',background:'rgba(255,255,255,.03)',opacity:.72}}><div style={{fontSize:13,letterSpacing:'.08em',textTransform:'uppercase'}}>🔒 Certificate locked</div><h3 style={{margin:'8px 0 6px'}}>Complete the course to unlock your certificate.</h3><p className="small muted" style={{margin:0}}>Finish all {lessons.length} lessons. Once every lesson is marked <b>Completed</b>, you can claim your certificate after submitting a review.</p></div>}
         </div>}
         {!c.is_free&&!data.enrolled&&<div style={{maxWidth:520,marginTop:20}}>
           <div className="field"><label htmlFor="course-coupon">Have a discount code?</label><div className="actions" style={{alignItems:'stretch'}}><input id="course-coupon" value={couponCode} onChange={e=>{setCouponCode(e.target.value.toUpperCase());setCouponInfo(null);setCouponMessage('')}} placeholder="Enter coupon code" maxLength={40} style={{flex:1,minWidth:180}}/><button className="btn" type="button" disabled={!couponCode.trim()||couponBusy} onClick={applyCoupon}>{couponBusy?'Checking…':'Apply code'}</button></div></div>
@@ -343,13 +349,13 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
       </section>
       <AdUnit slot="8990444362" />
 
-      <section className="section courseReviews" style={{paddingTop:25}}>
+      <section id="course-reviews" className="section courseReviews" style={{paddingTop:25}}>
         <div className="sectionhead"><div><div className="eyebrow">Student feedback</div><h2>Reviews & Ratings</h2></div><span className="small muted">{reviews.length} review{reviews.length===1?'':'s'}</span></div>
         {data.enrolled&&<div className="card" style={{marginBottom:20}}>
           <div className="cardHead"><div><h3>{myReview?'Edit your review':'Rate this course'}</h3><p className="small muted">Share your experience with other students.</p></div></div>
           <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:14}}>{[1,2,3,4,5].map(n=><button key={n} type="button" className="iconBtn" aria-label={`Rate ${n} out of 5`} onClick={()=>setReviewRating(n)} style={{fontSize:22,padding:'4px 9px',color:n<=reviewRating?'#f3c969':'#66798a',borderColor:n<=reviewRating?'#8a7540':'var(--line)'}}><span style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,lineHeight:1}}><span style={{fontSize:12,fontWeight:700}}>{n}</span><span>★</span></span></button>)}</div>
           <div className="field"><label>Your review</label><textarea maxLength={1000} value={reviewText} onChange={e=>setReviewText(e.target.value)} placeholder="Write your review about this course…"/><span className="small muted">At least 5 characters required.</span></div>
-          <div className="actions"><button className="btn primary" onClick={submitReview} disabled={reviewBusy||reviewText.trim().length<5}>{reviewBusy?'Saving…':myReview?'Update review':'Publish review'}</button>{reviewMessage&&<span className="small muted" style={{alignSelf:'center'}}>{reviewMessage}</span>}</div>
+          <div className="actions"><button className="btn primary" onClick={submitReview} disabled={reviewBusy||reviewRating<1||reviewText.trim().length<5}>{reviewBusy?'Saving…':myReview?'Update review':'Publish review'}</button>{courseComplete&&myReview&&!certificate&&!data.certificateBlockedByPath&&<button type="button" className="btn" onClick={claimCourseCertificate} disabled={reviewBusy}>{reviewBusy?'Preparing…':'Get my certificate'}</button>}{reviewMessage&&<span className="small muted" style={{alignSelf:'center'}}>{reviewMessage}</span>}</div>
         </div>}
         {!data.enrolled&&<div className="card" style={{marginBottom:20}}><p className="muted" style={{margin:0}}>Reviews are visible to everyone. Get course access to write your own review.</p></div>}
         {reviews.length===0?<div className="emptyAcademy"><div><h3>No reviews yet.</h3><p className="muted">Be the first student to share your experience.</p></div></div>:<div style={{display:'grid',gap:12}}>{reviews.map((r:any)=><article className="card" key={r.id}>
@@ -358,16 +364,15 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
         </article>)}</div>}
       </section>
     </div>
-    {reviewModalOpen&&courseComplete&&!certificate&&!data.certificateBlockedByPath&&data.enrolled&&<div role="dialog" aria-modal="true" aria-labelledby="certificate-review-title" style={{position:'fixed',inset:0,zIndex:1000,display:'grid',placeItems:'center',padding:18,background:'rgba(3,7,18,.82)',backdropFilter:'blur(8px)'}}>
-      <div style={{width:'100%',maxWidth:520,padding:26,borderRadius:20,border:'1px solid rgba(167,139,250,.35)',background:'#0b1220',boxShadow:'0 24px 80px rgba(0,0,0,.55)'}}>
-        <div className="eyebrow">One last step</div>
-        <h2 id="certificate-review-title" style={{marginTop:8}}>Rate this course to unlock your certificate</h2>
-        <p className="muted" style={{lineHeight:1.7}}>Before receiving your certificate for <b>{c.title}</b>, please rate the course and share a short review. Your review will also appear on the course page.</p>
-        <div style={{display:'flex',gap:7,margin:'18px 0'}}>{[1,2,3,4,5].map(n=><button key={n} type="button" className="iconBtn" aria-label={`Rate ${n} out of 5`} onClick={()=>setReviewRating(n)} style={{fontSize:25,padding:'5px 10px',color:n<=reviewRating?'#f3c969':'#66798a',borderColor:n<=reviewRating?'#8a7540':'var(--line)'}}><span style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,lineHeight:1}}><span style={{fontSize:12,fontWeight:700}}>{n}</span><span>★</span></span></button>)}</div>
-        <div className="field"><label>What did you think of the course?</label><textarea maxLength={1000} value={reviewText} onChange={e=>setReviewText(e.target.value)} placeholder="Write at least 5 characters…"/><span className="small muted">{reviewText.trim().length}/5 minimum characters</span></div>
+    {reviewModalOpen&&<div role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setReviewModalOpen(false)}} style={{position:'fixed',inset:0,zIndex:1000,background:'rgba(0,0,0,.78)',display:'grid',placeItems:'center',padding:18}}>
+      <section role="dialog" aria-modal="true" aria-labelledby="course-review-modal-title" className="card" style={{width:'min(100%,560px)',maxHeight:'90vh',overflowY:'auto',padding:24,background:'var(--panel,#101c2b)',border:'1px solid var(--line)'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12}}><div><div className="eyebrow">Certificate requirement</div><h2 id="course-review-modal-title" style={{margin:'6px 0'}}>Rate this course</h2></div><button type="button" className="iconBtn" aria-label="Close review dialog" onClick={()=>setReviewModalOpen(false)}>✕</button></div>
+        <p className="small muted">Choose a rating and write at least 5 characters. Your certificate will open after your review is submitted.</p>
+        <div style={{display:'flex',gap:7,flexWrap:'wrap',margin:'18px 0'}}>{[1,2,3,4,5].map(n=><button key={n} type="button" className="iconBtn" aria-label={`Rate ${n} out of 5`} onClick={()=>setReviewRating(n)} style={{fontSize:22,padding:'4px 9px',color:n<=reviewRating?'#f3c969':'#66798a',borderColor:n<=reviewRating?'#8a7540':'var(--line)'}}>★</button>)}</div>
+        <div className="field"><label htmlFor="course-certificate-review">Your review</label><textarea id="course-certificate-review" maxLength={1000} value={reviewText} onChange={e=>setReviewText(e.target.value)} placeholder="Write at least 5 characters about this course…"/><span className="small muted">{reviewText.trim().length}/5 minimum characters</span></div>
         {reviewMessage&&<p className="small muted" role="status">{reviewMessage}</p>}
-        <button className="btn primary" style={{width:'100%',justifyContent:'center',marginTop:10}} onClick={submitReview} disabled={reviewBusy||reviewText.trim().length<5}>{reviewBusy?'Saving review…':'Submit review & unlock certificate'}</button>
-      </div>
+        <div className="actions" style={{marginTop:16}}><button type="button" className="btn primary" onClick={submitReview} disabled={reviewBusy||reviewRating<1||reviewText.trim().length<5}>{reviewBusy?'Submitting…':'Submit review & get certificate'}</button><button type="button" className="btn" onClick={()=>setReviewModalOpen(false)} disabled={reviewBusy}>Cancel</button></div>
+      </section>
     </div>}
   </main>;
 }
