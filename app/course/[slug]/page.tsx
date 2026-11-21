@@ -29,7 +29,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   const [certificate,setCertificate]=useState<{certificateId:string;issuedAt:string}|null>(null);
   const [reviews,setReviews]=useState<any[]>([]);
   const [myReview,setMyReview]=useState<any>(null);
-  const [reviewRating,setReviewRating]=useState(5);
+  const [reviewRating,setReviewRating]=useState(0);
   const [reviewText,setReviewText]=useState('');
   const [reviewBusy,setReviewBusy]=useState(false);
   const [reviewMessage,setReviewMessage]=useState('');
@@ -177,7 +177,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
   };
 
   const submitReview=async()=>{
-    if(reviewBusy||reviewText.trim().length<5)return;
+    if(reviewBusy||reviewRating<1||reviewRating>5||reviewText.trim().length<5)return;
     setReviewBusy(true);setReviewMessage('');
     try{
       const r=await fetch(`/api/courses/${slug}/reviews`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rating:reviewRating,review:reviewText})});
@@ -352,7 +352,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
           <div className="cardHead"><div><h3>{myReview?'Edit your review':'Rate this course'}</h3><p className="small muted">Share your experience with other students.</p></div></div>
           <div style={{display:'flex',gap:7,flexWrap:'wrap',marginBottom:14}}>{[1,2,3,4,5].map(n=><button key={n} type="button" className="iconBtn" aria-label={`Rate ${n} out of 5`} onClick={()=>setReviewRating(n)} style={{fontSize:22,padding:'4px 9px',color:n<=reviewRating?'#f3c969':'#66798a',borderColor:n<=reviewRating?'#8a7540':'var(--line)'}}><span style={{display:'flex',flexDirection:'column',alignItems:'center',gap:3,lineHeight:1}}><span style={{fontSize:12,fontWeight:700}}>{n}</span><span>★</span></span></button>)}</div>
           <div className="field"><label>Your review</label><textarea maxLength={1000} value={reviewText} onChange={e=>setReviewText(e.target.value)} placeholder="Write your review about this course…"/><span className="small muted">At least 5 characters required.</span></div>
-          <div className="actions"><button className="btn primary" onClick={submitReview} disabled={reviewBusy||reviewText.trim().length<5}>{reviewBusy?'Saving…':myReview?'Update review':'Publish review'}</button>{courseComplete&&myReview&&!certificate&&!data.certificateBlockedByPath&&<button type="button" className="btn" onClick={claimCourseCertificate} disabled={reviewBusy}>{reviewBusy?'Preparing…':'Get my certificate'}</button>}{reviewMessage&&<span className="small muted" style={{alignSelf:'center'}}>{reviewMessage}</span>}</div>
+          <div className="actions"><button className="btn primary" onClick={submitReview} disabled={reviewBusy||reviewRating<1||reviewText.trim().length<5}>{reviewBusy?'Saving…':myReview?'Update review':'Publish review'}</button>{courseComplete&&myReview&&!certificate&&!data.certificateBlockedByPath&&<button type="button" className="btn" onClick={claimCourseCertificate} disabled={reviewBusy}>{reviewBusy?'Preparing…':'Get my certificate'}</button>}{reviewMessage&&<span className="small muted" style={{alignSelf:'center'}}>{reviewMessage}</span>}</div>
         </div>}
         {!data.enrolled&&<div className="card" style={{marginBottom:20}}><p className="muted" style={{margin:0}}>Reviews are visible to everyone. Get course access to write your own review.</p></div>}
         {reviews.length===0?<div className="emptyAcademy"><div><h3>No reviews yet.</h3><p className="muted">Be the first student to share your experience.</p></div></div>:<div style={{display:'grid',gap:12}}>{reviews.map((r:any)=><article className="card" key={r.id}>
