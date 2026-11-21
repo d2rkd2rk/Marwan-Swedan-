@@ -193,7 +193,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
         if(certificateResponse.ok&&certificateResult.certificateId){
           setCertificate({certificateId:certificateResult.certificateId,issuedAt:certificateResult.issuedAt});
           setReviewModalOpen(false);
-          setReviewMessage('Review saved. Your certificate is ready.');
+          window.location.assign(`/certificate/${certificateResult.certificateId}`);
         }else{
           setReviewMessage(certificateResult.error||'Review saved, but the certificate could not be issued yet.');
         }
