@@ -214,7 +214,7 @@ export default function CoursePage({params}:{params:Promise<{slug:string}>}){
       const result=await response.json();
       if(!response.ok||!result.certificateId)throw new Error(result.error|| (result.needsReview?'Submit your review first.':'The certificate could not be issued.'));
       setCertificate({certificateId:result.certificateId,issuedAt:result.issuedAt});
-      setReviewMessage('Your certificate is ready.');
+      window.location.assign(`/certificate/${result.certificateId}`);
     }catch(e:any){setReviewMessage(e.message||'Could not issue certificate.');}
     finally{setReviewBusy(false);}
   };
