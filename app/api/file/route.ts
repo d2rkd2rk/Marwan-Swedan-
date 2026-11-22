@@ -4,6 +4,7 @@ import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import db from '@/lib/db';
 import {session} from '@/lib/auth';
 import {ensurePathTables,hasCourseAccess} from '@/lib/pathAccess';
+import {ensureInstructorSchema} from '@/lib/instructors';
 
 function storage(){
   const accessKeyId=process.env.TIGRIS_STORAGE_ACCESS_KEY_ID;
@@ -49,6 +50,12 @@ export async function GET(request:NextRequest){
   const isPublicMedia=isPublicAvatar||isPublicThumbnail;
   const user=isPublicMedia?null:await session();
   if(!isPublicMedia&&!user)return new NextResponse('Authentication required',{status:401});
+  if(user?.role==='instructor'&&!isProfileCv)return new NextResponse('Forbidden',{status:403});
+  if(parts[0]==='courses'&&!isPublicMedia){
+    await ensureInstructorSchema();
+    const pendingUpload=await db\`select status from instructor_uploads where file_url=\${thumbnailUrl} limit 1\`;
+    if(pendingUpload.length&&pendingUpload[0].status!=='approved'&&user?.role!=='admin')return new NextResponse('Not found',{status:404});
+  }
   if(isProfileCv&&user?.id!==parts[1]&&user?.role!=='admin')return new NextResponse('Forbidden',{status:403});
   if(isLegacyCourseThumbnail&&!isPublishedLegacyThumbnail&&user?.role!=='admin')return new NextResponse('Not found',{status:404});
 
