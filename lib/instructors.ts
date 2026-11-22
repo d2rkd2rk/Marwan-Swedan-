@@ -5,8 +5,16 @@ let schemaPromise: Promise<void> | null = null;
 export function ensureInstructorSchema() {
   if (!schemaPromise) {
     schemaPromise = (async () => {
-      await db`alter table users drop constraint if exists users_role_check`;
-      await db`alter table users add constraint users_role_check check (role in ('student','admin','instructor'))`;
+      await db.begin(async tx => {
+        await tx`select pg_advisory_xact_lock(7710182027)`;
+        const roleConstraint = await tx`select pg_get_constraintdef(oid) as definition from pg_constraint where conrelid='users'::regclass and conname='users_role_check'`;
+        if (!roleConstraint.length) {
+          await tx`alter table users add constraint users_role_check check (role in ('student','admin','instructor'))`;
+        } else if (!String(roleConstraint[0].definition).includes('instructor')) {
+          await tx`alter table users drop constraint users_role_check`;
+          await tx`alter table users add constraint users_role_check check (role in ('student','admin','instructor'))`;
+        }
+      });
       await db`create table if not exists instructor_courses (
         id uuid primary key default gen_random_uuid(),
         user_id uuid not null references users(id) on delete cascade,
