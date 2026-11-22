@@ -6,7 +6,7 @@ import {ensurePathTables} from '@/lib/pathAccess';
 export async function GET(){
   try{
     const user=await requireUser();
-    if(user.role==='admin')return NextResponse.json({error:'Student dashboard is not available for admins.'},{status:403});
+    if(user.role==='admin'||user.role==='instructor')return NextResponse.json({error:'This dashboard is not available for this account type.'},{status:403});
     await ensurePathTables();
     const [courses,certificates,paths,pathCertificates]=await Promise.all([
       db`select c.id,c.title,c.slug,c.description,c.category,c.level,c.duration_minutes,c.thumbnail_url,c.is_free,c.price,c.published,e.created_at as enrolled_at from enrollments e join courses c on c.id=e.course_id where e.user_id=${user.id} and e.revoked_at is null order by e.created_at desc`,
