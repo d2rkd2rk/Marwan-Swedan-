@@ -24,7 +24,7 @@ export function AuthForm({mode}:{mode:'login'|'register'}){
     setVerificationMessage(json.emailSent?'Account created. Check your inbox and click the verification link before signing in.':'Your account was created, but the verification email could not be sent yet. Use the resend button below after email setup is complete.');
     return;
    }
-   const next=new URLSearchParams(location.search).get('next');location.href=next||'/'
+   const next=new URLSearchParams(location.search).get('next');location.href=next||(json.user?.role==='instructor'?'/instructor':'/')
   }catch{setError('Unable to connect to the server.')}finally{setBusy(false)}
  };
 

@@ -1,7 +1,8 @@
 import {NextResponse} from 'next/server';
 import {PutBucketCorsCommand,PutObjectCommand,S3Client} from '@aws-sdk/client-s3';
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
-import {requireAdmin} from '@/lib/auth';
+import {requireUser} from '@/lib/auth';
+import {ensureInstructorSchema, instructorHasCourse} from '@/lib/instructors';
 
 const allowed=new Set([
   'image/jpeg','image/png','image/webp','image/gif','image/avif',
@@ -29,7 +30,9 @@ function storage(){
 
 export async function POST(request:Request){
  try{
-  await requireAdmin();
+  const user=await requireUser();
+  if(user.role!=='admin'&&user.role!=='instructor')return NextResponse.json({error:'Forbidden'},{status:403});
+  if(user.role==='instructor')await ensureInstructorSchema();
   const b=await request.json();
   const name=String(b.name||'').trim();
   const type=String(b.type||'application/octet-stream');
@@ -42,6 +45,10 @@ export async function POST(request:Request){
   const namespace=String(b.namespace||'courses').trim();
   if(namespace!=='courses'&&namespace!=='course-thumbnails'&&namespace!=='path-thumbnails')return NextResponse.json({error:'Invalid upload namespace.'},{status:400});
   const courseId=String(b.courseId||'uploads').replace(/[^a-zA-Z0-9_-]/g,'')||'uploads';
+  if(user.role==='instructor'){
+    if(namespace!=='courses'||!type.startsWith('video/'))return NextResponse.json({error:'Instructors can upload course videos only.'},{status:403});
+    if(!(await instructorHasCourse(user.id,courseId)))return NextResponse.json({error:'You are not assigned to this course.'},{status:403});
+  }
   const key=`${namespace}/${courseId}/${crypto.randomUUID()}-${name.replace(/[^a-zA-Z0-9._-]/g,'-')}`;
   try {
     await client.send(new PutBucketCorsCommand({
