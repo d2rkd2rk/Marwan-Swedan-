@@ -68,7 +68,8 @@ export async function PATCH(request:Request) {
     if (!pending.length) return NextResponse.json({error:'Pending video not found.'},{status:404});
     const upload = pending[0] as any;
     if (action === 'reject') {
-      await db`update instructor_uploads set status='rejected',reviewed_by=${admin.id},reviewed_at=now() where id=${uploadId} and status='pending'`;
+      const rejected = await db`update instructor_uploads set status='rejected',reviewed_by=${admin.id},reviewed_at=now() where id=${uploadId} and status='pending' returning id`;
+      if (!rejected.length) return NextResponse.json({error:'This video has already been reviewed.'},{status:409});
       await audit(admin.id,'reject_instructor_video',request,{uploadId,courseId:upload.course_id});
       return NextResponse.json({ok:true});
     }
