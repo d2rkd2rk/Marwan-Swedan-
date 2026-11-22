@@ -32,7 +32,7 @@ export async function POST(request:Request) {
     try {
       const parsed = new URL(fileUrl,'https://provenra.invalid');
       key = parsed.searchParams.get('key')||'';
-      if (parsed.pathname !== '/api/file' || !key.startsWith(`courses/${courseId}/`) || key.split('/').length < 3) throw new Error();
+      if (parsed.origin !== 'https://provenra.invalid' || parsed.pathname !== '/api/file' || !key.startsWith(`courses/${courseId}/`) || key.split('/').length < 3 || key.split('/').some(part => part === '.' || part === '..')) throw new Error();
     } catch {
       return NextResponse.json({error:'Invalid video reference.'},{status:400});
     }
