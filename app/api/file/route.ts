@@ -53,7 +53,7 @@ export async function GET(request:NextRequest){
   if(user?.role==='instructor'&&!isProfileCv)return new NextResponse('Forbidden',{status:403});
   if(parts[0]==='courses'&&!isPublicMedia){
     await ensureInstructorSchema();
-    const pendingUpload=await db\`select status from instructor_uploads where file_url=\${thumbnailUrl} limit 1\`;
+    const pendingUpload=await db`select status from instructor_uploads where file_url=${thumbnailUrl} limit 1`;
     if(pendingUpload.length&&pendingUpload[0].status!=='approved'&&user?.role!=='admin')return new NextResponse('Not found',{status:404});
   }
   if(isProfileCv&&user?.id!==parts[1]&&user?.role!=='admin')return new NextResponse('Forbidden',{status:403});
