@@ -75,9 +75,11 @@ export async function PATCH(request:Request) {
     const slugBase = String(upload.title).toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'') || 'lesson';
     let lessonId = '';
     await db.begin(async tx => {
+      const locked = await tx`select id from instructor_uploads where id=${uploadId} and status='pending' for update`;
+      if (!locked.length) throw new Error('VIDEO_ALREADY_REVIEWED');
       const positionRows = await tx`select coalesce(max(position),0)::int+1 as position from lessons where course_id=${upload.course_id}`;
       const existing = await tx`select id from lessons where course_id=${upload.course_id} and slug=${slugBase} limit 1`;
-      const slug = existing.length ? `${slugBase}-${Date.now().toString().slice(-6)}` : slugBase;
+      const slug = existing.length ? `${slugBase}-${crypto.randomUUID().slice(0,8)}` : slugBase;
       const lessons = await tx`insert into lessons(course_id,title,slug,position,duration_minutes,file_url,file_name,content,published) values(${upload.course_id},${upload.title},${slug},${positionRows[0].position},0,${upload.file_url},${upload.file_name},'',true) returning id`;
       lessonId = String(lessons[0].id);
       await tx`update instructor_uploads set status='approved',lesson_id=${lessonId},reviewed_by=${admin.id},reviewed_at=now() where id=${uploadId} and status='pending'`;
@@ -86,6 +88,7 @@ export async function PATCH(request:Request) {
     void sendCourseNotification(String(upload.course_id),String(upload.title)).catch(()=>{});
     return NextResponse.json({ok:true,lessonId});
   } catch(e:any) {
-    return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Could not review video.'},{status:e.message==='FORBIDDEN'?403:400});
+    const status=e.message==='FORBIDDEN'?403:e.message==='VIDEO_ALREADY_REVIEWED'?409:400;
+    return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':e.message==='VIDEO_ALREADY_REVIEWED'?'This video has already been reviewed.':'Could not review video.'},{status});
   }
 }
