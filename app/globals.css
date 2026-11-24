@@ -288,3 +288,19 @@
 .courseRosterVideo{display:grid;gap:4px;padding:10px 4px;border-bottom:1px solid var(--line);min-width:0}
 .courseRosterVideo b{font-size:12px;line-height:1.45;overflow-wrap:anywhere}
 .courseRosterVideo small{font-size:10px;color:var(--muted)}
+
+
+/* Course department management and public filters */
+.departmentTabs{display:flex;gap:9px;overflow-x:auto;padding:5px 1px 12px;margin-top:30px;scrollbar-width:thin}
+.departmentTabs button{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;padding:10px 17px;background:rgba(255,255,255,.025);color:var(--muted);font:600 13px 'Space Grotesk',sans-serif;cursor:pointer;transition:all .18s ease}
+.departmentTabs button:hover,.departmentTabs button.active{border-color:rgba(210,180,119,.7);background:rgba(210,180,119,.12);color:#e8d5a6}
+.departmentList,.departmentAssignments{display:grid;gap:10px;margin-top:18px}
+.departmentRow,.departmentAssignment{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:15px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}
+.departmentRow>div:first-child,.departmentAssignmentHead>div{display:grid;gap:5px;min-width:0}
+.departmentRow small,.departmentAssignment small{font-size:11px;color:var(--muted)}
+.departmentAssignment{display:grid;gap:12px}
+.departmentAssignmentHead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.departmentChecks{display:flex;gap:9px;flex-wrap:wrap}
+.departmentChecks label{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);border-radius:9px;color:var(--muted);font-size:12px;cursor:pointer}
+.departmentChecks input{accent-color:#d2b477}
+@media(max-width:600px){.departmentRow{align-items:flex-start}.departmentRow>.actions{width:100%}.departmentRow>.actions .btn{flex:1}.departmentAssignmentHead>.btn{width:100%}}
