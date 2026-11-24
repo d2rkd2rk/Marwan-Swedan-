@@ -3,6 +3,7 @@ import db from '@/lib/db';
 import {requireUser} from '@/lib/auth';
 import {audit} from '@/lib/security';
 import {ensureInstructorSchema, instructorHasCourse} from '@/lib/instructors';
+import {sendRoleNotification} from '@/lib/push';
 
 export async function GET() {
   try {
@@ -38,6 +39,18 @@ export async function POST(request:Request) {
     }
     const rows = await db`insert into instructor_uploads(instructor_id,course_id,title,file_url,file_name) values(${user.id},${courseId},${title},${fileUrl},${fileName}) returning id`;
     await audit(user.id,'submit_instructor_video',request,{uploadId:rows[0].id,courseId});
+    try {
+      await sendRoleNotification(
+        'admin',
+        'PROVENRA',
+        'A new instructor video is waiting for review.',
+        '/admin/instructors',
+        `instructor-review-${rows[0].id}`
+      );
+    } catch (pushError) {
+      // Push delivery must never block an instructor video submission.
+      console.error('INSTRUCTOR_REVIEW_PUSH_FAILED', pushError);
+    }
     return NextResponse.json({ok:true,uploadId:rows[0].id},{status:201});
   } catch (e:any) {
     return NextResponse.json({error:e.message==='UNAUTHENTICATED'?'Authentication required.':'Could not submit video.'},{status:e.message==='UNAUTHENTICATED'?401:400});
