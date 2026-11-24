@@ -2,7 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 
-type Course={id:string;title:string};
+type Course={id:string;title:string;student_count:number};
 export default function InstructorPortal(){
  const [loading,setLoading]=useState(true);
  const [courses,setCourses]=useState<Course[]>([]);
@@ -63,7 +63,7 @@ export default function InstructorPortal(){
   <h1>Submit a course video.</h1>
   <p className="muted">Upload a video for a course assigned to you. It will not be visible to students until it is approved.</p>
   {courses.length===0?<div className="error">No courses are currently assigned to your instructor account.</div>:<>
-   <div className="field"><label>Assigned course</label><select value={courseId} onChange={e=>setCourseId(e.target.value)}>{courses.map(course=><option key={course.id} value={course.id}>{course.title}</option>)}</select></div>
+   <div className="field"><label>Assigned course</label><select value={courseId} onChange={e=>setCourseId(e.target.value)}>{courses.map(course=><option key={course.id} value={course.id}>{course.title} — {Number(course.student_count||0)} students</option>)}</select>{(()=>{const selected=courses.find(course=>course.id===courseId);return selected?<span className="small muted">Active students enrolled in this course: <b>{Number(selected.student_count||0)}</b></span>:null})()}</div>
    <div className="field"><label>Video title</label><input value={title} maxLength={180} onChange={e=>setTitle(e.target.value)} placeholder="Enter the lesson title"/></div>
    <div className="field"><label>Video file</label><input id="instructor-video-file" type="file" accept="video/mp4,video/webm,video/quicktime,video/*" onChange={e=>setFile(e.target.files?.[0]||null)}/>{file&&<span className="small muted">{file.name} · {(file.size/1024/1024).toFixed(1)} MB</span>}<span className="small muted">Videos are uploaded directly to private storage. Maximum size: 5 GB.</span></div>
    <button className="btn primary" style={{width:'100%'}} disabled={busy||!courseId||!title.trim()||!file} onClick={submit}>{busy?'Uploading…':'Upload video for review'}</button>
