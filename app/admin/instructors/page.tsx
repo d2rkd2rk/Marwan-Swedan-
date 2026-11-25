@@ -8,7 +8,7 @@ type Assignment={id:string;user_id:string;course_id:string;name:string;username:
 type Upload={id:string;title:string;file_url:string;file_name:string;status:string;instructor_name:string;course_title:string;course_id:string;created_at:string};
 export default function InstructorsAdmin(){
  const [users,setUsers]=useState<Item[]>([]),[courses,setCourses]=useState<Course[]>([]),[assignments,setAssignments]=useState<Assignment[]>([]),[uploads,setUploads]=useState<Upload[]>([]);
- const [userId,setUserId]=useState(''),[courseId,setCourseId]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[authorized,setAuthorized]=useState<boolean|null>(null);
+ const [userId,setUserId]=useState(''),[accountSearch,setAccountSearch]=useState(''),[courseId,setCourseId]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[authorized,setAuthorized]=useState<boolean|null>(null);
  const load=async()=>{
   const me=await fetch('/api/auth/me',{cache:'no-store'}).then(r=>r.json());
   if(me.user?.role!=='admin'){setAuthorized(false);return}
@@ -17,7 +17,7 @@ export default function InstructorsAdmin(){
   const data=await response.json();
   if(!response.ok)throw new Error(data.error||'Could not load instructor management.');
   setUsers(data.users||[]);setCourses(data.courses||[]);setAssignments(data.assignments||[]);setUploads(data.uploads||[]);
-  setUserId(current=>current||data.users?.[0]?.id||'');setCourseId(current=>current||data.courses?.[0]?.id||'');
+  setUserId(current=>current&&data.users?.some((user:Item)=>user.id===current)?current:'');setCourseId(current=>current||data.courses?.[0]?.id||'');
  };
  useEffect(()=>{load().catch(e=>setMessage(e.message||'Could not load data.'))},[]);
  const changeAccess=async(action:'assign'|'revoke',targetUser:string,targetCourse:string)=>{
@@ -50,7 +50,7 @@ export default function InstructorsAdmin(){
    <div className="card">
     <div className="cardHead"><div><div className="eyebrow">Access control</div><h3>Assign an instructor</h3></div></div>
     <div className="grid">
-     <div className="field"><label>Account</label><select value={userId} onChange={e=>setUserId(e.target.value)}><option value="">Choose account</option>{users.map(user=><option key={user.id} value={user.id}>{user.name} · @{user.username} · {user.role}</option>)}</select></div>
+     <div className="field"><label>Search account</label><input type="search" value={accountSearch} onChange={e=>setAccountSearch(e.target.value)} placeholder="Search by name, username or email…" autoComplete="off"/>{userId&&users.some(user=>user.id===userId)?<div className="lessonRow" style={{marginTop:10}}><div className="lessonInfo"><b>{users.find(user=>user.id===userId)?.name||'Selected account'}</b><small>@{users.find(user=>user.id===userId)?.username} · {users.find(user=>user.id===userId)?.email} · {users.find(user=>user.id===userId)?.role}</small></div><button type="button" className="btn" onClick={()=>setUserId('')}>Change</button></div>:<p className="small muted" style={{marginTop:8}}>Type to find an existing account, then select it from the results.</p>}{accountSearch.trim()&&<div role="listbox" aria-label="Matching accounts" style={{marginTop:8,maxHeight:260,overflowY:'auto',border:'1px solid var(--line, rgba(255,255,255,.14))',borderRadius:12}}>{users.filter(user=>[user.name,user.username,user.email].some(value=>String(value||'').toLocaleLowerCase().includes(accountSearch.trim().toLocaleLowerCase()))).slice(0,30).map(user=><button type="button" role="option" aria-selected={user.id===userId} key={user.id} onClick={()=>{setUserId(user.id);setAccountSearch('')}} style={{display:'block',width:'100%',textAlign:'left',padding:'11px 13px',border:0,borderBottom:'1px solid var(--line, rgba(255,255,255,.08))',background:user.id===userId?'rgba(255,255,255,.09)':'transparent',color:'inherit',cursor:'pointer'}}><b>{user.name||'Unnamed account'}</b><small style={{display:'block',opacity:.7,marginTop:3}}>@{user.username} · {user.email||'No email'} · {user.role}</small></button>)}{users.filter(user=>[user.name,user.username,user.email].some(value=>String(value||'').toLocaleLowerCase().includes(accountSearch.trim().toLocaleLowerCase()))).length===0&&<p className="small muted" style={{padding:12,margin:0}}>No matching accounts found.</p>}</div>}</div>
      <div className="field"><label>Course</label><select value={courseId} onChange={e=>setCourseId(e.target.value)}><option value="">Choose course</option>{courses.map(course=><option key={course.id} value={course.id}>{course.title}</option>)}</select></div>
     </div>
     <button className="btn primary" disabled={busy||!userId||!courseId} onClick={()=>changeAccess('assign',userId,courseId)}>Grant instructor access</button>
