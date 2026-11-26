@@ -44,7 +44,7 @@ export async function POST(request:Request) {
         'admin',
         'PROVENRA',
         'A new instructor video is waiting for review.',
-        '/admin/instructors',
+        '/prv-7k9x4m2q/instructors',
         `instructor-review-${rows[0].id}`
       );
     } catch (pushError) {

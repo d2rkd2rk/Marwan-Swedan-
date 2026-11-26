@@ -3,7 +3,7 @@ import {useEffect} from 'react';
 
 export default function CourseImageManager(){
  useEffect(()=>{
-  if(location.pathname!=='/admin')return;
+  if(location.pathname!=='/prv-7k9x4m2q')return;
   let file:File|null=null;let busy=false;
   const timer=window.setInterval(()=>{
    const card=document.querySelector<HTMLElement>('.adminMain > .card');

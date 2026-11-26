@@ -46,7 +46,7 @@ Email delivery uses the server-side Resend API. Secrets are kept in the deployme
 
 ## 5. Building a playlist
 
-From `/admin`:
+From `/prv-7k9x4m2q`:
 
 1. Create a playlist.
 2. Choose `Free` or `Paid`.

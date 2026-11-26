@@ -51,7 +51,7 @@ export async function POST(request:Request){
     :await tx.unsafe("insert into payment_requests(user_id,course_id,coupon_id,coupon_code,original_price,discount_amount,amount,sender_phone,sender_name,transaction_reference,receipt_key) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) returning id",[user.id,target.id,couponId,couponCode,Number(target.price),discount,amount,senderPhone,senderName,reference||null,receiptKey]);
    return {id:inserted[0].id,title:target.title};
   });
-  try{await sendRoleNotification('admin','New InstaPay payment request',user.name+' submitted a payment request for '+result.title+'.','/admin/transactions','payment-'+result.id)}catch(error){console.error('PAYMENT_ADMIN_PUSH_FAILED',error)}
+  try{await sendRoleNotification('admin','New InstaPay payment request',user.name+' submitted a payment request for '+result.title+'.','/prv-7k9x4m2q/transactions','payment-'+result.id)}catch(error){console.error('PAYMENT_ADMIN_PUSH_FAILED',error)}
   return NextResponse.json({ok:true,id:result.id,message:'Your payment request has been submitted and is awaiting admin review.'},{status:201});
  }catch(e:any){const duplicate=String(e.message||'').includes('payment_requests_one_pending')||String(e.message||'').includes('duplicate key');return NextResponse.json({error:duplicate?'You already have a pending payment request for this item.':e.message||'Could not submit payment request.'},{status:e.message==='UNAUTHENTICATED'?401:e.message==='FORBIDDEN'?403:400})}
 }

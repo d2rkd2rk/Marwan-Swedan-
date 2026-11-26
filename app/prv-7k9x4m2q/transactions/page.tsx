@@ -35,7 +35,7 @@ export default function AdminTransactions(){
   const url=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='academy-payment-transactions.csv';a.click();URL.revokeObjectURL(url);
  }
  return <main><div className="shell"><section className="section">
-  <div className="actions" style={{justifyContent:'space-between'}}><div><div className="eyebrow">Admin finance</div><h1 style={{fontFamily:'Space Grotesk',fontSize:'clamp(38px,6vw,60px)'}}>Transactions.</h1></div><Link className="btn" href="/admin">Back to admin</Link></div>
+  <div className="actions" style={{justifyContent:'space-between'}}><div><div className="eyebrow">Admin finance</div><h1 style={{fontFamily:'Space Grotesk',fontSize:'clamp(38px,6vw,60px)'}}>Transactions.</h1></div><Link className="btn" href="/prv-7k9x4m2q">Back to admin</Link></div>
   {message&&<p className="small" role="status">{message}</p>}
   <div className="grid" style={{marginTop:20}}>
    <article className="card"><div className="eyebrow">Approved revenue</div><h2>{egp(summary.revenue)}</h2><p className="small muted">Approved transfers only.</p></article>
