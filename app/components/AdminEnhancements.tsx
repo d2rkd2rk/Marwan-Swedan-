@@ -3,7 +3,7 @@ import {useEffect} from 'react';
 
 export default function AdminEnhancements(){
  useEffect(()=>{
-  if(location.pathname!=='/admin')return;
+  if(location.pathname!=='/prv-7k9x4m2q')return;
   let stopped=false;
   const install=async()=>{
    try{

@@ -5,6 +5,7 @@ const siteUrl='https://marwanswedan.online';
 const privatePaths=[
  '/api/',
  '/admin',
+ '/prv-7k9x4m2q',
  '/account',
  '/dashboard',
  '/login',

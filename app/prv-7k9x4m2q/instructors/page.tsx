@@ -43,7 +43,7 @@ export default function InstructorsAdmin(){
  if(!authorized)return <main className="shell"><section className="section"><div className="error">Administrator access required.</div><Link className="btn" href="/">Back</Link></section></main>;
  const pending=uploads.filter(upload=>upload.status==='pending');
  return <main><div className="shell">
-  <nav className="nav"><Link className="brand" href="/">PROVENRA</Link><div className="navlinks"><Link href="/admin">Admin dashboard</Link><Link href="/admin/transactions">Transactions</Link></div><Link className="btn" href="/admin">Back to dashboard</Link></nav>
+  <nav className="nav"><Link className="brand" href="/">PROVENRA</Link><div className="navlinks"><Link href="/prv-7k9x4m2q">Admin dashboard</Link><Link href="/prv-7k9x4m2q/transactions">Transactions</Link></div><Link className="btn" href="/prv-7k9x4m2q">Back to dashboard</Link></nav>
   <section className="dash">
    <div className="eyebrow">Academy access</div><div className="adminTitle"><div><h1>Instructors.</h1><p className="muted">Assign course access and review every submitted video before it goes live.</p></div></div>
    {message&&<div className="success" role="status">{message}</div>}

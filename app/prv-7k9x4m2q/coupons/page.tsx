@@ -15,8 +15,8 @@ export default function CouponsAdmin(){
  if(me===null)return <main><div className="shell"><section className="section">Checking administrator session…</section></div></main>;
  if(me.role!=='admin')return <main><div className="shell"><section className="section"><div className="error">Administrator access required.</div><Link className="btn" href="/">Back</Link></section></div></main>;
  return <main><div className="shell">
- <nav className="nav"><Link className="brand" href="/">PROVENRA</Link><div className="navlinks"><Link href="/admin">Dashboard</Link><Link href="/courses">Academy</Link></div><button className="btn" onClick={async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/'}}>Sign out</button></nav>
- <section className="dash"><div className="eyebrow">Creator Console</div><div className="adminTitle"><div><h1>Discount coupons.</h1><p className="muted">Create limited-time offers and track coupon requests.</p></div><Link className="btn" href="/admin">← Admin dashboard</Link></div>
+ <nav className="nav"><Link className="brand" href="/">PROVENRA</Link><div className="navlinks"><Link href="/prv-7k9x4m2q">Dashboard</Link><Link href="/courses">Academy</Link></div><button className="btn" onClick={async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/'}}>Sign out</button></nav>
+ <section className="dash"><div className="eyebrow">Creator Console</div><div className="adminTitle"><div><h1>Discount coupons.</h1><p className="muted">Create limited-time offers and track coupon requests.</p></div><Link className="btn" href="/prv-7k9x4m2q">← Admin dashboard</Link></div>
  {message&&<div className="success" role="status">{message}</div>}
  <div className="card"><div className="cardHead"><div><div className="eyebrow">{editingId?'Edit coupon':'New promotion'}</div><h3>{editingId?'Update coupon':'Create discount coupon'}</h3></div>{editingId&&<button className="btn" onClick={reset}>Cancel</button>}</div>
  <div className="grid"><div>
