@@ -16,7 +16,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     const user=await requireUser();
     const {slug}=await params;
     if(!process.env.DATABASE_URL)return NextResponse.json({error:'Database is not configured.'},{status:503});
-    const rows=await db`select id,title,slug,description,category,level,duration_minutes,thumbnail_url,ai_context,is_free,price,published from courses where slug=${slug} and published=true limit 1`;
+    const rows=await db`select id,title,slug,description,category,level,coalesce((select sum(l.duration_minutes)::int from lessons l where l.course_id=courses.id),0) as duration_minutes,thumbnail_url,ai_context,is_free,price,published from courses where slug=${slug} and published=true limit 1`;
     const course=rows[0] as any;
     if(!course)return NextResponse.json({error:'Course not found.'},{status:404});
     await ensurePathTables();
