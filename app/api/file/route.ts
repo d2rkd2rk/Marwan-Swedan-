@@ -50,7 +50,6 @@ export async function GET(request:NextRequest){
   const isPublicMedia=isPublicAvatar||isPublicThumbnail;
   const user=isPublicMedia?null:await session();
   if(!isPublicMedia&&!user)return new NextResponse('Authentication required',{status:401});
-  if(user?.role==='instructor'&&!isProfileCv)return new NextResponse('Forbidden',{status:403});
   if(parts[0]==='courses'&&!isPublicMedia){
     await ensureInstructorSchema();
     const pendingUpload=await db`select status from instructor_uploads where file_url=${thumbnailUrl} limit 1`;
