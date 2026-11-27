@@ -62,7 +62,7 @@ export async function GET(request:NextRequest){
   if(!isPublicMedia&&!isProfileCv&&!isLegacyCourseThumbnail){
     const course=await db`select is_free from courses where id=${courseId} limit 1`;
     if(!course.length)return new NextResponse('Not found',{status:404});
-    let allowed=Boolean(course[0].is_free)||user!.role==='admin';
+    let allowed=user!.role==='instructor'?false:(Boolean(course[0].is_free)||user!.role==='admin');
     if(!allowed){
       await ensurePathTables();
       allowed=await hasCourseAccess(user!.id,courseId);
