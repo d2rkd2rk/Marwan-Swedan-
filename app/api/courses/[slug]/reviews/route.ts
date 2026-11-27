@@ -41,6 +41,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
 export async function POST(request:Request,{params}:{params:Promise<{slug:string}>}){
  try{
   const user=await requireUser();
+  if(user.role==='instructor')return NextResponse.json({error:'Instructors cannot submit student reviews.'},{status:403});
   await ensureReviewsTable();
   const {slug}=await params;
   const course=await getCourse(slug);
