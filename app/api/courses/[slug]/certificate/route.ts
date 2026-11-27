@@ -33,6 +33,7 @@ async function getEligible(userId:string,slug:string){
 export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
   try{
     const user=await requireUser();
+    if(user.role==='instructor')return NextResponse.json({error:'Instructors are not eligible for course certificates.'},{status:403});
     await ensureCertificateFlag();
     await ensureCertificateTable();
     await ensureReviewsTable();
