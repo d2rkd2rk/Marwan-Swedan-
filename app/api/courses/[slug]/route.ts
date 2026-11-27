@@ -21,6 +21,7 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
     if(!course)return NextResponse.json({error:'Course not found.'},{status:404});
     await ensurePathTables();
     const isAdmin=user.role==='admin';
+    const isInstructor=user.role==='instructor';
     let enrolled=isAdmin;
     if(!enrolled)enrolled=await hasCourseAccess(user.id,course.id);
     const lessons=await db`select id,title,slug,position,duration_minutes,published,video_url,file_url,file_name from lessons where course_id=${course.id} and published=true order by position asc`;
@@ -33,8 +34,8 @@ export async function GET(_:Request,{params}:{params:Promise<{slug:string}>}){
       const rows=await db`select lp.lesson_id,lp.completed,lp.progress_seconds,lp.updated_at,lp.last_viewed_at,coalesce(ws.watch_ranges,'[]'::jsonb) as watch_ranges,coalesce(ws.duration_seconds,0) as duration_seconds from lesson_progress lp join lessons l on l.id=lp.lesson_id left join lesson_watch_state ws on ws.lesson_id=lp.lesson_id and ws.user_id=lp.user_id where lp.user_id=${user.id} and l.course_id=${course.id}`;
       progress=rows.map((row:any)=>{const ranges=parseWatchRanges(row.watch_ranges);const watchedSeconds=ranges.reduce((sum:number,r:any)=>sum+Math.max(0,Number(r[1])-Number(r[0])),0);return {...row,watched_seconds:Math.floor(watchedSeconds),watch_percent:row.duration_seconds?Math.min(100,Math.floor(watchedSeconds/row.duration_seconds*100)):0,watch_ranges:undefined}});
     }
-    const certificateBlockedByPath=!isAdmin&&!(await hasStandaloneCourseAccess(user.id,course.id))&&await hasCourseAccessViaPath(user.id,course.id);
-    return NextResponse.json({course:{...course,ai_context:undefined},lessons:safeLessons,progress,enrolled,requiresPurchase:!course.is_free&&!enrolled,certificateBlockedByPath});
+    const certificateBlockedByPath=!isAdmin&&!isInstructor&&!(await hasStandaloneCourseAccess(user.id,course.id))&&await hasCourseAccessViaPath(user.id,course.id);
+    return NextResponse.json({course:{...course,ai_context:undefined},lessons:safeLessons,progress,enrolled,isInstructor,requiresPurchase:!course.is_free&&!enrolled,certificateBlockedByPath});
   }catch(e:any){return NextResponse.json({error:'Authentication required'},{status:401})}
 }
 
