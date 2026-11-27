@@ -10,7 +10,7 @@ export async function GET() {
     const user = await requireUser();
     if (user.role !== 'instructor') return NextResponse.json({error:'Instructor access required.'},{status:403});
     await ensureInstructorSchema();
-    const courses = await db`select c.id,c.title,c.slug,(select count(*)::int from enrollments e where e.course_id=c.id and e.revoked_at is null) as student_count from instructor_courses ic join courses c on c.id=ic.course_id where ic.user_id=${user.id} order by c.title asc`;
+    const courses = await db`select c.id,c.title,c.slug,(select count(*)::int from enrollments e join users student on student.id=e.user_id where e.course_id=c.id and e.revoked_at is null and student.role='student') as student_count from instructor_courses ic join courses c on c.id=ic.course_id where ic.user_id=${user.id} order by c.title asc`;
     return NextResponse.json({courses});
   } catch (e:any) {
     return NextResponse.json({error:e.message==='FORBIDDEN'?'Forbidden':'Authentication required.'},{status:e.message==='FORBIDDEN'?403:401});
